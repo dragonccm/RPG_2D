@@ -8,6 +8,9 @@ public interface ISkillExecutor
     bool CanExecute(Character user);
     float GetCooldown();
     float GetManaCost();
+    void ShowDamageArea(Vector2 position);
+    void UpdateDamageArea(Vector2 position);
+    void HideDamageArea();
 }
 
 // Enhanced SkillSlot with dynamic hotkey support

@@ -1,3 +1,9 @@
+/// <summary>
+/// File: NearbyHealthDisplay.cs
+/// Author: Unity 2D RPG Refactoring Agent  
+/// Description: Display health bars for nearby enemies with proper API usage
+/// </summary>
+
 using UnityEngine;
 using System.Collections.Generic;
 
@@ -13,10 +19,9 @@ public class NearbyHealthDisplay : MonoBehaviour
 
     void Start()
     {
-        // Tìm UICanvas, n?u không có thì tìm Canvas ??u tiên
         uiCanvas = GameObject.Find("UICanvas")?.GetComponent<Canvas>();
         if (uiCanvas == null)
-            uiCanvas = FindObjectOfType<Canvas>();
+            uiCanvas = FindFirstObjectByType<Canvas>();
         
         if (uiCanvas == null)
         {
@@ -49,7 +54,6 @@ public class NearbyHealthDisplay : MonoBehaviour
             }
         }
 
-        // S?p x?p theo kho?ng cách
         enemiesInRange.Sort((a, b) => Vector2.Distance(transform.position, a.transform.position)
             .CompareTo(Vector2.Distance(transform.position, b.transform.position)));
 
@@ -58,7 +62,6 @@ public class NearbyHealthDisplay : MonoBehaviour
             enemiesInRange = enemiesInRange.GetRange(0, maxDisplayCount);
         }
 
-        // C?p nh?t health bars
         for (int i = 0; i < enemiesInRange.Count; i++)
         {
             GameObject enemy = enemiesInRange[i];
@@ -72,7 +75,6 @@ public class NearbyHealthDisplay : MonoBehaviour
                     if (healthBar != null && (healthBar.target == null || healthBar.target.gameObject != enemy))
                     {
                         healthBar.Initialize(enemy.GetComponent<Character>());
-                        // Setup cho enemy: ch? slider, không text/mana/name
                         healthBar.SetupForEnemy();
                     }
                 }
@@ -83,7 +85,6 @@ public class NearbyHealthDisplay : MonoBehaviour
             }
         }
 
-        // ?n các health bar th?a
         for (int i = enemiesInRange.Count; i < healthBars.Count; i++)
         {
             if (healthBars[i] != null)
@@ -105,7 +106,6 @@ public class NearbyHealthDisplay : MonoBehaviour
             if (healthBar != null)
             {
                 healthBar.Initialize(enemy.GetComponent<Character>());
-                // Setup cho enemy: ch? slider, không text/mana/name
                 healthBar.SetupForEnemy();
             }
             else
@@ -128,7 +128,6 @@ public class NearbyHealthDisplay : MonoBehaviour
             Vector3 worldPos = target.transform.position + Vector3.up * 1.5f;
             Vector3 screenPos = Camera.main.WorldToScreenPoint(worldPos);
             
-            // Ki?m tra xem target có trong t?m nhìn camera không
             if (screenPos.z > 0)
             {
                 healthBar.transform.position = screenPos;
@@ -143,7 +142,6 @@ public class NearbyHealthDisplay : MonoBehaviour
 
     void OnDestroy()
     {
-        // Cleanup t?t c? health bars
         foreach (GameObject healthBar in healthBars)
         {
             if (healthBar != null)
@@ -152,7 +150,6 @@ public class NearbyHealthDisplay : MonoBehaviour
         healthBars.Clear();
     }
 
-    // Public methods ?? configure
     public void SetDisplayRange(float range)
     {
         displayRange = range;
@@ -167,7 +164,6 @@ public class NearbyHealthDisplay : MonoBehaviour
     {
         showWorldSpaceHealthBars = show;
         
-        // ?n/hi?n t?t c? health bars hi?n t?i
         foreach (GameObject healthBar in healthBars)
         {
             if (healthBar != null)
@@ -175,7 +171,6 @@ public class NearbyHealthDisplay : MonoBehaviour
         }
     }
 
-    // Debug method
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;

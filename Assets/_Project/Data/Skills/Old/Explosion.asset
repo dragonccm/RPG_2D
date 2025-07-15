@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3801336f91abb87468f0d8079c0aef75, type: 3}
+  m_Name: Explosion
+  m_EditorClassIdentifier: 
+  skillName: Explosion
+  description: Creates a massive explosion that damages all enemies in the area.
+  skillIcon: {fileID: 21300000, guid: 64644dc12c3a7e64d847d9390ebf0d03, type: 3}
+  requiredLevel: 1
+  damage: 40
+  range: 3
+  speed: 5
+  cooldown: 5
+  manaCost: 35
+  stunDuration: 0
+  knockbackForce: 12
+  healAmount: 0
+  areaRadius: 3
+  chargeTime: 1
+  skillColor: {r: 1, g: 0.14091702, b: 0, a: 1}
+  castSound: {fileID: 0}
+  impactSound: {fileID: 0}
+  effectPrefab: {fileID: -2253911629886400664, guid: 515d54d12962d724aa20463e9a2a0eaf,
+    type: 3}
+  projectilePrefab: {fileID: 0}
+  animationTrigger: Attack
+  animationLength: 2
+  skillType: 2
+  damageZonePrefab: {fileID: 2624625082774161072, guid: 59fd75c127e5a3a488e4fcf79ca3e926,
+    type: 3}
+  criticalChance: 0.05
+  criticalMultiplier: 3
+  upgrades: []
+  maxLevel: 5
+  currentLevel: 1
+  showDamageArea: 1
+  damageAreaColor: {r: 0, g: 1, b: 1, a: 0.3}
+  damageAreaDisplayTime: 1

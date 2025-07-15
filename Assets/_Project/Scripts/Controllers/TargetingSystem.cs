@@ -1,21 +1,25 @@
-﻿using UnityEngine;
+﻿/// <summary>
+/// File: TargetingSystem.cs
+/// Author: Unity 2D RPG Refactoring Agent
+/// Description: Clean targeting system with proper API usage and removed deprecated code
+/// </summary>
+
+using UnityEngine;
 
 public class TargetingSystem : MonoBehaviour
 {
     [Header("Targeting Settings")]
     public GameObject currentTarget;
     [SerializeField] private float targetingRange = 10f;
-    //[SerializeField] private string targetHealthBarPrefabPath = "HealthBarText";
     
     private GameObject healthBarInstance;
     private Canvas uiCanvas;
 
     void Start()
     {
-        // Tìm UICanvas, nếu không có thì tìm Canvas đầu tiên
         uiCanvas = GameObject.Find("UICanvas")?.GetComponent<Canvas>();
         if (uiCanvas == null)
-            uiCanvas = FindObjectOfType<Canvas>();
+            uiCanvas = FindFirstObjectByType<Canvas>();
         
         if (uiCanvas == null)
         {
@@ -31,7 +35,6 @@ public class TargetingSystem : MonoBehaviour
         }
         else
         {
-            // Kiểm tra target còn sống và trong tầm
             Character targetCharacter = currentTarget.GetComponent<Character>();
             if (targetCharacter == null || targetCharacter.health.currentValue <= 0)
             {
@@ -39,10 +42,7 @@ public class TargetingSystem : MonoBehaviour
                 currentTarget = null;
                 return;
             }
-
-            //UpdateHealthBarPosition();
             
-            // Kiểm tra khoảng cách
             if (Vector2.Distance(transform.position, currentTarget.transform.position) > targetingRange)
             {
                 DestroyHealthBar();
@@ -70,65 +70,11 @@ public class TargetingSystem : MonoBehaviour
             }
         }
         
-        //if (closestEnemy != currentTarget)
-        //{
-        //    currentTarget = closestEnemy;
-        //    if (currentTarget != null)
-        //    {
-        //        CreateHealthBar();
-        //    }
-        //}
+        if (closestEnemy != currentTarget)
+        {
+            currentTarget = closestEnemy;
+        }
     }
-
-    //void CreateHealthBar()
-    //{
-    //    if (healthBarInstance == null && uiCanvas != null && currentTarget != null)
-    //    {
-    //        GameObject healthBarPrefab = Resources.Load<GameObject>(targetHealthBarPrefabPath);
-    //        if (healthBarPrefab != null)
-    //        {
-    //            healthBarInstance = Instantiate(healthBarPrefab, uiCanvas.transform);
-    //            HealthBar healthBar = healthBarInstance.GetComponent<HealthBar>();
-    //            if (healthBar != null)
-    //            {
-    //                Character targetCharacter = currentTarget.GetComponent<Character>();
-    //                healthBar.Initialize(targetCharacter);
-                    
-    //                // Configure cho target health bar
-    //                healthBar.SetShowMana(false); // Target thường không hiển thị mana
-    //                healthBar.SetShowName(true);  // Hiển thị tên target
-    //                healthBar.SetShowText(true);  // Hiển thị số liệu
-    //            }
-    //            else
-    //            {
-    //                Debug.LogWarning($"HealthBar component không tìm thấy trong prefab {targetHealthBarPrefabPath}");
-    //            }
-    //        }
-    //        else
-    //        {
-    //            Debug.LogError($"Không tìm thấy prefab {targetHealthBarPrefabPath} trong Resources folder!");
-    //        }
-    //    }
-    //}
-
-    //void UpdateHealthBarPosition()
-    //{
-    //    if (healthBarInstance != null && currentTarget != null && Camera.main != null)
-    //    {
-    //        Vector3 targetScreenPos = Camera.main.WorldToScreenPoint(currentTarget.transform.position + Vector3.up * 2f);
-            
-    //        // Kiểm tra xem target có trong tầm nhìn camera không
-    //        if (targetScreenPos.z > 0)
-    //        {
-    //            healthBarInstance.transform.position = targetScreenPos;
-    //            healthBarInstance.SetActive(true);
-    //        }
-    //        else
-    //        {
-    //            healthBarInstance.SetActive(false);
-    //        }
-    //    }
-    //}
 
     void DestroyHealthBar()
     {
@@ -144,17 +90,12 @@ public class TargetingSystem : MonoBehaviour
         DestroyHealthBar();
     }
 
-    // Public methods để control từ bên ngoài
     public void SetTarget(GameObject target)
     {
         if (target != currentTarget)
         {
             DestroyHealthBar();
             currentTarget = target;
-            //if (currentTarget != null)
-            //{
-            //    CreateHealthBar();
-            //}
         }
     }
 
@@ -169,7 +110,6 @@ public class TargetingSystem : MonoBehaviour
         targetingRange = range;
     }
 
-    // Debug method
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;

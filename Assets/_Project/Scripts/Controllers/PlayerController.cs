@@ -34,10 +34,10 @@ public class PlayerController : MonoBehaviour
     {
         HandleLevelUpInput(); // Handle level up input first
         HandleUIToggle(); // Handle UI toggle
-        
+
         // Check if character can move (not stunned, not being knocked back)
         bool canMove = character != null ? character.CanMove() : true;
-        
+
         if (!isBusy && canMove)
         {
             float moveX = Input.GetAxisRaw("Horizontal");
@@ -121,9 +121,9 @@ public class PlayerController : MonoBehaviour
             isBusy = true;
             animator.SetTrigger("Attack"); // Uses existing animation parameter
             movement = Vector2.zero;
-            
+
             Debug.Log("🗡️ Triggered Attack animation (J key test)");
-            
+
             // Auto-reset busy state after animation
             StartCoroutine(ResetBusyAfterDelay(1f)); // Default 1 second
         }
@@ -143,9 +143,9 @@ public class PlayerController : MonoBehaviour
             int currentLevel = skillManager.GetPlayerLevel();
             int newLevel = currentLevel + 10;
             skillManager.SetPlayerLevel(newLevel);
-            
+
             Debug.Log($"🎉 Level Up! {currentLevel} → {newLevel} (Press V)");
-            
+
             // Show level up effect or animation if needed
             ShowLevelUpEffect();
         }
@@ -167,10 +167,10 @@ public class PlayerController : MonoBehaviour
             int unlockedSlots = skillManager.GetUnlockedSlots().Count;
             Debug.Log($"✨ New Level: {skillManager.GetPlayerLevel()}");
             Debug.Log($"🎯 Unlocked Skill Slots: {unlockedSlots}/8");
-            
+
             // Optional: Play level up sound effect here
             // AudioSource.PlayClipAtPoint(levelUpSound, transform.position);
-            
+
             // Optional: Trigger level up animation
             if (animator != null)
             {
@@ -194,7 +194,7 @@ public class PlayerController : MonoBehaviour
     {
         // Only apply movement if character can move and not busy
         bool canMove = character != null ? character.CanMove() : true;
-        
+
         if (!isBusy && canMove)
         {
             // Làm mượt di chuyển
@@ -207,7 +207,7 @@ public class PlayerController : MonoBehaviour
     public void EndAction()
     {
         Debug.Log("EndAction called from Animation Event, setting isBusy to false");
-        isBusy = false;     
+        isBusy = false;
     }
 
     /// <summary>
@@ -220,12 +220,12 @@ public class PlayerController : MonoBehaviour
             isBusy = true;
             animator.SetTrigger("Attack"); // All skills use existing Attack animation
             movement = Vector2.zero;
-            
-            string logMessage = string.IsNullOrEmpty(skillName) ? 
-                "🗡️ Triggered Attack animation for skill" : 
+
+            string logMessage = string.IsNullOrEmpty(skillName) ?
+                "🗡️ Triggered Attack animation for skill" :
                 $"🗡️ Triggered Attack animation for {skillName}";
             Debug.Log(logMessage);
-            
+
             // Auto-reset if no Animation Event is set up
             StartCoroutine(ResetBusyAfterDelay(1f));
         }
@@ -286,31 +286,31 @@ public class PlayerController : MonoBehaviour
     public bool ValidateComponents()
     {
         bool isValid = true;
-        
+
         if (character == null)
         {
             Debug.LogError("Character component missing!");
             isValid = false;
         }
-        
+
         if (skillManager == null)
         {
             Debug.LogError("ModularSkillManager component missing!");
             isValid = false;
         }
-        
+
         if (animator == null)
         {
             Debug.LogError("Animator component missing!");
             isValid = false;
         }
-        
+
         if (rb == null)
         {
             Debug.LogError("Rigidbody2D component missing!");
             isValid = false;
         }
-        
+
         return isValid;
     }
 

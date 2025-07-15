@@ -10,23 +10,23 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3801336f91abb87468f0d8079c0aef75, type: 3}
-  m_Name: SwordStrike
+  m_Name: Heal
   m_EditorClassIdentifier: 
-  skillName: Sword Strike
-  description: Basic sword attack using existing 'Attack' animation
-  skillIcon: {fileID: 21300000, guid: 8ebf48e8b8b271d41adb6fa2511b29fb, type: 3}
-  requiredLevel: 1
-  damage: 25
-  range: 2
-  speed: 5
-  cooldown: 1
-  manaCost: 10
+  skillName: Heal
+  description: Instantly restore health to the caster.
+  skillIcon: {fileID: 0}
+  requiredLevel: 3
+  damage: 0
+  range: 0
+  speed: 0
+  cooldown: 5
+  manaCost: 25
   stunDuration: 0
-  knockbackForce: 5
-  healAmount: 0
+  knockbackForce: 0
+  healAmount: 50
   areaRadius: 0
   chargeTime: 0
-  skillColor: {r: 1, g: 0, b: 0, a: 1}
+  skillColor: {r: 0, g: 1, b: 0, a: 1}
   castSound: {fileID: 0}
   impactSound: {fileID: 0}
   effectPrefab: {fileID: 0}
@@ -34,12 +34,13 @@ MonoBehaviour:
   animationTrigger: Attack
   animationLength: 1
   usesExistingAttackAnimation: 1
-  skillType: 0
-  criticalChance: 0.1
+  skillType: 3
+  damageZonePrefab: {fileID: 0}
+  criticalChance: 0
   criticalMultiplier: 2
   upgrades: []
   maxLevel: 5
   currentLevel: 1
   showDamageArea: 1
-  damageAreaColor: {r: 1, g: 0, b: 0, a: 0.3}
-  damageAreaDisplayTime: 1
+  damageAreaColor: {r: 0, g: 1, b: 0, a: 0.3}
+  damageAreaDisplayTime: 2

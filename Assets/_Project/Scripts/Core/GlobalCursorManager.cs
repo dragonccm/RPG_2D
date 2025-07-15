@@ -121,10 +121,17 @@ public class GlobalCursorManager : MonoBehaviour
         if (hitCollider != null)
         {
             var character = hitCollider.GetComponent<Character>();
-            if (character != null && character.GetComponent<PlayerController>() == null)
+            if (character != null)
             {
-                // Check if alive
-                if (character.health == null || character.health.currentValue > 0)
+                // Check if it's not a player by looking for PlayerController component
+                var playerController = character.GetComponent<MonoBehaviour>();
+                bool isPlayer = false;
+                if (playerController != null && playerController.GetType().Name == "PlayerController")
+                {
+                    isPlayer = true;
+                }
+                
+                if (!isPlayer && (character.health == null || character.health.currentValue > 0))
                 {
                     if (showDebugInfo)
                         Debug.Log($"?? Found enemy in layer: {character.name}");

@@ -1,7 +1,10 @@
 using UnityEngine;
 
 /// <summary>
-/// Sample Skill Creator - T? ??ng t?o sample skills ?? test h? th?ng
+/// File: SampleSkillCreator.cs
+/// Author: Enhanced RPG System
+/// Description: Automatically creates sample skills for testing the Enhanced RPG Skill System.
+/// Skills are created as SkillModule assets with proper visualization settings for each type.
 /// </summary>
 public class SampleSkillCreator : MonoBehaviour
 {
@@ -16,34 +19,26 @@ public class SampleSkillCreator : MonoBehaviour
     [SerializeField] private GameObject defaultEffectPrefab;
     [SerializeField] private GameObject defaultProjectilePrefab;
 
-    void Start()
+    private void Start()
     {
         if (createSampleSkills)
         {
             CreateAllSampleSkills();
-            createSampleSkills = false; // Prevent creating multiple times
+            createSampleSkills = false;
         }
     }
 
-    /// <summary>
-    /// T?o t?t c? sample skills
-    /// </summary>
     [ContextMenu("Create Sample Skills")]
     public void CreateAllSampleSkills()
     {
-        Debug.Log("?? Creating sample skills for testing...");
-        
         CreateMeleeSkills();
         CreateProjectileSkills();
         CreateAreaSkills();
         CreateSupportSkills();
-        
-        Debug.Log("? Sample skills creation completed!");
     }
 
     private void CreateMeleeSkills()
     {
-        // 1. Basic Sword Strike
         CreateSkill("SwordStrike", SkillType.Melee, new SkillStats
         {
             damage = 25f,
@@ -55,7 +50,6 @@ public class SampleSkillCreator : MonoBehaviour
             requiredLevel = 1
         }, "Basic sword strike dealing moderate damage to nearby enemies.");
 
-        // 2. Power Slam
         CreateSkill("PowerSlam", SkillType.Melee, new SkillStats
         {
             damage = 40f,
@@ -67,13 +61,10 @@ public class SampleSkillCreator : MonoBehaviour
             stunDuration = 1f,
             requiredLevel = 5
         }, "Powerful slam attack with stun effect.");
-
-        Debug.Log("?? Created Melee skills: SwordStrike, PowerSlam");
     }
 
     private void CreateProjectileSkills()
     {
-        // 3. Magic Arrow
         CreateSkill("MagicArrow", SkillType.Projectile, new SkillStats
         {
             damage = 20f,
@@ -85,7 +76,6 @@ public class SampleSkillCreator : MonoBehaviour
             requiredLevel = 2
         }, "Fast magical arrow that travels in straight line.");
 
-        // 4. Fireball
         CreateSkill("Fireball", SkillType.Projectile, new SkillStats
         {
             damage = 35f,
@@ -97,13 +87,10 @@ public class SampleSkillCreator : MonoBehaviour
             knockbackForce = 10f,
             requiredLevel = 8
         }, "Explosive fireball projectile with high damage.");
-
-        Debug.Log("?? Created Projectile skills: MagicArrow, Fireball");
     }
 
     private void CreateAreaSkills()
     {
-        // 5. Lightning Strike
         CreateSkill("LightningStrike", SkillType.Area, new SkillStats
         {
             damage = 30f,
@@ -116,7 +103,6 @@ public class SampleSkillCreator : MonoBehaviour
             requiredLevel = 10
         }, "Lightning strike at target location affecting all enemies in area.");
 
-        // 6. Meteor
         CreateSkill("Meteor", SkillType.Area, new SkillStats
         {
             damage = 60f,
@@ -129,13 +115,10 @@ public class SampleSkillCreator : MonoBehaviour
             chargeTime = 1.5f,
             requiredLevel = 15
         }, "Devastating meteor impact with large area damage.");
-
-        Debug.Log("?? Created Area skills: LightningStrike, Meteor");
     }
 
     private void CreateSupportSkills()
     {
-        // 7. Heal
         CreateSkill("Heal", SkillType.Support, new SkillStats
         {
             healAmount = 50f,
@@ -144,7 +127,6 @@ public class SampleSkillCreator : MonoBehaviour
             requiredLevel = 3
         }, "Instantly restore health to the caster.");
 
-        // 8. Greater Heal
         CreateSkill("GreaterHeal", SkillType.Support, new SkillStats
         {
             healAmount = 100f,
@@ -153,21 +135,17 @@ public class SampleSkillCreator : MonoBehaviour
             requiredLevel = 12
         }, "Powerful healing spell that restores large amount of health.");
 
-        // 9. Mana Restore
         CreateSkill("ManaRestore", SkillType.Support, new SkillStats
         {
-            healAmount = 0f, // Special: This will restore mana instead
+            healAmount = 0f,
             cooldown = 8f,
-            manaCost = 0f, // No mana cost for mana restore
+            manaCost = 0f,
             requiredLevel = 6
         }, "Restore mana instead of health. No mana cost.");
-
-        Debug.Log("? Created Support skills: Heal, GreaterHeal, ManaRestore");
     }
 
     private void CreateSkill(string skillName, SkillType skillType, SkillStats stats, string description)
     {
-        // Create SkillModule ScriptableObject
         SkillModule skill = ScriptableObject.CreateInstance<SkillModule>();
         
         // Basic information
@@ -197,17 +175,13 @@ public class SampleSkillCreator : MonoBehaviour
         skill.effectPrefab = defaultEffectPrefab;
         skill.projectilePrefab = defaultProjectilePrefab;
         
-        // Skill type
+        // Skill type specific settings
         skill.skillType = skillType;
-        
-        // Balance
         skill.criticalChance = stats.criticalChance;
         skill.criticalMultiplier = 2f;
         
-        // Damage area visualization
-        skill.showDamageArea = true;
-        skill.damageAreaColor = GetDamageAreaColorByType(skillType);
-        skill.damageAreaDisplayTime = 2f;
+        // Visualization settings based on skill type
+        ConfigureSkillVisualization(skill, skillType);
 
 #if UNITY_EDITOR
         // Save as asset in editor
@@ -218,40 +192,54 @@ public class SampleSkillCreator : MonoBehaviour
         
         string assetPath = $"{skillsFolder}{skillName}.asset";
         UnityEditor.AssetDatabase.CreateAsset(skill, assetPath);
-        
-        Debug.Log($"?? Created skill asset: {assetPath}");
 #endif
+    }
+
+    private void ConfigureSkillVisualization(SkillModule skill, SkillType skillType)
+    {
+        // Configure visualization based on skill type
+        switch (skillType)
+        {
+            case SkillType.Melee:
+                skill.showDamageArea = true;
+                skill.damageAreaColor = new Color(1f, 0f, 0f, 0.3f);
+                skill.damageAreaDisplayTime = 0.5f;
+                break;
+                
+            case SkillType.Projectile:
+                skill.showDamageArea = true;
+                skill.damageAreaColor = new Color(1f, 1f, 0f, 0.3f);
+                skill.damageAreaDisplayTime = 0.3f;
+                break;
+                
+            case SkillType.Area:
+                skill.showDamageArea = true;
+                skill.damageAreaColor = new Color(0f, 1f, 1f, 0.3f);
+                skill.damageAreaDisplayTime = 2f;
+                break;
+                
+            case SkillType.Support:
+                skill.showDamageArea = false;
+                skill.damageAreaColor = new Color(0f, 1f, 0f, 0.3f);
+                skill.damageAreaDisplayTime = 0f;
+                break;
+        }
     }
 
     private Color GetSkillColorByType(SkillType skillType)
     {
-        switch (skillType)
+        return skillType switch
         {
-            case SkillType.Melee: return Color.red;
-            case SkillType.Projectile: return Color.yellow;
-            case SkillType.Area: return Color.cyan;
-            case SkillType.Support: return Color.green;
-            default: return Color.white;
-        }
+            SkillType.Melee => Color.red,
+            SkillType.Projectile => Color.yellow,
+            SkillType.Area => Color.cyan,
+            SkillType.Support => Color.green,
+            _ => Color.white
+        };
     }
 
-    private Color GetDamageAreaColorByType(SkillType skillType)
-    {
-        switch (skillType)
-        {
-            case SkillType.Melee: return new Color(1f, 0f, 0f, 0.3f);
-            case SkillType.Projectile: return new Color(1f, 1f, 0f, 0.3f);
-            case SkillType.Area: return new Color(0f, 1f, 1f, 0.3f);
-            case SkillType.Support: return new Color(0f, 1f, 0f, 0.3f);
-            default: return new Color(1f, 0f, 0f, 0.3f);
-        }
-    }
-
-    /// <summary>
-    /// Struct ?? ??nh ngh?a stats c?a skill
-    /// </summary>
     [System.Serializable]
-    public struct SkillStats
+    private struct SkillStats
     {
         public float damage;
         public float range;

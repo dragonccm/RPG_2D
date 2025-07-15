@@ -10,36 +10,36 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3801336f91abb87468f0d8079c0aef75, type: 3}
-  m_Name: Fireball
+  m_Name: MagicArrow
   m_EditorClassIdentifier: 
-  skillName: Fireball
-  description: Ranged fire projectile with burning damage over time.
-  skillIcon: {fileID: 21300000, guid: 270d20b85d43a4942bc64d06403484d9, type: 3}
-  requiredLevel: 1
-  damage: 40
+  skillName: MagicArrow
+  description: Fast magical arrow that travels in straight line.
+  skillIcon: {fileID: 0}
+  requiredLevel: 2
+  damage: 20
   range: 8
   speed: 12
-  cooldown: 2.5
-  manaCost: 15
+  cooldown: 1
+  manaCost: 8
   stunDuration: 0
-  knockbackForce: 5
+  knockbackForce: 0
   healAmount: 0
   areaRadius: 0
   chargeTime: 0
-  skillColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  skillColor: {r: 0.6, g: 0.1960784, b: 0.8000001, a: 1}
   castSound: {fileID: 0}
   impactSound: {fileID: 0}
   effectPrefab: {fileID: 0}
   projectilePrefab: {fileID: 0}
   animationTrigger: Attack
   animationLength: 1
-  usesExistingAttackAnimation: 1
   skillType: 1
+  damageZonePrefab: {fileID: 0}
   criticalChance: 0.1
   criticalMultiplier: 2
   upgrades: []
   maxLevel: 5
   currentLevel: 1
   showDamageArea: 1
-  damageAreaColor: {r: 1, g: 0, b: 0, a: 0.3}
-  damageAreaDisplayTime: 1
+  damageAreaColor: {r: 0.627451, g: 0.1254902, b: 0.9411765, a: 1}
+  damageAreaDisplayTime: 2

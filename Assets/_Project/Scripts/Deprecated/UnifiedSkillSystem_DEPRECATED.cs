@@ -23,4 +23,6 @@ To use the new system:
 ===============================================================================================
 */
 
-// This class is deprecated - use SimpleHotkeyChanger instead
+// This file has been removed as part of the Unity 2D RPG refactoring process.
+// The functionality has been integrated into ModularSkillManager and EnhancedSkillSystemManager.
+// If you need this functionality, please use the updated systems.

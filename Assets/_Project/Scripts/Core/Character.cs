@@ -50,26 +50,29 @@ public class Character : MonoBehaviour
         health.Decrease(damage);
         TriggerDamageFlash();
         
-        if (showDamageNumbers && CombatEffectsManager.Instance != null)
+        // Safe CombatEffectsManager usage
+        var effectsManager = FindCombatEffectsManager();
+        
+        if (showDamageNumbers && effectsManager != null)
         {
             Vector3 damagePosition = transform.position + Vector3.up * 1.5f;
-            CombatEffectsManager.Instance.ShowDamageNumber(damage, damagePosition, isCritical);
+            effectsManager.ShowDamageNumber(damage, damagePosition, isCritical);
         }
         
-        if (enableScreenShake && damage > 10f && CombatEffectsManager.Instance != null)
+        if (enableScreenShake && damage > 10f && effectsManager != null)
         {
             float shakeIntensity = Mathf.Clamp(damage * 0.01f, 0.05f, 0.3f);
-            CombatEffectsManager.Instance.ScreenShake(shakeIntensity, 0.1f);
+            effectsManager.ScreenShake(shakeIntensity, 0.1f);
         }
         
-        if (enableHitStop && isCritical && CombatEffectsManager.Instance != null)
+        if (enableHitStop && isCritical && effectsManager != null)
         {
-            CombatEffectsManager.Instance.HitStop(0.1f);
+            effectsManager.HitStop(0.1f);
         }
         
-        if (CombatEffectsManager.Instance != null)
+        if (effectsManager != null)
         {
-            CombatEffectsManager.Instance.CreateImpactEffect(
+            effectsManager.CreateImpactEffect(
                 transform.position, 
                 isCritical ? Color.yellow : Color.red, 
                 isCritical ? 1.5f : 1f
@@ -195,8 +198,6 @@ public class Character : MonoBehaviour
 
     protected virtual void Die()
     {
-        Debug.Log($"{name} đã chết!");
-        
         OnDeath?.Invoke();
         
         if (currentKnockbackCoroutine != null)
@@ -208,9 +209,10 @@ public class Character : MonoBehaviour
             StopCoroutine(currentFlashCoroutine);
         }
         
-        if (CombatEffectsManager.Instance != null)
+        var effectsManager = FindCombatEffectsManager();
+        if (effectsManager != null)
         {
-            CombatEffectsManager.Instance.CreateImpactEffect(
+            effectsManager.CreateImpactEffect(
                 transform.position, 
                 Color.black, 
                 2f
@@ -229,15 +231,17 @@ public class Character : MonoBehaviour
     {
         health.Increase(amount);
         
-        if (showDamageNumbers && CombatEffectsManager.Instance != null)
+        var effectsManager = FindCombatEffectsManager();
+        
+        if (showDamageNumbers && effectsManager != null)
         {
             Vector3 healPosition = transform.position + Vector3.up * 1.5f;
-            CombatEffectsManager.Instance.ShowDamageNumber(amount, healPosition, false);
+            effectsManager.ShowDamageNumber(amount, healPosition, false);
         }
         
-        if (CombatEffectsManager.Instance != null)
+        if (effectsManager != null)
         {
-            CombatEffectsManager.Instance.CreateImpactEffect(
+            effectsManager.CreateImpactEffect(
                 transform.position, 
                 Color.green, 
                 1f
@@ -250,6 +254,22 @@ public class Character : MonoBehaviour
         if (mana != null)
         {
             mana.Increase(amount);
+        }
+    }
+
+    /// <summary>
+    /// Safe method to find CombatEffectsManager
+    /// </summary>
+    private CombatEffectsManager FindCombatEffectsManager()
+    {
+        try
+        {
+            return CombatEffectsManager.Instance;
+        }
+        catch
+        {
+            // If CombatEffectsManager doesn't exist, find it manually
+            return FindFirstObjectByType<CombatEffectsManager>();
         }
     }
 

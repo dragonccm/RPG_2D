@@ -1,9 +1,12 @@
+/// <summary>
+/// File: CombatEffectsManager.cs  
+/// Author: Unity 2D RPG Refactoring Agent
+/// Description: Manages combat visual effects like damage numbers, screen shake, hit stop
+/// </summary>
+
 using UnityEngine;
 using System.Collections;
 
-/// <summary>
-/// Manager class ?? x? lý các hi?u ?ng combat nh? damage numbers, screen shake, etc.
-/// </summary>
 public class CombatEffectsManager : MonoBehaviour
 {
     [Header("Damage Number Settings")]
@@ -25,7 +28,7 @@ public class CombatEffectsManager : MonoBehaviour
         {
             if (instance == null)
             {
-                instance = FindObjectOfType<CombatEffectsManager>();
+                instance = FindFirstObjectByType<CombatEffectsManager>();
                 if (instance == null)
                 {
                     GameObject go = new GameObject("CombatEffectsManager");
@@ -60,9 +63,6 @@ public class CombatEffectsManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Hi?n th? damage number t?i v? trí cho tr??c
-    /// </summary>
     public void ShowDamageNumber(float damage, Vector3 worldPosition, bool isCritical = false)
     {
         if (damageNumberPrefab != null)
@@ -72,14 +72,10 @@ public class CombatEffectsManager : MonoBehaviour
         }
         else
         {
-            // Fallback: Create simple damage number
             StartCoroutine(CreateSimpleDamageNumber(damage, worldPosition, isCritical));
         }
     }
 
-    /// <summary>
-    /// T?o damage number ??n gi?n n?u không có prefab
-    /// </summary>
     private IEnumerator CreateSimpleDamageNumber(float damage, Vector3 position, bool isCritical)
     {
         GameObject textObj = new GameObject("DamageNumber");
@@ -87,62 +83,57 @@ public class CombatEffectsManager : MonoBehaviour
         
         TextMesh textMesh = textObj.AddComponent<TextMesh>();
         textMesh.text = Mathf.Ceil(damage).ToString();
-        textMesh.fontSize = isCritical ? 20 : 15;
+        textMesh.fontSize = isCritical ? 20 : 14;
         textMesh.color = isCritical ? Color.yellow : Color.red;
         textMesh.anchor = TextAnchor.MiddleCenter;
         
-        // Add outline effect
-        MeshRenderer renderer = textObj.GetComponent<MeshRenderer>();
-        if (renderer != null)
+        float elapsedTime = 0f;
+        Vector3 startPos = position;
+        Vector3 endPos = position + Vector3.up * 2f;
+        
+        while (elapsedTime < damageNumberLifetime)
         {
-            renderer.material.shader = Shader.Find("GUI/Text Shader");
+            elapsedTime += Time.deltaTime;
+            float progress = elapsedTime / damageNumberLifetime;
+            
+            textObj.transform.position = Vector3.Lerp(startPos, endPos, progress);
+            
+            Color color = textMesh.color;
+            color.a = 1f - progress;
+            textMesh.color = color;
+            
+            yield return null;
         }
-
-        yield return StartCoroutine(AnimateDamageNumber(textObj, damage, isCritical));
+        
+        Destroy(textObj);
     }
 
-    /// <summary>
-    /// Animate damage number movement and fade
-    /// </summary>
     private IEnumerator AnimateDamageNumber(GameObject damageNumberObj, float damage, bool isCritical)
     {
-        Vector3 startPosition = damageNumberObj.transform.position;
-        Vector3 endPosition = startPosition + Vector3.up * damageNumberSpeed;
-        
-        float elapsed = 0f;
-        
-        // Get text component (could be TextMesh or UI Text)
-        TextMesh textMesh = damageNumberObj.GetComponent<TextMesh>();
-        UnityEngine.UI.Text uiText = damageNumberObj.GetComponent<UnityEngine.UI.Text>();
-        
-        Color originalColor = Color.red;
-        if (textMesh != null)
-            originalColor = textMesh.color;
-        else if (uiText != null)
-            originalColor = uiText.color;
-
-        while (elapsed < damageNumberLifetime)
+        var textComponent = damageNumberObj.GetComponent<TextMesh>();
+        if (textComponent != null)
         {
-            elapsed += Time.deltaTime;
-            float progress = elapsed / damageNumberLifetime;
+            textComponent.text = Mathf.Ceil(damage).ToString();
+            textComponent.color = isCritical ? Color.yellow : Color.red;
+        }
+        
+        Vector3 startPos = damageNumberObj.transform.position;
+        Vector3 endPos = startPos + Vector3.up * damageNumberSpeed;
+        
+        float elapsedTime = 0f;
+        
+        while (elapsedTime < damageNumberLifetime)
+        {
+            elapsedTime += Time.deltaTime;
+            float progress = elapsedTime / damageNumberLifetime;
             
-            // Move upward
-            damageNumberObj.transform.position = Vector3.Lerp(startPosition, endPosition, progress);
+            damageNumberObj.transform.position = Vector3.Lerp(startPos, endPos, progress);
             
-            // Fade out
-            Color currentColor = originalColor;
-            currentColor.a = 1f - progress;
-            
-            if (textMesh != null)
-                textMesh.color = currentColor;
-            else if (uiText != null)
-                uiText.color = currentColor;
-            
-            // Scale effect for critical hits
-            if (isCritical)
+            if (textComponent != null)
             {
-                float scale = 1f + Mathf.Sin(elapsed * 10f) * 0.1f;
-                damageNumberObj.transform.localScale = Vector3.one * scale;
+                Color color = textComponent.color;
+                color.a = 1f - progress;
+                textComponent.color = color;
             }
             
             yield return null;
@@ -151,9 +142,6 @@ public class CombatEffectsManager : MonoBehaviour
         Destroy(damageNumberObj);
     }
 
-    /// <summary>
-    /// Trigger screen shake effect
-    /// </summary>
     public void ScreenShake(float intensity = -1f, float duration = -1f)
     {
         if (mainCamera == null) return;
@@ -167,24 +155,21 @@ public class CombatEffectsManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Screen shake coroutine
-    /// </summary>
     private IEnumerator ScreenShakeCoroutine(float intensity, float duration)
     {
         isShaking = true;
         originalCameraPosition = mainCamera.transform.position;
         
-        float elapsed = 0f;
+        float elapsedTime = 0f;
         
-        while (elapsed < duration)
+        while (elapsedTime < duration)
         {
-            elapsed += Time.deltaTime;
+            elapsedTime += Time.deltaTime;
             
-            Vector3 randomPoint = originalCameraPosition + Random.insideUnitSphere * intensity;
-            randomPoint.z = originalCameraPosition.z; // Keep original Z position
+            float offsetX = Random.Range(-intensity, intensity);
+            float offsetY = Random.Range(-intensity, intensity);
             
-            mainCamera.transform.position = randomPoint;
+            mainCamera.transform.position = originalCameraPosition + new Vector3(offsetX, offsetY, 0);
             
             yield return null;
         }
@@ -193,18 +178,12 @@ public class CombatEffectsManager : MonoBehaviour
         isShaking = false;
     }
 
-    /// <summary>
-    /// Trigger hit stop effect (freeze frame)
-    /// </summary>
     public void HitStop(float duration = -1f)
     {
         float stopDuration = duration > 0 ? duration : hitStopDuration;
         StartCoroutine(HitStopCoroutine(stopDuration));
     }
 
-    /// <summary>
-    /// Hit stop coroutine
-    /// </summary>
     private IEnumerator HitStopCoroutine(float duration)
     {
         float originalTimeScale = Time.timeScale;
@@ -215,101 +194,58 @@ public class CombatEffectsManager : MonoBehaviour
         Time.timeScale = originalTimeScale;
     }
 
-    /// <summary>
-    /// Create impact effect at position
-    /// </summary>
-    public void CreateImpactEffect(Vector3 position, Color color, float size = 1f)
+    public void CreateImpactEffect(Vector3 position, Color color, float scale = 1f)
     {
-        StartCoroutine(ImpactEffectCoroutine(position, color, size));
+        StartCoroutine(CreateImpactEffectCoroutine(position, color, scale));
     }
 
-    /// <summary>
-    /// Impact effect coroutine
-    /// </summary>
-    private IEnumerator ImpactEffectCoroutine(Vector3 position, Color color, float size)
+    private IEnumerator CreateImpactEffectCoroutine(Vector3 position, Color color, float scale)
     {
-        // Create multiple particles for impact
-        for (int i = 0; i < 8; i++)
+        GameObject effectObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        effectObj.name = "ImpactEffect";
+        effectObj.transform.position = position;
+        effectObj.transform.localScale = Vector3.zero;
+        
+        var collider = effectObj.GetComponent<Collider>();
+        if (collider != null) Destroy(collider);
+        
+        var renderer = effectObj.GetComponent<Renderer>();
+        if (renderer != null)
         {
-            GameObject particle = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            particle.transform.position = position;
-            particle.transform.localScale = Vector3.one * (0.1f * size);
-            
-            var renderer = particle.GetComponent<Renderer>();
-            if (renderer != null)
-            {
-                renderer.material.color = color;
-            }
-            
-            // Random direction for particles
-            Vector2 randomDirection = Random.insideUnitCircle.normalized;
-            
-            // Animate particle
-            StartCoroutine(AnimateImpactParticle(particle, randomDirection, size));
+            var material = new Material(Shader.Find("Standard"));
+            material.color = color;
+            material.SetFloat("_Mode", 3);
+            material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+            material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+            material.SetInt("_ZWrite", 0);
+            material.DisableKeyword("_ALPHATEST_ON");
+            material.EnableKeyword("_ALPHABLEND_ON");
+            material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+            material.renderQueue = 3000;
+            renderer.material = material;
         }
         
-        yield return null;
-    }
-
-    /// <summary>
-    /// Animate individual impact particle
-    /// </summary>
-    private IEnumerator AnimateImpactParticle(GameObject particle, Vector2 direction, float size)
-    {
-        float lifetime = 0.3f;
-        float elapsed = 0f;
-        Vector3 startPos = particle.transform.position;
+        float duration = 0.3f;
+        float elapsedTime = 0f;
+        Vector3 targetScale = Vector3.one * scale;
         
-        while (elapsed < lifetime && particle != null)
+        while (elapsedTime < duration)
         {
-            elapsed += Time.deltaTime;
-            float progress = elapsed / lifetime;
+            elapsedTime += Time.deltaTime;
+            float progress = elapsedTime / duration;
             
-            // Move particle
-            particle.transform.position = startPos + (Vector3)(direction * progress * size);
+            effectObj.transform.localScale = Vector3.Lerp(Vector3.zero, targetScale, progress);
             
-            // Scale down
-            float scale = (1f - progress) * 0.1f * size;
-            particle.transform.localScale = Vector3.one * scale;
-            
-            // Fade out
-            var renderer = particle.GetComponent<Renderer>();
             if (renderer != null)
             {
-                Color color = renderer.material.color;
-                color.a = 1f - progress;
-                renderer.material.color = color;
+                Color currentColor = renderer.material.color;
+                currentColor.a = 1f - progress;
+                renderer.material.color = currentColor;
             }
             
             yield return null;
         }
         
-        if (particle != null)
-        {
-            Destroy(particle);
-        }
-    }
-
-    /// <summary>
-    /// Play combat sound effect
-    /// </summary>
-    public void PlayCombatSound(AudioClip clip, float volume = 1f)
-    {
-        if (clip != null)
-        {
-            AudioSource.PlayClipAtPoint(clip, mainCamera.transform.position, volume);
-        }
-    }
-
-    /// <summary>
-    /// Set camera reference manually if needed
-    /// </summary>
-    public void SetCamera(Camera camera)
-    {
-        mainCamera = camera;
-        if (mainCamera != null)
-        {
-            originalCameraPosition = mainCamera.transform.position;
-        }
+        Destroy(effectObj);
     }
 }

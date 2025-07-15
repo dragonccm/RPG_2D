@@ -1,21 +1,24 @@
+/// <summary>
+/// File: ModularSkillManager.cs
+/// Author: Unity 2D RPG Refactoring Agent
+/// Description: Core skill management system with modular architecture and hotkey support
+/// </summary>
+
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 
-/// <summary>
-/// ModularSkillManager - Integrated with UniversalHotkeyManager
-/// </summary>
 public class ModularSkillManager : MonoBehaviour
 {
     [Header("Skill Slots Configuration")]
-    [SerializeField] private int maxSkillSlots = 8; // T?i ?a 8 slots (level 40)
-    [SerializeField] private int levelsPerSlot = 5; // M?i 5 level m? 1 slot
+    [SerializeField] private int maxSkillSlots = 8;
+    [SerializeField] private int levelsPerSlot = 5;
     
     [Header("Available Skills")]
-    public List<SkillModule> availableSkills = new List<SkillModule>(); // Made public for UI access
+    public List<SkillModule> availableSkills = new List<SkillModule>();
     
     [Header("Legacy System Settings")]
-    [SerializeField] private bool enableLegacyHotkeys = false; // DISABLED by default
+    [SerializeField] private bool enableLegacyHotkeys = false;
     [SerializeField] private List<SkillSlot> skillSlots = new List<SkillSlot>();
     
     private Character player;
@@ -26,6 +29,12 @@ public class ModularSkillManager : MonoBehaviour
     public System.Action<int, SkillModule> OnSkillEquipped;
     public System.Action<int> OnSkillUnequipped;
 
+    private bool isSkillActive = false;
+    private bool isSkillHeld = false;
+    private int activeSkillSlot = -1;
+    private GameObject currentPreviewDamageArea = null;
+    private GameObject currentProjectileDirectionLine = null;
+
     private void Awake()
     {
         player = GetComponent<Character>();
@@ -35,19 +44,12 @@ public class ModularSkillManager : MonoBehaviour
     private void Start()
     {
         UpdateUnlockedSlots();
-        
-        Debug.Log($"ModularSkillManager initialized. Legacy hotkeys: {(enableLegacyHotkeys ? "ENABLED" : "DISABLED")}");
-        if (!enableLegacyHotkeys)
-        {
-            Debug.Log("Use UniversalHotkeyManager for skill execution via custom key bindings");
-        }
     }
 
     private void Update()
     {
         UpdateCooldowns();
         
-        // Only handle legacy input if enabled
         if (enableLegacyHotkeys)
         {
             HandleSkillInput();
@@ -58,7 +60,6 @@ public class ModularSkillManager : MonoBehaviour
     {
         skillSlots.Clear();
         
-        // ?? FIXED: Dynamic hotkey generation based on maxSkillSlots
         KeyCode[] hotkeys = GenerateDynamicHotkeys(maxSkillSlots);
         
         for (int i = 0; i < maxSkillSlots; i++)
@@ -66,55 +67,43 @@ public class ModularSkillManager : MonoBehaviour
             var slot = new SkillSlot(i, hotkeys[i]);
             skillSlots.Add(slot);
         }
-        
-        Debug.Log($"? Initialized {maxSkillSlots} skill slots with dynamic hotkeys");
     }
     
-    /// <summary>
-    /// Generate dynamic hotkeys based on slot count - SUPPORTS UNLIMITED SLOTS
-    /// </summary>
     private KeyCode[] GenerateDynamicHotkeys(int slotCount)
     {
         KeyCode[] hotkeys = new KeyCode[slotCount];
         
-        // Standard number keys: 1-9, 0 (10 keys)
         KeyCode[] numberKeys = { 
             KeyCode.Alpha1, KeyCode.Alpha2, KeyCode.Alpha3, KeyCode.Alpha4, KeyCode.Alpha5,
             KeyCode.Alpha6, KeyCode.Alpha7, KeyCode.Alpha8, KeyCode.Alpha9, KeyCode.Alpha0
         };
         
-        // Function keys: F1-F12 (12 keys)
         KeyCode[] functionKeys = {
             KeyCode.F1, KeyCode.F2, KeyCode.F3, KeyCode.F4, KeyCode.F5, KeyCode.F6,
             KeyCode.F7, KeyCode.F8, KeyCode.F9, KeyCode.F10, KeyCode.F11, KeyCode.F12
         };
         
-        // Letter keys: Q,W,E,R,T,Y,U,I,O,P (10 keys)
         KeyCode[] letterKeys = {
             KeyCode.Q, KeyCode.W, KeyCode.E, KeyCode.R, KeyCode.T,
             KeyCode.Y, KeyCode.U, KeyCode.I, KeyCode.O, KeyCode.P
         };
         
-        // Additional letter keys: A,S,D,F,G,H,J,K,L (9 keys)
         KeyCode[] extraLetterKeys = {
             KeyCode.A, KeyCode.S, KeyCode.D, KeyCode.F, KeyCode.G,
             KeyCode.H, KeyCode.J, KeyCode.K, KeyCode.L
         };
         
-        // Mouse buttons (5 keys)
         KeyCode[] mouseKeys = {
             KeyCode.Mouse3, KeyCode.Mouse4, KeyCode.Mouse5, KeyCode.Mouse6
         };
         
-        // Combine all available keys
         System.Collections.Generic.List<KeyCode> allAvailableKeys = new System.Collections.Generic.List<KeyCode>();
-        allAvailableKeys.AddRange(numberKeys);      // 1-9, 0
-        allAvailableKeys.AddRange(functionKeys);    // F1-F12
-        allAvailableKeys.AddRange(letterKeys);      // Q,W,E,R,T,Y,U,I,O,P
-        allAvailableKeys.AddRange(extraLetterKeys); // A,S,D,F,G,H,J,K,L
-        allAvailableKeys.AddRange(mouseKeys);       // Mouse3-6
+        allAvailableKeys.AddRange(numberKeys);
+        allAvailableKeys.AddRange(functionKeys);
+        allAvailableKeys.AddRange(letterKeys);
+        allAvailableKeys.AddRange(extraLetterKeys);
+        allAvailableKeys.AddRange(mouseKeys);
         
-        // Assign hotkeys up to available keys
         for (int i = 0; i < slotCount; i++)
         {
             if (i < allAvailableKeys.Count)
@@ -123,21 +112,8 @@ public class ModularSkillManager : MonoBehaviour
             }
             else
             {
-                // If we run out of keys, assign None (can be changed dynamically later)
                 hotkeys[i] = KeyCode.None;
-                Debug.LogWarning($"?? Slot {i} has no default hotkey (total keys available: {allAvailableKeys.Count})");
             }
-        }
-        
-        // Debug log hotkey assignments
-        Debug.Log($"?? Generated {slotCount} hotkeys:");
-        for (int i = 0; i < System.Math.Min(slotCount, 10); i++) // Show first 10
-        {
-            Debug.Log($"   Slot {i}: {hotkeys[i]}");
-        }
-        if (slotCount > 10)
-        {
-            Debug.Log($"   ... and {slotCount - 10} more slots");
         }
         
         return hotkeys;
@@ -158,17 +134,379 @@ public class ModularSkillManager : MonoBehaviour
 
     private void HandleSkillInput()
     {
-        // Only process if legacy hotkeys are enabled
         if (!enableLegacyHotkeys) return;
-        
+
         for (int i = 0; i < skillSlots.Count; i++)
         {
             var slot = skillSlots[i];
-            if (slot.isUnlocked && slot.HasSkill() && Input.GetKeyDown(slot.hotkey))
+            if (!slot.isUnlocked || !slot.HasSkill()) continue;
+
+            if (Input.GetKeyDown(slot.hotkey))
             {
-                Debug.Log($"Legacy hotkey {slot.hotkey} pressed for {slot.equippedSkill.skillName}");
-                ActivateSkill(i);
+                // Phase 1: Start skill
+                StartSkillPreview(i);
             }
+
+            if (Input.GetKey(slot.hotkey))
+            {
+                // Phase 2: Hold skill
+                HoldSkillPreview(i);
+            }
+
+            if (Input.GetKeyUp(slot.hotkey))
+            {
+                // Phase 3: Release skill
+                ActivateSkill(i);
+                EndSkillPreview(i);
+            }
+        }
+    }
+
+    private void StartSkillPreview(int slotIndex)
+    {
+        if (isSkillActive || slotIndex >= skillSlots.Count) return;
+
+        var slot = skillSlots[slotIndex];
+        if (!slot.isUnlocked || !slot.HasSkill()) return;
+
+        var skill = slot.equippedSkill;
+        if (skill == null || !skill.showDamageArea) return;
+
+        // Hi?n th? vùng sát th??ng preview
+        ShowSkillPreview(skill);
+
+        isSkillActive = true;
+        activeSkillSlot = slotIndex;
+    }
+
+    private void HoldSkillPreview(int slotIndex)
+    {
+        if (!isSkillActive || slotIndex != activeSkillSlot) return;
+
+        var slot = skillSlots[slotIndex];
+        if (!slot.isUnlocked || !slot.HasSkill()) return;
+
+        var skill = slot.equippedSkill;
+        if (skill == null || !skill.showDamageArea) return;
+
+        // C?p nh?t vùng sát th??ng preview n?u c?n
+        UpdateSkillPreview(skill);
+
+        isSkillHeld = true;
+    }
+
+    private void EndSkillPreview(int slotIndex)
+    {
+        if (!isSkillActive || slotIndex != activeSkillSlot) return;
+
+        // ?n vùng sát th??ng preview
+        HideSkillPreview();
+
+        isSkillActive = false;
+        isSkillHeld = false;
+        activeSkillSlot = -1;
+    }
+
+    private void ShowSkillPreview(SkillModule skill)
+    {
+        Vector2 playerPosition = transform.position;
+        
+        // C?p nh?t v? trí và kích th??c d?a trên lo?i k? n?ng
+        switch (skill.skillType)
+        {
+            case SkillType.Melee:
+                ShowMeleePreview(skill, playerPosition);
+                break;
+            case SkillType.Area:
+                ShowAreaPreview(skill, playerPosition);
+                break;
+            case SkillType.Projectile:
+                ShowProjectilePreview(skill, playerPosition);
+                break;
+            default:
+                // Support không hi?n th? preview
+                HideAllPreviews();
+                return;
+        }
+    }
+
+    private void ShowMeleePreview(SkillModule skill, Vector2 playerPosition)
+    {
+        // ?u tiên s? d?ng damageZonePrefab t? SkillModule
+        if (skill.damageZonePrefab != null)
+        {
+            // S? d?ng custom prefab cho Melee
+            if (currentPreviewDamageArea == null)
+            {
+                currentPreviewDamageArea = Object.Instantiate(skill.damageZonePrefab);
+                currentPreviewDamageArea.name = "MeleePreviewArea_Custom";
+            }
+            
+            currentPreviewDamageArea.transform.position = new Vector3(playerPosition.x, playerPosition.y, 0);
+            currentPreviewDamageArea.transform.localScale = Vector3.one * skill.range * 2;
+        }
+        else
+        {
+            // Fallback: T?o vùng sát th??ng preview m?c ??nh cho Melee
+            if (currentPreviewDamageArea == null)
+            {
+                currentPreviewDamageArea = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                currentPreviewDamageArea.name = "MeleePreviewArea";
+                
+                // Remove collider
+                var collider = currentPreviewDamageArea.GetComponent<Collider>();
+                if (collider != null)
+                {
+                    Destroy(collider);
+                }
+            }
+
+            currentPreviewDamageArea.transform.position = new Vector3(playerPosition.x, playerPosition.y, 0);
+            currentPreviewDamageArea.transform.localScale = Vector3.one * skill.range * 2;
+            
+            SetPreviewMaterial(currentPreviewDamageArea, skill.damageAreaColor);
+        }
+
+        currentPreviewDamageArea.SetActive(true);
+    }
+
+    private void ShowAreaPreview(SkillModule skill, Vector2 playerPosition)
+    {
+        Vector2 mousePos = GetMouseWorldPosition();
+        Vector2 validPos = GetValidTargetPosition(mousePos, playerPosition, skill);
+        
+        // ?u tiên s? d?ng damageZonePrefab t? SkillModule
+        if (skill.damageZonePrefab != null)
+        {
+            // S? d?ng custom prefab cho Area
+            if (currentPreviewDamageArea == null)
+            {
+                currentPreviewDamageArea = Object.Instantiate(skill.damageZonePrefab);
+                currentPreviewDamageArea.name = "AreaPreviewArea_Custom";
+            }
+            
+            currentPreviewDamageArea.transform.position = new Vector3(validPos.x, validPos.y, 0);
+            currentPreviewDamageArea.transform.localScale = Vector3.one * skill.areaRadius * 2;
+        }
+        else
+        {
+            // Fallback: T?o vùng sát th??ng preview m?c ??nh cho Area
+            if (currentPreviewDamageArea == null)
+            {
+                currentPreviewDamageArea = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                currentPreviewDamageArea.name = "AreaPreviewArea";
+                
+                // Remove collider
+                var collider = currentPreviewDamageArea.GetComponent<Collider>();
+                if (collider != null)
+                {
+                    Destroy(collider);
+                }
+            }
+
+            currentPreviewDamageArea.transform.position = new Vector3(validPos.x, validPos.y, 0);
+            currentPreviewDamageArea.transform.localScale = Vector3.one * skill.areaRadius * 2;
+            
+            SetPreviewMaterial(currentPreviewDamageArea, skill.damageAreaColor);
+        }
+
+        currentPreviewDamageArea.SetActive(true);
+    }
+
+    private void ShowProjectilePreview(SkillModule skill, Vector2 playerPosition)
+    {
+        Vector2 mousePos = GetMouseWorldPosition();
+        Vector2 direction = (mousePos - playerPosition).normalized;
+        
+        // ?u tiên s? d?ng damageZonePrefab thay vì LineRenderer cho Projectile
+        if (skill.damageZonePrefab != null)
+        {
+            // S? d?ng custom prefab cho Projectile direction indicator
+            if (currentProjectileDirectionLine == null)
+            {
+                currentProjectileDirectionLine = Object.Instantiate(skill.damageZonePrefab);
+                currentProjectileDirectionLine.name = "ProjectileDirectionPrefab";
+            }
+            
+            // ??t v? trí và h??ng cho custom prefab
+            Vector3 startPos = new Vector3(playerPosition.x, playerPosition.y, 0);
+            Vector3 endPos = startPos + (Vector3)(direction * skill.range);
+            Vector3 midPos = (startPos + endPos) / 2f;
+            
+            currentProjectileDirectionLine.transform.position = midPos;
+            
+            // Xoay prefab theo h??ng
+            if (direction != Vector2.zero)
+            {
+                float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+                currentProjectileDirectionLine.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+            }
+            
+            // Scale theo range
+            float rangeScale = skill.range / 2f;
+            currentProjectileDirectionLine.transform.localScale = new Vector3(rangeScale, 0.2f, 1f);
+        }
+        else
+        {
+            // Fallback: T?o ???ng th?ng LineRenderer nh? c?
+            if (currentProjectileDirectionLine == null)
+            {
+                currentProjectileDirectionLine = new GameObject("ProjectileDirectionLine");
+                var lineRendererComponent = currentProjectileDirectionLine.AddComponent<LineRenderer>();
+                
+                // Thi?t l?p LineRenderer
+                lineRendererComponent.material = CreateLineMaterial(skill.skillColor);
+                lineRendererComponent.startWidth = 0.1f;
+                lineRendererComponent.endWidth = 0.05f;
+                lineRendererComponent.positionCount = 2;
+                lineRendererComponent.useWorldSpace = true;
+            }
+
+            var lineRenderer = currentProjectileDirectionLine.GetComponent<LineRenderer>();
+            if (lineRenderer != null)
+            {
+                Vector3 startPos = new Vector3(playerPosition.x, playerPosition.y, 0);
+                Vector3 endPos = startPos + (Vector3)(direction * skill.range);
+                
+                lineRenderer.SetPosition(0, startPos);
+                lineRenderer.SetPosition(1, endPos);
+                lineRenderer.material.color = skill.skillColor;
+            }
+        }
+
+        currentProjectileDirectionLine.SetActive(true);
+        
+        // ?n damage area cho Projectile vì chúng ta ch? hi?n th? ???ng bay
+        if (currentPreviewDamageArea != null)
+        {
+            currentPreviewDamageArea.SetActive(false);
+        }
+    }
+
+    private void SetPreviewMaterial(GameObject previewObject, Color skillColor)
+    {
+        var renderer = previewObject.GetComponent<Renderer>();
+        if (renderer != null)
+        {
+            var material = new Material(Shader.Find("Standard"));
+            var previewColor = skillColor;
+            previewColor.a = 0.15f; // Alpha th?p h?n cho preview
+            material.color = previewColor;
+            material.SetFloat("_Mode", 3); // Transparent mode
+            material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+            material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+            material.SetInt("_ZWrite", 0);
+            material.DisableKeyword("_ALPHATEST_ON");
+            material.EnableKeyword("_ALPHABLEND_ON");
+            material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+            material.renderQueue = 3000;
+            renderer.material = material;
+        }
+    }
+
+    private Material CreateLineMaterial(Color color)
+    {
+        var material = new Material(Shader.Find("Sprites/Default"));
+        material.color = color;
+        return material;
+    }
+
+    private void HideAllPreviews()
+    {
+        if (currentPreviewDamageArea != null)
+        {
+            currentPreviewDamageArea.SetActive(false);
+        }
+        
+        if (currentProjectileDirectionLine != null)
+        {
+            currentProjectileDirectionLine.SetActive(false);
+        }
+    }
+
+    private void UpdateSkillPreview(SkillModule skill)
+    {
+        Vector2 playerPosition = transform.position;
+
+        switch (skill.skillType)
+        {
+            case SkillType.Area:
+                // C?p nh?t v? trí Area preview khi chu?t di chuy?n
+                if (currentPreviewDamageArea != null)
+                {
+                    Vector2 mousePos = GetMouseWorldPosition();
+                    Vector2 validPos = GetValidTargetPosition(mousePos, playerPosition, skill);
+                    currentPreviewDamageArea.transform.position = new Vector3(validPos.x, validPos.y, 0);
+                }
+                break;
+                
+            case SkillType.Projectile:
+                // C?p nh?t h??ng bay Projectile khi chu?t di chuy?n
+                if (currentProjectileDirectionLine != null)
+                {
+                    Vector2 mousePos = GetMouseWorldPosition();
+                    Vector2 direction = (mousePos - playerPosition).normalized;
+                    
+                    if (skill.damageZonePrefab != null)
+                    {
+                        // C?p nh?t custom prefab cho Projectile
+                        Vector3 startPos = new Vector3(playerPosition.x, playerPosition.y, 0);
+                        Vector3 endPos = startPos + (Vector3)(direction * skill.range);
+                        Vector3 midPos = (startPos + endPos) / 2f;
+                        
+                        currentProjectileDirectionLine.transform.position = midPos;
+                        
+                        // Xoay prefab theo h??ng
+                        if (direction != Vector2.zero)
+                        {
+                            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+                            currentProjectileDirectionLine.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+                        }
+                    }
+                    else
+                    {
+                        // C?p nh?t LineRenderer fallback
+                        var lineRenderer = currentProjectileDirectionLine.GetComponent<LineRenderer>();
+                        if (lineRenderer != null)
+                        {
+                            Vector3 startPos = new Vector3(playerPosition.x, playerPosition.y, 0);
+                            Vector3 endPos = startPos + (Vector3)(direction * skill.range);
+                            
+                            lineRenderer.SetPosition(0, startPos);
+                            lineRenderer.SetPosition(1, endPos);
+                        }
+                    }
+                }
+                break;
+        }
+    }
+
+    private void HideSkillPreview()
+    {
+        HideAllPreviews();
+    }
+
+    private Vector2 GetMouseWorldPosition()
+    {
+        Vector3 mouseScreenPos = Input.mousePosition;
+        mouseScreenPos.z = 10f;
+        Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(mouseScreenPos);
+        return new Vector2(mouseWorldPos.x, mouseWorldPos.y);
+    }
+
+    private Vector2 GetValidTargetPosition(Vector2 mousePos, Vector2 playerPos, SkillModule skill)
+    {
+        Vector2 direction = (mousePos - playerPos).normalized;
+        float distance = Vector2.Distance(mousePos, playerPos);
+        float maxRange = skill.range;
+
+        if (distance <= maxRange)
+        {
+            return mousePos;
+        }
+        else
+        {
+            return playerPos + direction * maxRange;
         }
     }
 
@@ -176,106 +514,70 @@ public class ModularSkillManager : MonoBehaviour
     {
         if (slotIndex >= skillSlots.Count) 
         {
-            Debug.LogWarning($"Skill slot index {slotIndex} is out of range. Available slots: {skillSlots.Count}");
             return;
         }
         
         var slot = skillSlots[slotIndex];
         if (!slot.isUnlocked || !slot.HasSkill()) 
         {
-            Debug.Log($"Slot {slotIndex} is locked or has no skill equipped");
             return;
         }
         
         var executor = slot.executor;
         
-        // Check if executor is null
         if (executor == null)
         {
-            Debug.LogError($"Executor for slot {slotIndex} is null!");
             return;
         }
         
-        // Check cooldown
         if (cooldownTimers.ContainsKey(executor)) 
         {
-            Debug.Log($"Skill in slot {slotIndex} is on cooldown");
             return;
         }
         
-        // Check if can execute
         if (!executor.CanExecute(player)) 
         {
-            Debug.Log($"Cannot execute skill in slot {slotIndex} - requirements not met");
             return;
         }
         
-        // CRITICAL FIX: Proper mouse position conversion with Z-coordinate
         Vector3 mouseScreenPos = Input.mousePosition;
-        mouseScreenPos.z = 10f; // IMPORTANT: Set camera distance
+        mouseScreenPos.z = 10f;
         Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(mouseScreenPos);
         Vector2 targetPos = new Vector2(mouseWorldPos.x, mouseWorldPos.y);
         
-        Debug.Log($"??? FIXED MOUSE POSITION: Screen={Input.mousePosition}, World={targetPos}");
-        
-        // Execute skill
         executor.Execute(player, targetPos);
-        
-        // Start cooldown
         cooldownTimers[executor] = executor.GetCooldown();
-        
-        Debug.Log($"Activated skill: {slot.equippedSkill.skillName} in slot {slotIndex} via LEGACY SYSTEM");
     }
 
     public bool EquipSkill(int slotIndex, SkillModule skill)
     {
         if (slotIndex >= skillSlots.Count) 
         {
-            Debug.LogError($"Cannot equip skill - slot index {slotIndex} is out of range");
             return false;
         }
         
         if (skill == null)
         {
-            Debug.LogError("Cannot equip null skill");
             return false;
         }
         
         var slot = skillSlots[slotIndex];
         if (!slot.isUnlocked) 
         {
-            Debug.Log($"Cannot equip {skill.skillName} - slot {slotIndex} is locked");
             return false;
         }
         
-        // Check level requirement
         if (GetPlayerLevel() < skill.requiredLevel)
         {
-            Debug.Log($"Cannot equip {skill.skillName}. Required level: {skill.requiredLevel}");
             return false;
         }
 
-        // IMPORTANT: When equipping to legacy system, remove from Universal system
-        var unifiedSystemInstance = FindFirstObjectByType<UnifiedSkillSystem>();
-        if (unifiedSystemInstance != null)
-        {
-            var universalKey = UnifiedSkillSystem.GetKeyForSkill(skill);
-            if (universalKey != KeyCode.None)
-            {
-                UnifiedSkillSystem.RemoveKeyAssignment(universalKey);
-                Debug.Log($"Removed {skill.skillName} from Universal key {universalKey} when equipping to legacy slot {slotIndex}");
-            }
-        }
+        // Remove reference to UnifiedSkillSystem as it's been removed
         
         bool success = slot.EquipSkill(skill);
         if (success)
         {
             OnSkillEquipped?.Invoke(slotIndex, skill);
-            Debug.Log($"Equipped {skill.skillName} to legacy slot {slotIndex}");
-        }
-        else
-        {
-            Debug.LogError($"Failed to equip {skill.skillName} to legacy slot {slotIndex}");
         }
         
         return success;
@@ -290,7 +592,6 @@ public class ModularSkillManager : MonoBehaviour
         slot.UnequipSkill();
         
         OnSkillUnequipped?.Invoke(slotIndex);
-        Debug.Log($"Unequipped skill {skillName} from legacy slot {slotIndex}");
     }
 
     public void UpdateUnlockedSlots()
@@ -307,15 +608,12 @@ public class ModularSkillManager : MonoBehaviour
             {
                 skillSlots[i].UnlockSlot();
                 OnSlotUnlocked?.Invoke(i);
-                Debug.Log($"Unlocked skill slot {i} at level {playerLevel}");
             }
         }
     }
 
     public int GetPlayerLevel()
     {
-        // TODO: Implement proper level system
-        // For now, return a test value
         return PlayerPrefs.GetInt("PlayerLevel", 1);
     }
 
@@ -323,7 +621,6 @@ public class ModularSkillManager : MonoBehaviour
     {
         PlayerPrefs.SetInt("PlayerLevel", level);
         UpdateUnlockedSlots();
-        Debug.Log($"Player level set to {level}");
     }
 
     public List<SkillModule> GetAvailableSkills()
@@ -359,9 +656,6 @@ public class ModularSkillManager : MonoBehaviour
         return GetSkillCooldown(slotIndex) > 0f;
     }
 
-    /// <summary>
-    /// Check if skill is equipped in ANY slot
-    /// </summary>
     public bool IsSkillEquippedInLegacySystem(SkillModule skill)
     {
         if (skill == null) return false;
@@ -369,9 +663,6 @@ public class ModularSkillManager : MonoBehaviour
         return skillSlots.Any(slot => slot.HasSkill() && slot.equippedSkill == skill);
     }
 
-    /// <summary>
-    /// Get slot index where skill is equipped (-1 if not equipped)
-    /// </summary>
     public int GetSkillSlotIndex(SkillModule skill)
     {
         if (skill == null) return -1;
@@ -384,21 +675,11 @@ public class ModularSkillManager : MonoBehaviour
         return -1;
     }
 
-    /// <summary>
-    /// Enable/disable legacy hotkey system
-    /// </summary>
     public void SetLegacyHotkeysEnabled(bool enabled)
     {
         enableLegacyHotkeys = enabled;
-        Debug.Log($"Legacy hotkeys {(enabled ? "ENABLED" : "DISABLED")}");
-        
-        if (!enabled)
-        {
-            Debug.Log("All skill input now handled by UniversalHotkeyManager");
-        }
     }
 
-    // Method ?? th?m skill m?i v?o available list
     public void AddAvailableSkill(SkillModule skill)
     {
         if (!availableSkills.Contains(skill))
@@ -407,7 +688,6 @@ public class ModularSkillManager : MonoBehaviour
         }
     }
 
-    // Method ?? remove skill kh?i available list
     public void RemoveAvailableSkill(SkillModule skill)
     {
         availableSkills.Remove(skill);
@@ -472,98 +752,33 @@ public class ModularSkillManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Context menu for debugging - Enhanced with dynamic hotkey info
-    /// </summary>
-    [ContextMenu("?? Debug Skill Assignments")]
-    public void DebugSkillAssignments()
-    {
-        Debug.Log("=== MODULAR SKILL MANAGER DEBUG ===");
-        Debug.Log($"Legacy Hotkeys Enabled: {enableLegacyHotkeys}");
-        Debug.Log($"Player Level: {GetPlayerLevel()}");
-        Debug.Log($"Available Skills: {availableSkills.Count}");
-        
-        Debug.Log("Current Slot Assignments:");
-        for (int i = 0; i < skillSlots.Count; i++)
-        {
-            var slot = skillSlots[i];
-            if (slot.isUnlocked)
-            {
-                string skillName = slot.HasSkill() ? slot.equippedSkill.skillName : "Empty";
-                string hotkeyInfo = $"Hotkey: {slot.GetHotkey()}";
-                Debug.Log($"  Slot {i}: {skillName} | {hotkeyInfo} | Status: {(slot.HasSkill() ? "Equipped" : "Empty")}");
-            }
-            else
-            {
-                Debug.Log($"  Slot {i}: LOCKED | Hotkey: {slot.GetHotkey()}");
-            }
-        }
-        
-        // Show Universal hotkeys for comparison (if available)
-        Debug.Log("=== UNIVERSAL HOTKEY COMPARISON SKIPPED ===");
-        Debug.Log("Note: Cross-system consistency check requires UnifiedSkillSystem instance");
-        
-        Debug.Log("=== END DEBUG ===");
-    }
-
-    /// <summary>
-    /// Migrate all legacy assignments to Universal system
-    /// </summary>
-    [ContextMenu("?? Migrate to Universal System")]
-    public void MigrateToUniversalSystem()
-    {
-        // Migrate skills to universal system (simplified)
-        Debug.Log("?? Migration to Universal system not available in this version");
-        Debug.Log("Use UnifiedSkillSystem directly for custom key bindings");
-        
-        // Disable legacy system
-        SetLegacyHotkeysEnabled(false);
-        
-        Debug.Log($"?? Legacy system disabled");
-    }
-
-    /// <summary>
-    /// Update hotkey for a skill slot - CRITICAL FIX
-    /// </summary>
     public bool UpdateSlotHotkey(int slotIndex, KeyCode newKey)
     {
         if (slotIndex < 0 || slotIndex >= skillSlots.Count)
         {
-            Debug.LogError($"Invalid slot index {slotIndex}");
             return false;
         }
         
         var slot = skillSlots[slotIndex];
         KeyCode oldKey = slot.hotkey;
         
-        // Check if any other slot is using this key
         for (int i = 0; i < skillSlots.Count; i++)
         {
             if (i != slotIndex && skillSlots[i].UsesHotkey(newKey))
             {
-                Debug.LogWarning($"Key {newKey} is already used by slot {i}");
                 return false;
             }
         }
         
-        // Update the hotkey
         slot.UpdateHotkey(newKey);
-        
-        Debug.Log($"?? Updated slot {slotIndex} hotkey: {oldKey} ? {newKey}");
         return true;
     }
     
-    /// <summary>
-    /// Find slot by hotkey
-    /// </summary>
     public SkillSlot GetSlotByHotkey(KeyCode key)
     {
         return skillSlots.FirstOrDefault(slot => slot.UsesHotkey(key));
     }
     
-    /// <summary>
-    /// Get slot index by hotkey (-1 if not found)
-    /// </summary>
     public int GetSlotIndexByHotkey(KeyCode key)
     {
         for (int i = 0; i < skillSlots.Count; i++)
@@ -574,77 +789,55 @@ public class ModularSkillManager : MonoBehaviour
         return -1;
     }
     
-    /// <summary>
-    /// Assign skill to specific hotkey (finds or creates slot)
-    /// </summary>
     public bool AssignSkillToHotkey(SkillModule skill, KeyCode key)
     {
         if (skill == null)
         {
-            Debug.LogError("Cannot assign null skill");
             return false;
         }
         
-        // Check level requirement
         if (GetPlayerLevel() < skill.requiredLevel)
         {
-            Debug.Log($"Cannot assign {skill.skillName}. Required level: {skill.requiredLevel}");
             return false;
         }
         
-        // Find if any slot already uses this key
         var existingSlot = GetSlotByHotkey(key);
         
         if (existingSlot != null && existingSlot.isUnlocked)
         {
-            // Unequip existing skill if any
             if (existingSlot.HasSkill())
             {
-                Debug.Log($"?? Unequipping {existingSlot.equippedSkill.skillName} from slot {existingSlot.slotIndex}");
                 existingSlot.UnequipSkill();
             }
             
-            // Equip new skill
             bool success = existingSlot.EquipSkill(skill);
             if (success)
             {
                 OnSkillEquipped?.Invoke(existingSlot.slotIndex, skill);
-                Debug.Log($"? Assigned {skill.skillName} to existing slot {existingSlot.slotIndex} with hotkey {key}");
             }
             return success;
         }
         
-        // Find empty unlocked slot and update its hotkey
         var emptySlot = skillSlots.FirstOrDefault(s => s.isUnlocked && !s.HasSkill());
         if (emptySlot != null)
         {
-            // Update hotkey and equip skill
             emptySlot.UpdateHotkey(key);
             bool success = emptySlot.EquipSkill(skill);
             if (success)
             {
                 OnSkillEquipped?.Invoke(emptySlot.slotIndex, skill);
-                Debug.Log($"? Assigned {skill.skillName} to empty slot {emptySlot.slotIndex} with new hotkey {key}");
             }
             return success;
         }
         
-        Debug.LogWarning($"?? No available slots to assign {skill.skillName} to hotkey {key}");
         return false;
     }
     
-    /// <summary>
-    /// Get total available hotkey slots (for UI purposes)
-    /// </summary>
     public int GetMaxSupportedSlots()
     {
-        // Numbers (10) + Function keys (12) + Letters (19) + Mouse (4) = 45 slots total
         return 45;
     }
     
-    /// <summary>
-    /// Get hotkey display name for UI
-    /// </summary>
     public string GetHotkeyDisplayName(KeyCode key)
     {
         switch (key)
@@ -678,91 +871,5 @@ public class ModularSkillManager : MonoBehaviour
             case KeyCode.None: return "---";
             default: return key.ToString();
         }
-    }
-    
-    /// <summary>
-    /// Validate maxSkillSlots setting and provide recommendations
-    /// </summary>
-    [ContextMenu("?? Validate Max Skill Slots")]
-    public void ValidateMaxSkillSlots()
-    {
-        Debug.Log("=== MAX SKILL SLOTS VALIDATION ===");
-        Debug.Log($"Current maxSkillSlots: {maxSkillSlots}");
-        Debug.Log($"Max supported slots: {GetMaxSupportedSlots()}");
-        
-        if (maxSkillSlots <= 8)
-        {
-            Debug.Log("? Standard configuration (legacy compatible)");
-        }
-        else if (maxSkillSlots <= GetMaxSupportedSlots())
-        {
-            Debug.Log("? Extended configuration supported");
-            Debug.Log($"   Using slots 0-{maxSkillSlots-1} with dynamic hotkeys");
-        }
-        else
-        {
-            Debug.LogWarning($"?? Configuration exceeds recommended maximum!");
-            Debug.LogWarning($"   Some slots (#{GetMaxSupportedSlots()}-{maxSkillSlots-1}) will have no default hotkeys");
-            Debug.LogWarning($"   Consider using {GetMaxSupportedSlots()} or fewer slots for optimal experience");
-        }
-        
-        // Show hotkey mapping for current configuration
-        Debug.Log("\n?? Current Hotkey Mapping:");
-        KeyCode[] currentHotkeys = GenerateDynamicHotkeys(maxSkillSlots);
-        for (int i = 0; i < System.Math.Min(maxSkillSlots, 15); i++)
-        {
-            Debug.Log($"   Slot {i}: {GetHotkeyDisplayName(currentHotkeys[i])} ({currentHotkeys[i]})");
-        }
-        if (maxSkillSlots > 15)
-        {
-            Debug.Log($"   ... and {maxSkillSlots - 15} more slots");
-        }
-        
-        Debug.Log("=== END VALIDATION ===");
-    }
-    
-    /// <summary>
-    /// Recommend optimal maxSkillSlots based on player level system
-    /// </summary>
-    [ContextMenu("?? Recommend Optimal Configuration")]
-    public void RecommendOptimalConfiguration()
-    {
-        Debug.Log("=== OPTIMAL CONFIGURATION RECOMMENDATIONS ===");
-        
-        int currentLevel = GetPlayerLevel();
-        int maxPossibleLevel = 100; // Assume max level 100
-        
-        // Calculate theoretical max slots at max level
-        int maxTheoreticalSlots = Mathf.Min((maxPossibleLevel / levelsPerSlot) + 1, maxSkillSlots);
-        
-        Debug.Log($"Current Level: {currentLevel}");
-        Debug.Log($"Current Unlocked Slots: {GetUnlockedSlots().Count}");
-        Debug.Log($"Max Theoretical Slots (Lv.{maxPossibleLevel}): {maxTheoreticalSlots}");
-        
-        // Recommendations based on available skills
-        int availableSkillsCount = availableSkills.Count;
-        Debug.Log($"Available Skills: {availableSkillsCount}");
-        
-        int recommendedSlots = Mathf.Max(availableSkillsCount, 12); // At least 12 or number of skills
-        recommendedSlots = Mathf.Min(recommendedSlots, GetMaxSupportedSlots());
-        
-        Debug.Log($"\n?? RECOMMENDATIONS:");
-        Debug.Log($"   Recommended maxSkillSlots: {recommendedSlots}");
-        Debug.Log($"   Reason: Supports all {availableSkillsCount} skills with room for growth");
-        
-        if (maxSkillSlots < recommendedSlots)
-        {
-            Debug.Log($"   ?? Consider increasing from {maxSkillSlots} to {recommendedSlots}");
-        }
-        else if (maxSkillSlots > recommendedSlots + 10)
-        {
-            Debug.Log($"   ?? Consider reducing from {maxSkillSlots} to {recommendedSlots} for better UI");
-        }
-        else
-        {
-            Debug.Log($"   ? Current setting ({maxSkillSlots}) is reasonable");
-        }
-        
-        Debug.Log("=== END RECOMMENDATIONS ===");
     }
 }

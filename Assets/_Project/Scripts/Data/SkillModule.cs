@@ -1,5 +1,11 @@
 using UnityEngine;
 
+/// <summary>
+/// File: SkillModule.cs 
+/// Author: Enhanced RPG System
+/// Description: Core skill data container and behavior definition for the Enhanced RPG Skill System.
+/// Supports Melee, Projectile, Area and Support skills with visualization and execution logic.
+/// </summary>
 [CreateAssetMenu(fileName = "SkillModule", menuName = "RPG/Skill Module")]
 public class SkillModule : ScriptableObject
 {
@@ -31,16 +37,15 @@ public class SkillModule : ScriptableObject
     public GameObject effectPrefab;
     public GameObject projectilePrefab;
     
-    [Header("Animation - Uses Existing 'Attack' Animation")]
-    public string animationTrigger = "Attack"; // Always use existing Attack trigger
+    [Header("Animation")]
+    [Tooltip("All skills use the existing 'Attack' animation")]
+    public string animationTrigger = "Attack";
     public float animationLength = 1f;
-    [Tooltip("All skills will use the existing 'Attack' animation parameter")]
-    public bool usesExistingAttackAnimation = true;
     
     [Header("Skill Type")]
-    public SkillType skillType = SkillType.Melee; // Use existing SkillType enum from SkillData.cs
+    public SkillType skillType = SkillType.Melee;
     
-    [Header("Damage Zone Override")]
+    [Header("Damage Zone")]
     [Tooltip("Optional: Custom damage zone prefab to override auto-generated zones")]
     public GameObject damageZonePrefab;
     
@@ -50,11 +55,11 @@ public class SkillModule : ScriptableObject
     public float criticalMultiplier = 2f;
     
     [Header("Upgrade System")]
-    public SkillModule[] upgrades; // Skill nâng c?p
+    public SkillModule[] upgrades;
     public int maxLevel = 5;
     public int currentLevel = 1;
 
-    [Header("Damage Area Visualization")]
+    [Header("Visualization")]
     [Tooltip("Show damage area indicator when using skill")]
     public bool showDamageArea = true;
     [Tooltip("Color of damage area indicator")]
@@ -62,38 +67,19 @@ public class SkillModule : ScriptableObject
     [Tooltip("Duration to show damage area in seconds")]
     public float damageAreaDisplayTime = 1f;
     
-    /// <summary>
-    /// Enhanced method to create skill executor with Support type support
-    /// </summary>
     public ISkillExecutor CreateExecutor()
     {
-        switch (skillType)
+        return skillType switch
         {
-            case SkillType.Melee:
-                return new MeleeSkillExecutor(this);
-            case SkillType.Projectile:
-                return new ProjectileSkillExecutor(this);
-            case SkillType.Area:
-                return new AreaSkillExecutor(this);
-            case SkillType.Support:
-                return new SupportSkillExecutor(this);
-            // Legacy support
-            case SkillType.Stun:
-                return new StunSkillExecutor(this);
-            case SkillType.Heal:
-                return new HealSkillExecutor(this);
-            case SkillType.Buff:
-                return new BuffSkillExecutor(this);
-            default:
-                return new MeleeSkillExecutor(this);
-        }
+            SkillType.Melee => new MeleeSkillExecutor(this),
+            SkillType.Projectile => new ProjectileSkillExecutor(this),
+            SkillType.Area => new AreaSkillExecutor(this),
+            SkillType.Support => new SupportSkillExecutor(this),
+            _ => new MeleeSkillExecutor(this)
+        };
     }
 
-    // Helper methods for skill validation
-    public bool CanPlayerUse(int playerLevel)
-    {
-        return playerLevel >= requiredLevel;
-    }
+    public bool CanPlayerUse(int playerLevel) => playerLevel >= requiredLevel;
 
     public bool CanExecute(Character user)
     {
@@ -115,31 +101,14 @@ public class SkillModule : ScriptableObject
         info += $"<i>{description}</i>\n\n";
         info += $"<color=#ffdd44>Level Required:</color> {requiredLevel}\n";
         
-        // Type-specific information
-        switch (skillType)
+        info += skillType switch
         {
-            case SkillType.Melee:
-                info += $"<color=#ff6666>Damage:</color> {damage}\n";
-                info += $"<color=#66ff66>Range:</color> {range}\n";
-                break;
-                
-            case SkillType.Projectile:
-                info += $"<color=#ff6666>Damage:</color> {damage}\n";
-                info += $"<color=#66ff66>Range:</color> {range}\n";
-                info += $"<color=#ffff66>Speed:</color> {speed}\n";
-                break;
-                
-            case SkillType.Area:
-                info += $"<color=#ff6666>Damage:</color> {damage}\n";
-                info += $"<color=#66ff66>Range:</color> {range}\n";
-                info += $"<color=#ffff66>Area Radius:</color> {areaRadius}\n";
-                break;
-                
-            case SkillType.Support:
-                if (healAmount > 0)
-                    info += $"<color=#66ff66>Heal Amount:</color> {healAmount}\n";
-                break;
-        }
+            SkillType.Melee => $"<color=#ff6666>Damage:</color> {damage}\n<color=#66ff66>Range:</color> {range}\n",
+            SkillType.Projectile => $"<color=#ff6666>Damage:</color> {damage}\n<color=#66ff66>Range:</color> {range}\n<color=#ffff66>Speed:</color> {speed}\n",
+            SkillType.Area => $"<color=#ff6666>Damage:</color> {damage}\n<color=#66ff66>Range:</color> {range}\n<color=#ffff66>Area Radius:</color> {areaRadius}\n",
+            SkillType.Support => healAmount > 0 ? $"<color=#66ff66>Heal Amount:</color> {healAmount}\n" : "",
+            _ => ""
+        };
         
         info += $"<color=#6666ff>Cooldown:</color> {cooldown}s\n";
         info += $"<color=#ffaa44>Mana Cost:</color> {manaCost}\n";
@@ -153,16 +122,15 @@ public class SkillModule : ScriptableObject
         return info;
     }
 
-    // Validation method for editor
     private void OnValidate()
     {
-        // Ensure animation trigger is always "Attack" for compatibility
-        if (usesExistingAttackAnimation)
-        {
-            animationTrigger = "Attack";
-        }
-        
-        // Ensure valid values
+        ValidateValues();
+        if (string.IsNullOrEmpty(description)) GenerateDefaultDescription();
+        UpdateDamageAreaColorByType();
+    }
+
+    private void ValidateValues()
+    {
         damage = Mathf.Max(0f, damage);
         range = Mathf.Max(0.1f, range);
         cooldown = Mathf.Max(0.1f, cooldown);
@@ -170,90 +138,46 @@ public class SkillModule : ScriptableObject
         requiredLevel = Mathf.Max(1, requiredLevel);
         areaRadius = Mathf.Max(0f, areaRadius);
         healAmount = Mathf.Max(0f, healAmount);
-        
-        // Auto-generate description if empty
-        if (string.IsNullOrEmpty(description))
-        {
-            GenerateDefaultDescription();
-        }
-        
-        // Auto-set appropriate damage area color based on skill type
-        UpdateDamageAreaColorByType();
     }
 
     private void GenerateDefaultDescription()
     {
-        switch (skillType)
+        description = skillType switch
         {
-            case SkillType.Melee:
-                description = $"Melee attack dealing {damage} damage in {range} range. Auto-generates hit zone collider around player.";
-                break;
-            case SkillType.Projectile:
-                description = $"Ranged projectile attack dealing {damage} damage with {range} range. Shows range circle and direction arrow.";
-                break;
-            case SkillType.Area:
-                description = $"Area attack dealing {damage} damage in {areaRadius} radius. Shows target area at mouse position.";
-                break;
-            case SkillType.Support:
-                description = healAmount > 0 ? 
-                    $"Support skill restoring {healAmount} health instantly. No damage zones." :
-                    "Support skill providing enhancement to the caster. No damage zones.";
-                break;
-            case SkillType.Stun:
-                description = $"Stun attack dealing {damage} damage and stunning for {stunDuration} seconds.";
-                break;
-            case SkillType.Heal:
-                description = $"Healing skill restoring {healAmount} health instantly.";
-                break;
-            case SkillType.Buff:
-                description = "Buff skill providing temporary enhancement to the caster.";
-                break;
-        }
+            SkillType.Melee => $"Melee attack dealing {damage} damage in {range} range.",
+            SkillType.Projectile => $"Ranged projectile attack dealing {damage} damage with {range} range.",
+            SkillType.Area => $"Area attack dealing {damage} damage in {areaRadius} radius.",
+            SkillType.Support => healAmount > 0 ? 
+                $"Support skill restoring {healAmount} health instantly." :
+                "Support skill providing enhancement to the caster.",
+            _ => "Unknown skill type"
+        };
     }
     
-    /// <summary>
-    /// Auto-update damage area color based on skill type
-    /// </summary>
     private void UpdateDamageAreaColorByType()
     {
-        // Only auto-update if using default color
-        if (damageAreaColor.Equals(new Color(1f, 0f, 0f, 0.3f)))
+        if (!damageAreaColor.Equals(new Color(1f, 0f, 0f, 0.3f))) return;
+        
+        damageAreaColor = skillType switch
         {
-            switch (skillType)
-            {
-                case SkillType.Melee:
-                    damageAreaColor = new Color(1f, 0f, 0f, 0.3f); // Red
-                    break;
-                case SkillType.Projectile:
-                    damageAreaColor = new Color(1f, 1f, 0f, 0.3f); // Yellow
-                    break;
-                case SkillType.Area:
-                    damageAreaColor = new Color(0f, 1f, 1f, 0.3f); // Cyan
-                    break;
-                case SkillType.Support:
-                    damageAreaColor = new Color(0f, 1f, 0f, 0.3f); // Green
-                    break;
-            }
-        }
+            SkillType.Melee => new Color(1f, 0f, 0f, 0.3f),
+            SkillType.Projectile => new Color(1f, 1f, 0f, 0.3f),
+            SkillType.Area => new Color(0f, 1f, 1f, 0.3f),
+            SkillType.Support => new Color(0f, 1f, 0f, 0.3f),
+            _ => new Color(1f, 0f, 0f, 0.3f)
+        };
     }
     
-    // Get skill stats for UI display
     public string GetStatsText()
     {
         string stats = "";
         
-        if (damage > 0)
-            stats += $"Damage: {damage}\n";
-        if (healAmount > 0)
-            stats += $"Heal: {healAmount}\n";
-        if (range > 0)
-            stats += $"Range: {range}\n";
-        if (areaRadius > 0)
-            stats += $"Area: {areaRadius}\n";
-        if (stunDuration > 0)
-            stats += $"Stun: {stunDuration}s\n";
-        if (knockbackForce > 0)
-            stats += $"Knockback: {knockbackForce}\n";
+        if (damage > 0) stats += $"Damage: {damage}\n";
+        if (healAmount > 0) stats += $"Heal: {healAmount}\n";
+        if (range > 0) stats += $"Range: {range}\n";
+        if (areaRadius > 0) stats += $"Area: {areaRadius}\n";
+        if (stunDuration > 0) stats += $"Stun: {stunDuration}s\n";
+        if (knockbackForce > 0) stats += $"Knockback: {knockbackForce}\n";
         
         stats += $"Cooldown: {cooldown}s\n";
         stats += $"Mana: {manaCost}\n";
@@ -262,63 +186,39 @@ public class SkillModule : ScriptableObject
         return stats;
     }
 
-    /// <summary>
-    /// Get skill color based on type - enhanced with Support
-    /// </summary>
     public Color GetSkillTypeColor()
     {
-        switch (skillType)
+        return skillType switch
         {
-            case SkillType.Melee: return Color.red;
-            case SkillType.Projectile: return Color.yellow;
-            case SkillType.Area: return Color.cyan;
-            case SkillType.Support: return Color.green;
-            case SkillType.Stun: return Color.magenta;
-            case SkillType.Heal: return Color.green;
-            case SkillType.Buff: return Color.blue;
-            default: return Color.white;
-        }
+            SkillType.Melee => Color.red,
+            SkillType.Projectile => Color.yellow,
+            SkillType.Area => Color.cyan,
+            SkillType.Support => Color.green,
+            _ => Color.white
+        };
     }
     
-    /// <summary>
-    /// Get skill type description for UI
-    /// </summary>
     public string GetSkillTypeDescription()
     {
-        switch (skillType)
+        return skillType switch
         {
-            case SkillType.Melee:
-                return "C?n chi?n - T? ??ng sinh collider vùng sát th??ng";
-            case SkillType.Projectile:
-                return "Phóng chiêu - V? vòng tròn t?m xa và m?i tên ch? ???ng";
-            case SkillType.Area:
-                return "Di?n r?ng - V? vùng sát th??ng t?i v? trí ??t chiêu";
-            case SkillType.Support:
-                return "H? tr? - Không c?n v? vùng, ch? th?c thi hi?u ?ng";
-            case SkillType.Stun:
-                return "Choáng (Legacy) - S? d?ng Melee thay th?";
-            case SkillType.Heal:
-                return "H?i máu (Legacy) - S? d?ng Support thay th?";
-            case SkillType.Buff:
-                return "Buff (Legacy) - S? d?ng Support thay th?";
-            default:
-                return "Không xác ??nh";
-        }
+            SkillType.Melee => "Melee - Auto-generates damage zone around player",
+            SkillType.Projectile => "Projectile - Shows range circle and direction arrow",
+            SkillType.Area => "Area - Shows damage zone at target location", 
+            SkillType.Support => "Support - No damage zone, applies effects directly",
+            _ => "Unknown skill type"
+        };
     }
     
-    /// <summary>
-    /// Check if skill requires target position (mouse click)
-    /// </summary>
-    public bool RequiresTargetPosition()
-    {
-        return skillType == SkillType.Projectile || skillType == SkillType.Area;
-    }
+    public bool RequiresTargetPosition() => skillType == SkillType.Projectile || skillType == SkillType.Area;
     
-    /// <summary>
-    /// Check if skill should show range indicator
-    /// </summary>
-    public bool ShouldShowRangeIndicator()
-    {
-        return skillType == SkillType.Projectile || skillType == SkillType.Area;
-    }
+    public bool ShouldShowRangeIndicator() => skillType == SkillType.Projectile || skillType == SkillType.Area;
+}
+
+public enum SkillType
+{
+    Melee,      // Melee attack - auto-generated damage zone
+    Projectile, // Projectile attack - shows range and direction
+    Area,       // Area effect - shows target zone
+    Support     // Support skill - no damage zone
 }

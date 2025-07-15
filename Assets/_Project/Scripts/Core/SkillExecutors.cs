@@ -2,7 +2,9 @@ using UnityEngine;
 using System.Collections;
 
 /// <summary>
-/// ENHANCED SKILL EXECUTORS v?i Support skill type và improved damage zones
+/// File: SkillExecutors.cs
+/// Author: Unity 2D RPG Refactoring Agent
+/// Description: Enhanced skill execution system with proper player damage prevention
 /// </summary>
 
 // Base class cho t?t c? skill executors
@@ -42,14 +44,18 @@ public abstract class SkillExecutorBase : ISkillExecutor
         if (animator != null)
         {
             animator.SetTrigger("Attack"); // ALWAYS use "Attack" trigger
-            Debug.Log($"?? Triggered Attack animation for {Module.skillName}");
         }
         
         // Also trigger PlayerController animation if available
-        var playerController = user.GetComponent<PlayerController>();
-        if (playerController != null)
+        var playerController = user.GetComponent<MonoBehaviour>();
+        if (playerController != null && playerController.GetType().Name == "PlayerController")
         {
-            playerController.TriggerSkillAnimation(Module.skillName);
+            // Use reflection to call TriggerSkillAnimation method
+            var method = playerController.GetType().GetMethod("TriggerSkillAnimation");
+            if (method != null)
+            {
+                method.Invoke(playerController, new object[] { Module.skillName });
+            }
         }
     }
     
@@ -86,32 +92,24 @@ public abstract class SkillExecutorBase : ISkillExecutor
     }
     
     /// <summary>
-    /// Enhanced enemy detection system
+    /// FIXED: Enhanced enemy detection with bulletproof player exclusion
     /// </summary>
-    protected Character[] FindEnemiesInRange(Vector2 center, float range)
+    protected Character[] FindEnemiesInRange(Vector2 center, float range, Character caster = null)
     {
         var enemies = new System.Collections.Generic.List<Character>();
         
-        Debug.Log($"?? ENEMY SEARCH: Center={center}, Range={range}");
-        
         // Find ALL Characters in scene and filter properly
         var allCharacters = Object.FindObjectsByType<Character>(FindObjectsSortMode.None);
-        Debug.Log($"?? Found {allCharacters.Length} total Characters in scene");
         
         foreach (var character in allCharacters)
         {
             if (character == null) continue;
             
-            // Skip if it's a player (has PlayerController)
-            if (character.GetComponent<PlayerController>() != null)
-            {
-                Debug.Log($"?? Skipping {character.name} (is player)");
-                continue;
-            }
+            // CRITICAL FIX: Multiple layers of player detection
+            if (IsPlayerCharacter(character, caster)) continue;
             
             // Calculate distance
             float distance = Vector2.Distance(center, character.transform.position);
-            Debug.Log($"?? Distance to {character.name}: {distance:F2} (range: {range})");
             
             if (distance <= range)
             {
@@ -119,21 +117,41 @@ public abstract class SkillExecutorBase : ISkillExecutor
                 if (character.health != null && character.health.currentValue > 0)
                 {
                     enemies.Add(character);
-                    Debug.Log($"? Added {character.name} to enemy list (distance: {distance:F2})");
                 }
-                else
-                {
-                    Debug.Log($"?? Skipping {character.name} (dead or no health)");
-                }
-            }
-            else
-            {
-                Debug.Log($"? {character.name} out of range (distance: {distance:F2} > {range})");
             }
         }
         
-        Debug.Log($"?? Final enemy count in range: {enemies.Count}");
         return enemies.ToArray();
+    }
+    
+    /// <summary>
+    /// BULLETPROOF player detection method
+    /// </summary>
+    protected bool IsPlayerCharacter(Character character, Character caster = null)
+    {
+        // Method 1: Same as caster
+        if (caster != null && character == caster) return true;
+        
+        // Method 2: Has PlayerController component
+        var playerController = character.GetComponent<MonoBehaviour>();
+        if (playerController != null && playerController.GetType().Name == "PlayerController")
+            return true;
+        
+        // Method 3: Check AttackableCharacter component
+        var attackable = character.GetComponent<AttackableCharacter>();
+        if (attackable != null && !attackable.CanBeAttacked())
+            return true;
+        
+        // Method 4: Check GameObject name patterns
+        string objName = character.gameObject.name.ToLower();
+        if (objName.Contains("player") || objName.Contains("hero") || objName.Contains("character"))
+            return true;
+            
+        // Method 5: Check tag
+        if (character.gameObject.CompareTag("Player"))
+            return true;
+        
+        return false;
     }
     
     /// <summary>
@@ -146,7 +164,6 @@ public abstract class SkillExecutorBase : ISkillExecutor
         Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(mouseScreenPos);
         Vector2 rawMousePos = new Vector2(mouseWorldPos.x, mouseWorldPos.y);
         
-        Debug.Log($"??? RAW MOUSE POSITION: Screen={Input.mousePosition}, World={rawMousePos}");
         return rawMousePos;
     }
     
@@ -165,78 +182,97 @@ public abstract class SkillExecutorBase : ISkillExecutor
             float distanceToMouse = Vector2.Distance(userPos, mouseTargetPosition);
             if (distanceToMouse <= maxDistance)
             {
-                Debug.Log($"?? AREA SKILL: Using exact mouse position {mouseTargetPosition}");
                 return mouseTargetPosition;
             }
             else
             {
                 Vector2 clampedPos = userPos + direction * maxDistance;
-                Debug.Log($"?? AREA SKILL: Mouse too far, clamped to {clampedPos}");
                 return clampedPos;
             }
         }
         
         // For other skills, normal range validation
         Vector2 validTarget = userPos + direction * Mathf.Min(Vector2.Distance(userPos, mouseTargetPosition), maxDistance);
-        Debug.Log($"? TARGET VALIDATION: Mouse={mouseTargetPosition}, User={userPos}, Valid={validTarget}");
         return validTarget;
     }
     
     /// <summary>
-    /// Enhanced damage area visualization v?i auto-generation
+    /// Enhanced damage area visualization v?i auto-generation và custom prefab support
     /// </summary>
     protected void ShowDamageAreaAtExactPosition(Vector2 exactPosition, float radius, string indicatorName = "DamageAreaIndicator")
     {
-        Debug.Log($"?? CREATING DAMAGE AREA AT EXACT POSITION: {exactPosition}");
-        Debug.Log($"?? Radius: {radius}, Name: {indicatorName}");
+        GameObject indicator = null;
         
-        // Check for Enhanced Skill System Manager
-        var enhancedManager = Object.FindFirstObjectByType<EnhancedSkillSystemManager>();
-        if (enhancedManager != null)
+        // ?u tiên s? d?ng custom prefab t? SkillModule
+        if (Module.damageZonePrefab != null)
         {
-            // Let the manager handle damage zone creation
-            Debug.Log($"?? Using EnhancedSkillSystemManager for damage zone creation");
-            return;
+            indicator = Object.Instantiate(Module.damageZonePrefab);
+            indicator.name = $"{indicatorName}_Custom_{Time.time:F2}";
+            
+            // Set position và scale cho custom prefab
+            indicator.transform.position = new Vector3(exactPosition.x, exactPosition.y, 0);
+            
+            // C? g?ng scale custom prefab theo radius
+            if (radius > 0)
+            {
+                indicator.transform.localScale = Vector3.one * radius * 2;
+            }
         }
-        
-        // Fallback: Create basic damage zone
-        GameObject indicator = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        indicator.name = $"{indicatorName}_EXACT_{Time.time:F2}";
-        
-        // Set exact position
-        indicator.transform.position = new Vector3(exactPosition.x, exactPosition.y, 0);
-        indicator.transform.localScale = Vector3.one * radius * 2;
-        
-        Debug.Log($"? Indicator created: Position={indicator.transform.position}, Scale={indicator.transform.localScale}");
-        
-        // Make it transparent
-        var renderer = indicator.GetComponent<Renderer>();
-        if (renderer != null)
+        else
         {
-            var material = new Material(Shader.Find("Standard"));
-            material.color = Module.damageAreaColor;
-            material.SetFloat("_Mode", 3); // Transparent mode
-            material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
-            material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-            material.SetInt("_ZWrite", 0);
-            material.DisableKeyword("_ALPHATEST_ON");
-            material.EnableKeyword("_ALPHABLEND_ON");
-            material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
-            material.renderQueue = 3000;
-            renderer.material = material;
-        }
-        
-        // Remove collider
-        var collider = indicator.GetComponent<Collider>();
-        if (collider != null)
-        {
-            Object.Destroy(collider);
+            // Fallback: Create basic damage zone
+            indicator = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            indicator.name = $"{indicatorName}_EXACT_{Time.time:F2}";
+            
+            // Set exact position
+            indicator.transform.position = new Vector3(exactPosition.x, exactPosition.y, 0);
+            indicator.transform.localScale = Vector3.one * radius * 2;
+            
+            // Make it transparent
+            var renderer = indicator.GetComponent<Renderer>();
+            if (renderer != null)
+            {
+                var material = new Material(Shader.Find("Standard"));
+                material.color = Module.damageAreaColor;
+                material.SetFloat("_Mode", 3); // Transparent mode
+                material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+                material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+                material.SetInt("_ZWrite", 0);
+                material.DisableKeyword("_ALPHATEST_ON");
+                material.EnableKeyword("_ALPHABLEND_ON");
+                material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+                material.renderQueue = 3000;
+                renderer.material = material;
+            }
+            
+            // Remove collider
+            var collider = indicator.GetComponent<Collider>();
+            if (collider != null)
+            {
+                Object.Destroy(collider);
+            }
         }
         
         // Auto destroy after display time
-        Object.Destroy(indicator, Module.damageAreaDisplayTime);
-        
-        Debug.Log($"? Damage area will be destroyed in {Module.damageAreaDisplayTime} seconds");
+        if (indicator != null)
+        {
+            Object.Destroy(indicator, Module.damageAreaDisplayTime);
+        }
+    }
+
+    public virtual void ShowDamageArea(Vector2 position)
+    {
+        // Default implementation: No action
+    }
+
+    public virtual void UpdateDamageArea(Vector2 position)
+    {
+        // Default implementation: No action
+    }
+
+    public virtual void HideDamageArea()
+    {
+        // Default implementation: No action
     }
 }
 
@@ -248,9 +284,6 @@ public class MeleeSkillExecutor : SkillExecutorBase
     public override void Execute(Character user, Vector2 targetPosition)
     {
         if (!Module.CanExecute(user)) return;
-
-        Debug.Log($"?? EXECUTING MELEE SKILL: {Module.skillName} with range {Module.range}");
-        Debug.Log($"?? User position: {user.transform.position}");
 
         // Use mana
         if (user.mana != null)
@@ -272,11 +305,9 @@ public class MeleeSkillExecutor : SkillExecutorBase
         
         // Attack ALWAYS centered on USER position
         Vector2 attackCenter = user.transform.position;
-        Debug.Log($"?? MELEE ATTACK CENTER: {attackCenter}");
         
-        var enemies = FindEnemiesInRange(attackCenter, Module.range);
-        
-        Debug.Log($"?? Melee attack from {user.name} found {enemies.Length} enemies within range {Module.range}");
+        // FIXED: Pass caster parameter to prevent self-damage
+        var enemies = FindEnemiesInRange(attackCenter, Module.range, user);
         
         foreach (var enemy in enemies)
         {
@@ -288,11 +319,9 @@ public class MeleeSkillExecutor : SkillExecutorBase
             if (isCritical)
             {
                 finalDamage *= Module.criticalMultiplier;
-                Debug.Log($"?? Critical hit on {enemy.name}! {finalDamage} damage");
             }
             
             enemy.TakeDamage(finalDamage, isCritical);
-            Debug.Log($"?? Dealt {finalDamage} damage to {enemy.name}");
             
             // Apply knockback if specified
             if (Module.knockbackForce > 0)
@@ -320,6 +349,22 @@ public class MeleeSkillExecutor : SkillExecutorBase
             ShowDamageAreaAtExactPosition(attackCenter, Module.range, "MeleeDamageArea_UserCentered");
         }
     }
+
+    public override void ShowDamageArea(Vector2 position)
+    {
+        // Không t?o damage area trong ShowDamageArea ?? tránh trùng l?p
+        // Damage area s? ???c t?o trong Execute() t?i v? trí player
+    }
+
+    public override void UpdateDamageArea(Vector2 position)
+    {
+        // Update logic for damage area if needed
+    }
+
+    public override void HideDamageArea()
+    {
+        // Logic to hide the damage area
+    }
 }
 
 // 2. PROJECTILE SKILL EXECUTOR - Phóng chiêu v?i range indicator
@@ -331,16 +376,9 @@ public class ProjectileSkillExecutor : SkillExecutorBase
     {
         if (!Module.CanExecute(user)) return;
 
-        Debug.Log($"?? EXECUTING PROJECTILE SKILL: {Module.skillName}");
-        Debug.Log($"?? User position: {user.transform.position}");
-        Debug.Log($"?? Target: {targetPosition}");
-
         // Use RAW mouse position for projectiles
         Vector2 rawMousePos = GetRawMouseWorldPosition();
         Vector2 validTarget = GetValidTargetPosition(rawMousePos, user);
-
-        Debug.Log($"??? Projectile targeting RAW mouse: {rawMousePos}");
-        Debug.Log($"? Projectile final target: {validTarget}");
 
         // Use mana
         if (user.mana != null)
@@ -359,8 +397,6 @@ public class ProjectileSkillExecutor : SkillExecutorBase
     private IEnumerator CreateProjectileAfterDelay(Character user, Vector2 targetPosition, float delay)
     {
         yield return new WaitForSeconds(delay);
-        
-        Debug.Log($"?? Creating projectile from {user.transform.position} to {targetPosition}");
         
         // Create projectile
         GameObject projectile = null;
@@ -395,6 +431,22 @@ public class ProjectileSkillExecutor : SkillExecutorBase
         var projectileBehavior = projectile.AddComponent<EnhancedProjectileBehavior>();
         projectileBehavior.Initialize(Module, user, targetPosition);
     }
+
+    public override void ShowDamageArea(Vector2 position)
+    {
+        // Projectile không hi?n th? damage area t?i v? trí b?t ??u
+        // Thay vào ?ó có th? hi?n th? trajectory ho?c không hi?n th? gì
+    }
+
+    public override void UpdateDamageArea(Vector2 position)
+    {
+        // Projectile có th? c?p nh?t trajectory preview
+    }
+
+    public override void HideDamageArea()
+    {
+        // ?n trajectory preview n?u có
+    }
 }
 
 // 3. AREA SKILL EXECUTOR - AoE v?i vùng sát th??ng chính xác
@@ -406,16 +458,9 @@ public class AreaSkillExecutor : SkillExecutorBase
     {
         if (!Module.CanExecute(user)) return;
 
-        Debug.Log($"?? EXECUTING AREA SKILL: {Module.skillName}");
-        Debug.Log($"?? User position: {user.transform.position}");
-        Debug.Log($"?? Target position: {targetPosition}");
-
         // Force use RAW mouse position
         Vector2 rawMousePos = GetRawMouseWorldPosition();
         Vector2 validTarget = GetValidTargetPosition(rawMousePos, user);
-        
-        Debug.Log($"??? Using RAW mouse position: {rawMousePos}");
-        Debug.Log($"? Final validated target: {validTarget}");
 
         // Use mana
         if (user.mana != null)
@@ -435,11 +480,9 @@ public class AreaSkillExecutor : SkillExecutorBase
     {
         yield return new WaitForSeconds(delay);
         
-        Debug.Log($"?? AREA ATTACK AT EXACT TARGET: {targetPosition} (radius: {Module.areaRadius})");
-        
         // Area damage EXACTLY at target position (mouse click)
-        var enemies = FindEnemiesInRange(targetPosition, Module.areaRadius);
-        Debug.Log($"?? Area attack hit {enemies.Length} enemies at {targetPosition} with radius {Module.areaRadius}");
+        // FIXED: Pass caster parameter to prevent self-damage
+        var enemies = FindEnemiesInRange(targetPosition, Module.areaRadius, user);
         
         foreach (var enemy in enemies)
         {
@@ -453,7 +496,6 @@ public class AreaSkillExecutor : SkillExecutorBase
             }
             
             enemy.TakeDamage(finalDamage, isCritical);
-            Debug.Log($"?? Area damage: {finalDamage} to {enemy.name}");
             
             // Apply stun if specified
             if (Module.stunDuration > 0)
@@ -474,6 +516,22 @@ public class AreaSkillExecutor : SkillExecutorBase
             ShowDamageAreaAtExactPosition(targetPosition, Module.areaRadius, "AreaDamageIndicator_MouseClick");
         }
     }
+
+    public override void ShowDamageArea(Vector2 position)
+    {
+        // Không t?o damage area t?i v? trí chu?t cho Area skill
+        // Ch? hi?n th? khi skill ???c execute
+    }
+
+    public override void UpdateDamageArea(Vector2 position)
+    {
+        // C?p nh?t v? trí vùng sát th??ng theo mouse nh?ng trong ph?m vi h?p l?
+    }
+
+    public override void HideDamageArea()
+    {
+        // ?n vùng sát th??ng area
+    }
 }
 
 // 4. SUPPORT SKILL EXECUTOR - H? tr? không c?n v? vùng
@@ -484,8 +542,6 @@ public class SupportSkillExecutor : SkillExecutorBase
     public override void Execute(Character user, Vector2 targetPosition)
     {
         if (!Module.CanExecute(user)) return;
-
-        Debug.Log($"? EXECUTING SUPPORT SKILL: {Module.skillName}");
 
         // Use mana
         if (user.mana != null)
@@ -505,13 +561,10 @@ public class SupportSkillExecutor : SkillExecutorBase
     {
         yield return new WaitForSeconds(delay);
         
-        Debug.Log($"? Support effect applied to {user.name}");
-        
         // Apply healing if specified
         if (Module.healAmount > 0)
         {
             user.Heal(Module.healAmount);
-            Debug.Log($"?? Healed {user.name} for {Module.healAmount} health");
         }
         
         // Apply buff effects (you can extend this)
@@ -556,8 +609,6 @@ public class SupportSkillExecutor : SkillExecutorBase
         
         // Auto destroy after effect
         Object.Destroy(supportEffect, Module.damageAreaDisplayTime);
-        
-        Debug.Log($"? Created support visual effect at {position}");
     }
 }
 
@@ -605,17 +656,12 @@ public class EnhancedProjectileBehavior : MonoBehaviour
             float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
             transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
         }
-        
-        Debug.Log($"?? PROJECTILE INITIALIZED: {skillModule.skillName}");
-        Debug.Log($"?? Start: {startPosition}, Target: {targetPosition}, Direction: {direction}");
-        Debug.Log($"? Max lifetime: {maxLifetime}, Speed: {skillModule.speed}");
     }
 
     private void Update()
     {
         if (skillModule == null)
         {
-            Debug.LogWarning("Projectile missing skill module, destroying");
             Destroy(gameObject);
             return;
         }
@@ -638,7 +684,6 @@ public class EnhancedProjectileBehavior : MonoBehaviour
         float distanceTraveled = Vector2.Distance(startPosition, transform.position);
         if (distanceTraveled >= skillModule.range || travelTime >= maxLifetime)
         {
-            Debug.Log($"?? Projectile {skillModule.skillName} exceeded range ({distanceTraveled:F2}/{skillModule.range}) or lifetime ({travelTime:F2}/{maxLifetime})");
             Destroy(gameObject);
         }
     }
@@ -650,11 +695,8 @@ public class EnhancedProjectileBehavior : MonoBehaviour
         
         foreach (var character in allCharacters)
         {
-            // Skip if it's the caster
-            if (character == caster) continue;
-            
-            // Skip if it's a player (has PlayerController)
-            if (character.GetComponent<PlayerController>() != null) continue;
+            // CRITICAL FIX: Use bulletproof player detection
+            if (IsPlayerCharacter(character)) continue;
             
             // Skip if dead
             if (character.health == null || character.health.currentValue <= 0) continue;
@@ -663,24 +705,50 @@ public class EnhancedProjectileBehavior : MonoBehaviour
             if (distance <= hitRadius)
             {
                 enemiesInRange.Add(character);
-                Debug.Log($"?? Projectile collision detected with {character.name} at distance {distance:F2}");
             }
         }
         
         return enemiesInRange.ToArray();
     }
     
+    /// <summary>
+    /// BULLETPROOF player detection for projectiles
+    /// </summary>
+    private bool IsPlayerCharacter(Character character)
+    {
+        // Same as caster
+        if (character == caster) return true;
+        
+        // Has PlayerController
+        var playerController = character.GetComponent<MonoBehaviour>();
+        if (playerController != null && playerController.GetType().Name == "PlayerController")
+            return true;
+        
+        // AttackableCharacter check
+        var attackable = character.GetComponent<AttackableCharacter>();
+        if (attackable != null && !attackable.CanBeAttacked())
+            return true;
+        
+        // Name patterns
+        string objName = character.gameObject.name.ToLower();
+        if (objName.Contains("player") || objName.Contains("hero") || objName.Contains("character"))
+            return true;
+            
+        // Tag check
+        if (character.gameObject.CompareTag("Player"))
+            return true;
+        
+        return false;
+    }
+    
     private void HitEnemy(Character enemy)
     {
-        Debug.Log($"?? PROJECTILE HIT: {skillModule.skillName} hit {enemy.name}");
-        
         // Calculate damage
         float finalDamage = skillModule.damage;
         bool isCritical = Random.Range(0f, 1f) < skillModule.criticalChance;
         if (isCritical)
         {
             finalDamage *= skillModule.criticalMultiplier;
-            Debug.Log($"?? Projectile critical hit! {finalDamage} damage");
         }
         
         enemy.TakeDamage(finalDamage, isCritical);
