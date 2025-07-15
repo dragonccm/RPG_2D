@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3801336f91abb87468f0d8079c0aef75, type: 3}
+  m_Name: Heal
+  m_EditorClassIdentifier: 
+  skillName: Heal
+  description: Instantly restore health and remove debuffs.
+  skillIcon: {fileID: 21300000, guid: 13acf4f525d3931478cf1ee0dedd3457, type: 3}
+  requiredLevel: 1
+  damage: 0
+  range: 2
+  speed: 5
+  cooldown: 4
+  manaCost: 20
+  stunDuration: 0
+  knockbackForce: 5
+  healAmount: 0
+  areaRadius: 0
+  chargeTime: 0
+  skillColor: {r: 0, g: 1, b: 0, a: 1}
+  castSound: {fileID: 0}
+  impactSound: {fileID: 0}
+  effectPrefab: {fileID: 0}
+  projectilePrefab: {fileID: 0}
+  animationTrigger: Attack
+  animationLength: 1
+  usesExistingAttackAnimation: 1
+  skillType: 5
+  criticalChance: 0.1
+  criticalMultiplier: 2
+  upgrades: []
+  maxLevel: 5
+  currentLevel: 1
+  showDamageArea: 1
+  damageAreaColor: {r: 1, g: 0, b: 0, a: 0.3}
+  damageAreaDisplayTime: 1

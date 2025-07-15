@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3801336f91abb87468f0d8079c0aef75, type: 3}
+  m_Name: ThunderStrike
+  m_EditorClassIdentifier: 
+  skillName: Thunder Strike
+  description: Calls down lightning to strike all nearby enemies.
+  skillIcon: {fileID: 21300000, guid: 84689119c0bdb5b4d8561e28ff3302c7, type: 3}
+  requiredLevel: 1
+  damage: 45
+  range: 2.5
+  speed: 5
+  cooldown: 6
+  manaCost: 40
+  stunDuration: 1
+  knockbackForce: 10
+  healAmount: 0
+  areaRadius: 2.5
+  chargeTime: 0.8
+  skillColor: {r: 1, g: 1, b: 0, a: 1}
+  castSound: {fileID: 0}
+  impactSound: {fileID: 0}
+  effectPrefab: {fileID: 0}
+  projectilePrefab: {fileID: 0}
+  animationTrigger: Attack
+  animationLength: 2
+  usesExistingAttackAnimation: 1
+  skillType: 2
+  criticalChance: 0.3
+  criticalMultiplier: 2.5
+  upgrades: []
+  maxLevel: 5
+  currentLevel: 1
+  showDamageArea: 1
+  damageAreaColor: {r: 1, g: 0, b: 0, a: 0.3}
+  damageAreaDisplayTime: 1

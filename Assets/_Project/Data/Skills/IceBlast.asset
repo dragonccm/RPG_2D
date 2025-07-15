@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3801336f91abb87468f0d8079c0aef75, type: 3}
+  m_Name: IceBlast
+  m_EditorClassIdentifier: 
+  skillName: Ice Blast
+  description: Freezing projectile that slows and damages enemies.
+  skillIcon: {fileID: 21300000, guid: ec955203e828ec34f86e6ce5f4816eda, type: 3}
+  requiredLevel: 1
+  damage: 28
+  range: 6
+  speed: 8
+  cooldown: 3
+  manaCost: 22
+  stunDuration: 0.5
+  knockbackForce: 4
+  healAmount: 0
+  areaRadius: 0
+  chargeTime: 0
+  skillColor: {r: 0.5, g: 0.8, b: 1, a: 1}
+  castSound: {fileID: 0}
+  impactSound: {fileID: 0}
+  effectPrefab: {fileID: 0}
+  projectilePrefab: {fileID: 0}
+  animationTrigger: Attack
+  animationLength: 1.3
+  usesExistingAttackAnimation: 1
+  skillType: 1
+  criticalChance: 0.12
+  criticalMultiplier: 2.2
+  upgrades: []
+  maxLevel: 5
+  currentLevel: 1
+  showDamageArea: 1
+  damageAreaColor: {r: 1, g: 0, b: 0, a: 0.3}
+  damageAreaDisplayTime: 1
