@@ -14,12 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   skillName: SwordStrike
   description: Basic sword strike dealing moderate damage to nearby enemies.
-  skillIcon: {fileID: 0}
+  skillIcon: {fileID: 21300000, guid: 8ebf48e8b8b271d41adb6fa2511b29fb, type: 3}
   requiredLevel: 1
   damage: 25
-  range: 2.5
-  speed: 0
-  cooldown: 1.5
+  range: 1
+  speed: 10
+  cooldown: 0.1
   manaCost: 10
   stunDuration: 0
   knockbackForce: 8
@@ -33,7 +33,6 @@ MonoBehaviour:
   projectilePrefab: {fileID: 0}
   animationTrigger: Attack
   animationLength: 1
-  usesExistingAttackAnimation: 1
   skillType: 0
   damageZonePrefab: {fileID: 0}
   criticalChance: 0.15

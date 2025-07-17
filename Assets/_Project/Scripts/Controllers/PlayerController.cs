@@ -28,6 +28,13 @@ public class PlayerController : MonoBehaviour
         character = GetComponent<Character>();
         skillManager = GetComponent<ModularSkillManager>();
         currentScaleX = transform.localScale.x;
+        
+        // Đảm bảo animator bắt đầu ở trạng thái Idle
+        if (animator != null)
+        {
+            animator.SetBool("IsMoving", false);
+            // Không set bất kỳ trigger nào ở đây
+        }
     }
 
     void Update()
@@ -43,6 +50,17 @@ public class PlayerController : MonoBehaviour
             float moveX = Input.GetAxisRaw("Horizontal");
             float moveY = Input.GetAxisRaw("Vertical");
             movement = new Vector2(moveX, moveY);
+
+            // Debug animation state
+            if (animator != null)
+            {
+                var currentState = animator.GetCurrentAnimatorStateInfo(0);
+                if (currentState.IsName("Guard") && !Input.GetKey(KeyCode.LeftShift))
+                {
+                    Debug.LogWarning("🚨 UNEXPECTED Guard animation detected! Forcing back to Idle.");
+                    animator.SetBool("IsMoving", false);
+                }
+            }
 
             animator.SetBool("IsMoving", movement.sqrMagnitude > 0);
 
@@ -211,19 +229,23 @@ public class PlayerController : MonoBehaviour
     }
 
     /// <summary>
-    /// Called by skill system when using skills - triggers existing Attack animation
+    /// Called by skill system when using skills - uses skill-specific animation trigger
     /// </summary>
-    public void TriggerSkillAnimation(string skillName = "")
+    public void TriggerSkillAnimation(string skillName = "", string animationTrigger = "")
     {
         if (animator != null)
         {
             isBusy = true;
-            animator.SetTrigger("Attack"); // All skills use existing Attack animation
+            
+            // Sử dụng animationTrigger từ skill hoặc fallback về "Attack"
+            string trigger = !string.IsNullOrEmpty(animationTrigger) ? animationTrigger : "Attack";
+            animator.SetTrigger(trigger);
+            
             movement = Vector2.zero;
 
             string logMessage = string.IsNullOrEmpty(skillName) ?
-                "🗡️ Triggered Attack animation for skill" :
-                $"🗡️ Triggered Attack animation for {skillName}";
+                $"🗡️ Triggered {trigger} animation for skill" :
+                $"🗡️ Triggered {trigger} animation for {skillName}";
             Debug.Log(logMessage);
 
             // Auto-reset if no Animation Event is set up

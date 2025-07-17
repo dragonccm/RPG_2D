@@ -18,8 +18,8 @@ MonoBehaviour:
   requiredLevel: 1
   damage: 35
   range: 2.5
-  speed: 5
-  cooldown: 1.2
+  speed: 10
+  cooldown: 0.1
   manaCost: 8
   stunDuration: 0
   knockbackForce: 5
@@ -33,8 +33,8 @@ MonoBehaviour:
   projectilePrefab: {fileID: 0}
   animationTrigger: Attack
   animationLength: 1
-  usesExistingAttackAnimation: 1
   skillType: 0
+  damageZonePrefab: {fileID: 0}
   criticalChance: 0.1
   criticalMultiplier: 2
   upgrades: []

@@ -75,6 +75,7 @@ public class SkillModule : ScriptableObject
             SkillType.Projectile => new ProjectileSkillExecutor(this),
             SkillType.Area => new AreaSkillExecutor(this),
             SkillType.Support => new SupportSkillExecutor(this),
+            SkillType.Instant => new InstantSkillExecutor(this),
             _ => new MeleeSkillExecutor(this)
         };
     }
@@ -150,6 +151,9 @@ public class SkillModule : ScriptableObject
             SkillType.Support => healAmount > 0 ? 
                 $"Support skill restoring {healAmount} health instantly." :
                 "Support skill providing enhancement to the caster.",
+            SkillType.Instant => healAmount > 0 ?
+                $"Instant heal restoring {healAmount} health immediately." :
+                "Instant skill with immediate effect.",
             _ => "Unknown skill type"
         };
     }
@@ -164,6 +168,7 @@ public class SkillModule : ScriptableObject
             SkillType.Projectile => new Color(1f, 1f, 0f, 0.3f),
             SkillType.Area => new Color(0f, 1f, 1f, 0.3f),
             SkillType.Support => new Color(0f, 1f, 0f, 0.3f),
+            SkillType.Instant => new Color(1f, 0f, 1f, 0.3f), // Magenta for instant
             _ => new Color(1f, 0f, 0f, 0.3f)
         };
     }
@@ -194,6 +199,7 @@ public class SkillModule : ScriptableObject
             SkillType.Projectile => Color.yellow,
             SkillType.Area => Color.cyan,
             SkillType.Support => Color.green,
+            SkillType.Instant => Color.magenta,
             _ => Color.white
         };
     }
@@ -206,6 +212,7 @@ public class SkillModule : ScriptableObject
             SkillType.Projectile => "Projectile - Shows range circle and direction arrow",
             SkillType.Area => "Area - Shows damage zone at target location", 
             SkillType.Support => "Support - No damage zone, applies effects directly",
+            SkillType.Instant => "Instant - No targeting required, instant execution",
             _ => "Unknown skill type"
         };
     }
@@ -213,6 +220,8 @@ public class SkillModule : ScriptableObject
     public bool RequiresTargetPosition() => skillType == SkillType.Projectile || skillType == SkillType.Area;
     
     public bool ShouldShowRangeIndicator() => skillType == SkillType.Projectile || skillType == SkillType.Area;
+    
+    public bool IsInstantSkill() => skillType == SkillType.Instant;
 }
 
 public enum SkillType
@@ -220,5 +229,6 @@ public enum SkillType
     Melee,      // Melee attack - auto-generated damage zone
     Projectile, // Projectile attack - shows range and direction
     Area,       // Area effect - shows target zone
-    Support     // Support skill - no damage zone
+    Support,    // Support skill - no damage zone
+    Instant     // Instant skill - no targeting required, instant execution
 }

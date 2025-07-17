@@ -121,6 +121,16 @@ public class ModularSkillManager : MonoBehaviour
 
     private void UpdateCooldowns()
     {
+        // Enhanced cooldown system using SkillSlot's built-in cooldown management
+        foreach (var slot in skillSlots)
+        {
+            if (slot.HasSkill())
+            {
+                slot.UpdateCooldown();
+            }
+        }
+        
+        // Legacy cooldown system (keep for backward compatibility)
         var cooldownList = cooldownTimers.ToList();
         foreach (var pair in cooldownList)
         {
@@ -141,24 +151,621 @@ public class ModularSkillManager : MonoBehaviour
             var slot = skillSlots[i];
             if (!slot.isUnlocked || !slot.HasSkill()) continue;
 
+            var skill = slot.equippedSkill;
+            
+            // Enhanced input handling with better validation
+            if (!slot.CanExecuteSkill(player)) continue;
+            
+            // Instant skills: Execute immediately on key down
+            if (skill.skillType == SkillType.Instant)
+            {
+                if (Input.GetKeyDown(slot.hotkey))
+                {
+                    ActivateSkillEnhanced(i);
+                }
+                continue; // Skip the hold-release logic for instant skills
+            }
+
+            // Normal skills: Enhanced hold-release logic
             if (Input.GetKeyDown(slot.hotkey))
             {
-                // Phase 1: Start skill
-                StartSkillPreview(i);
+                // Phase 1: Start skill with enhanced validation
+                StartSkillPreviewEnhanced(i);
             }
 
             if (Input.GetKey(slot.hotkey))
             {
-                // Phase 2: Hold skill
-                HoldSkillPreview(i);
+                // Phase 2: Hold skill with smooth updates
+                HoldSkillPreviewEnhanced(i);
             }
 
             if (Input.GetKeyUp(slot.hotkey))
             {
-                // Phase 3: Release skill
-                ActivateSkill(i);
-                EndSkillPreview(i);
+                // Phase 3: Release skill with enhanced execution
+                ActivateSkillEnhanced(i);
+                EndSkillPreviewEnhanced(i);
             }
+        }
+    }
+
+    /// <summary>
+    /// Enhanced skill preview start with better validation and visual feedback
+    /// </summary>
+    private void StartSkillPreviewEnhanced(int slotIndex)
+    {
+        if (isSkillActive || slotIndex >= skillSlots.Count) return;
+
+        var slot = skillSlots[slotIndex];
+        if (!slot.isUnlocked || !slot.HasSkill()) return;
+        
+        // Enhanced validation
+        if (!slot.CanExecuteSkill(player))
+        {
+            Debug.Log($"?? Cannot execute skill '{slot.equippedSkill.skillName}' - conditions not met");
+            return;
+        }
+
+        var skill = slot.equippedSkill;
+        if (skill == null || !skill.showDamageArea) return;
+
+        // Enhanced skill preview with better visual feedback
+        ShowSkillPreviewEnhanced(skill);
+
+        isSkillActive = true;
+        activeSkillSlot = slotIndex;
+        
+        Debug.Log($"?? Started preview for skill '{skill.skillName}' in slot {slotIndex}");
+    }
+
+    /// <summary>
+    /// Enhanced skill preview hold with smooth updates
+    /// </summary>
+    private void HoldSkillPreviewEnhanced(int slotIndex)
+    {
+        if (!isSkillActive || slotIndex != activeSkillSlot) return;
+
+        var slot = skillSlots[slotIndex];
+        if (!slot.isUnlocked || !slot.HasSkill()) return;
+
+        var skill = slot.equippedSkill;
+        if (skill == null || !skill.showDamageArea) return;
+
+        // Smooth preview updates
+        UpdateSkillPreviewEnhanced(skill);
+        isSkillHeld = true;
+    }
+
+    /// <summary>
+    /// Enhanced skill preview end with cleanup
+    /// </summary>
+    private void EndSkillPreviewEnhanced(int slotIndex)
+    {
+        if (!isSkillActive || slotIndex != activeSkillSlot) return;
+
+        var slot = skillSlots[slotIndex];
+        string skillName = slot.HasSkill() ? slot.equippedSkill.skillName : "Unknown";
+        
+        // Enhanced preview cleanup
+        HideSkillPreviewEnhanced();
+
+        isSkillActive = false;
+        isSkillHeld = false;
+        activeSkillSlot = -1;
+        
+        Debug.Log($"?? Ended preview for skill '{skillName}'");
+    }
+
+    /// <summary>
+    /// Enhanced skill activation with better error handling and feedback
+    /// </summary>
+    private void ActivateSkillEnhanced(int slotIndex)
+    {
+        if (slotIndex >= skillSlots.Count) 
+        {
+            Debug.LogWarning($"?? Invalid slot index: {slotIndex}");
+            return;
+        }
+        
+        var slot = skillSlots[slotIndex];
+        if (!slot.isUnlocked || !slot.HasSkill()) 
+        {
+            Debug.LogWarning($"?? Slot {slotIndex} is not unlocked or has no skill");
+            return;
+        }
+        
+        // Use enhanced SkillSlot execution method
+        var skill = slot.equippedSkill;
+        Vector2 targetPos = Vector2.zero;
+        
+        // Enhanced target position calculation
+        if (skill.skillType != SkillType.Instant)
+        {
+            targetPos = GetEnhancedMouseWorldPosition();
+        }
+        else
+        {
+            targetPos = player.transform.position;
+        }
+        
+        // Execute using enhanced SkillSlot method
+        bool success = slot.TryExecuteSkill(player, targetPos);
+        
+        if (success)
+        {
+            // Update legacy cooldown system for compatibility
+            if (slot.executor != null)
+            {
+                cooldownTimers[slot.executor] = slot.executor.GetCooldown();
+            }
+            
+            Debug.Log($"? Successfully activated skill '{skill.skillName}' from slot {slotIndex}");
+        }
+        else
+        {
+            Debug.Log($"? Failed to activate skill '{skill.skillName}' from slot {slotIndex}");
+        }
+    }
+
+    /// <summary>
+    /// Enhanced skill preview with better visuals and positioning
+    /// </summary>
+    private void ShowSkillPreviewEnhanced(SkillModule skill)
+    {
+        Vector2 playerPosition = transform.position;
+        
+        // Enhanced skill type handling
+        switch (skill.skillType)
+        {
+            case SkillType.Melee:
+                ShowMeleePreviewEnhanced(skill, playerPosition);
+                break;
+            case SkillType.Area:
+                ShowAreaPreviewEnhanced(skill, playerPosition);
+                break;
+            case SkillType.Projectile:
+                ShowProjectilePreviewEnhanced(skill, playerPosition);
+                break;
+            case SkillType.Instant:
+                // Instant skills show brief flash effect
+                ShowInstantPreviewEnhanced(skill, playerPosition);
+                return;
+            default:
+                // Support skills show brief indicator
+                ShowSupportPreviewEnhanced(skill, playerPosition);
+                return;
+        }
+    }
+
+    /// <summary>
+    /// Enhanced melee preview with better visual feedback
+    /// </summary>
+    private void ShowMeleePreviewEnhanced(SkillModule skill, Vector2 playerPosition)
+    {
+        if (skill.damageZonePrefab != null)
+        {
+            if (currentPreviewDamageArea == null)
+            {
+                currentPreviewDamageArea = Object.Instantiate(skill.damageZonePrefab);
+                currentPreviewDamageArea.name = "MeleePreviewArea_Enhanced";
+                
+                // Add enhanced visual effects
+                AddPreviewEnhancements(currentPreviewDamageArea, skill.damageAreaColor);
+            }
+            
+            currentPreviewDamageArea.transform.position = new Vector3(playerPosition.x, playerPosition.y, -0.1f);
+            currentPreviewDamageArea.transform.localScale = Vector3.one * skill.range * 2;
+        }
+        else
+        {
+            if (currentPreviewDamageArea == null)
+            {
+                currentPreviewDamageArea = CreateEnhancedPreviewSphere(playerPosition, skill.range, skill.damageAreaColor, "MeleePreview");
+            }
+            
+            currentPreviewDamageArea.transform.position = new Vector3(playerPosition.x, playerPosition.y, -0.1f);
+        }
+
+        currentPreviewDamageArea.SetActive(true);
+    }
+
+    /// <summary>
+    /// Enhanced area preview with smooth mouse tracking
+    /// </summary>
+    private void ShowAreaPreviewEnhanced(SkillModule skill, Vector2 playerPosition)
+    {
+        Vector2 mousePos = GetEnhancedMouseWorldPosition();
+        Vector2 validPos = GetValidTargetPositionEnhanced(mousePos, playerPosition, skill);
+        
+        if (skill.damageZonePrefab != null)
+        {
+            if (currentPreviewDamageArea == null)
+            {
+                currentPreviewDamageArea = Object.Instantiate(skill.damageZonePrefab);
+                currentPreviewDamageArea.name = "AreaPreviewArea_Enhanced";
+                
+                AddPreviewEnhancements(currentPreviewDamageArea, skill.damageAreaColor);
+            }
+            
+            currentPreviewDamageArea.transform.position = new Vector3(validPos.x, validPos.y, -0.1f);
+            currentPreviewDamageArea.transform.localScale = Vector3.one * skill.areaRadius * 2;
+        }
+        else
+        {
+            if (currentPreviewDamageArea == null)
+            {
+                currentPreviewDamageArea = CreateEnhancedPreviewSphere(validPos, skill.areaRadius, skill.damageAreaColor, "AreaPreview");
+            }
+            
+            currentPreviewDamageArea.transform.position = new Vector3(validPos.x, validPos.y, -0.1f);
+        }
+
+        currentPreviewDamageArea.SetActive(true);
+    }
+
+    /// <summary>
+    /// Enhanced projectile preview with better trajectory visualization
+    /// </summary>
+    private void ShowProjectilePreviewEnhanced(SkillModule skill, Vector2 playerPosition)
+    {
+        Vector2 mousePos = GetEnhancedMouseWorldPosition();
+        Vector2 direction = (mousePos - playerPosition).normalized;
+        
+        if (skill.damageZonePrefab != null)
+        {
+            if (currentProjectileDirectionLine == null)
+            {
+                currentProjectileDirectionLine = Object.Instantiate(skill.damageZonePrefab);
+                currentProjectileDirectionLine.name = "ProjectileDirection_Enhanced";
+                
+                AddPreviewEnhancements(currentProjectileDirectionLine, skill.skillColor);
+            }
+            
+            // Enhanced positioning and rotation
+            UpdateProjectileDirectionEnhanced(playerPosition, direction, skill.range);
+        }
+        else
+        {
+            if (currentProjectileDirectionLine == null)
+            {
+                currentProjectileDirectionLine = CreateEnhancedDirectionLine(playerPosition, direction, skill.range, skill.skillColor);
+            }
+            
+            UpdateProjectileDirectionLineEnhanced(playerPosition, direction, skill.range, skill.skillColor);
+        }
+
+        currentProjectileDirectionLine.SetActive(true);
+        
+        // Hide damage area for projectiles
+        if (currentPreviewDamageArea != null)
+        {
+            currentPreviewDamageArea.SetActive(false);
+        }
+    }
+
+    /// <summary>
+    /// Enhanced instant skill preview with brief flash effect
+    /// </summary>
+    private void ShowInstantPreviewEnhanced(SkillModule skill, Vector2 playerPosition)
+    {
+        // Create brief flash effect for instant skills
+        GameObject flashEffect = new GameObject($"InstantPreview_{skill.skillName}");
+        flashEffect.transform.position = new Vector3(playerPosition.x, playerPosition.y, -0.1f);
+        
+        var particleSystem = flashEffect.AddComponent<ParticleSystem>();
+        var main = particleSystem.main;
+        main.startColor = skill.skillColor;
+        main.startLifetime = 0.3f;
+        main.startSpeed = 2f;
+        main.maxParticles = 20;
+        main.startSize = 0.2f;
+        
+        var emission = particleSystem.emission;
+        emission.SetBursts(new ParticleSystem.Burst[]
+        {
+            new ParticleSystem.Burst(0.0f, 15)
+        });
+        
+        var shape = particleSystem.shape;
+        shape.shapeType = ParticleSystemShapeType.Circle;
+        shape.radius = 0.5f;
+        
+        // Auto destroy
+        Object.Destroy(flashEffect, 1f);
+    }
+
+    /// <summary>
+    /// Enhanced support skill preview with gentle indicator
+    /// </summary>
+    private void ShowSupportPreviewEnhanced(SkillModule skill, Vector2 playerPosition)
+    {
+        // Create gentle indicator for support skills
+        GameObject supportIndicator = new GameObject($"SupportPreview_{skill.skillName}");
+        supportIndicator.transform.position = new Vector3(playerPosition.x, playerPosition.y, -0.1f);
+        
+        var particleSystem = supportIndicator.AddComponent<ParticleSystem>();
+        var main = particleSystem.main;
+        main.startColor = new Color(skill.skillColor.r, skill.skillColor.g, skill.skillColor.b, 0.6f);
+        main.startLifetime = 1f;
+        main.startSpeed = 0.8f;
+        main.maxParticles = 12;
+        main.startSize = 0.15f;
+        
+        var emission = particleSystem.emission;
+        emission.rateOverTime = 8f;
+        
+        var shape = particleSystem.shape;
+        shape.shapeType = ParticleSystemShapeType.Circle;
+        shape.radius = 0.8f;
+        
+        var velocityOverLifetime = particleSystem.velocityOverLifetime;
+        velocityOverLifetime.enabled = true;
+        velocityOverLifetime.radial = new ParticleSystem.MinMaxCurve(1f);
+        
+        // Auto destroy
+        Object.Destroy(supportIndicator, 1.5f);
+    }
+
+    /// <summary>
+    /// Enhanced mouse world position with better accuracy
+    /// </summary>
+    private Vector2 GetEnhancedMouseWorldPosition()
+    {
+        Vector3 mouseScreenPos = Input.mousePosition;
+        mouseScreenPos.z = 10f;
+        Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(mouseScreenPos);
+        return new Vector2(mouseWorldPos.x, mouseWorldPos.y);
+    }
+
+    /// <summary>
+    /// Enhanced target position validation with smoother clamping
+    /// </summary>
+    private Vector2 GetValidTargetPositionEnhanced(Vector2 mousePos, Vector2 playerPos, SkillModule skill)
+    {
+        Vector2 direction = (mousePos - playerPos).normalized;
+        float distance = Vector2.Distance(mousePos, playerPos);
+        float maxRange = skill.range;
+
+        if (distance <= maxRange)
+        {
+            return mousePos;
+        }
+        else
+        {
+            // Smooth clamping to range
+            return Vector2.Lerp(playerPos, mousePos, maxRange / distance);
+        }
+    }
+
+    /// <summary>
+    /// Create enhanced preview sphere with better visuals
+    /// </summary>
+    private GameObject CreateEnhancedPreviewSphere(Vector2 position, float radius, Color color, string name)
+    {
+        GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        sphere.name = $"{name}_Enhanced_{Time.time:F2}";
+        sphere.transform.position = new Vector3(position.x, position.y, -0.1f);
+        sphere.transform.localScale = Vector3.one * radius * 2;
+        
+        // Remove collider
+        var collider = sphere.GetComponent<Collider>();
+        if (collider != null)
+        {
+            Object.Destroy(collider);
+        }
+        
+        // Enhanced material
+        SetEnhancedPreviewMaterial(sphere, color);
+        AddPreviewEnhancements(sphere, color);
+        
+        return sphere;
+    }
+
+    /// <summary>
+    /// Add visual enhancements to preview objects
+    /// </summary>
+    private void AddPreviewEnhancements(GameObject previewObject, Color baseColor)
+    {
+        // Add pulsing effect
+        var pulseEffect = previewObject.AddComponent<DamageAreaPulseEffect>();
+        pulseEffect.Initialize(baseColor, float.MaxValue); // Infinite duration for preview
+        
+        // Add subtle particle effect
+        var particleSystem = previewObject.AddComponent<ParticleSystem>();
+        var main = particleSystem.main;
+        main.startColor = new Color(baseColor.r, baseColor.g, baseColor.b, 0.3f);
+        main.startLifetime = 1f;
+        main.startSpeed = 0.5f;
+        main.maxParticles = 8;
+        main.startSize = 0.05f;
+        
+        var emission = particleSystem.emission;
+        emission.rateOverTime = 5f;
+        
+        var shape = particleSystem.shape;
+        shape.shapeType = ParticleSystemShapeType.Circle;
+        shape.radius = 0.8f;
+    }
+
+    /// <summary>
+    /// Enhanced preview material setup
+    /// </summary>
+    private void SetEnhancedPreviewMaterial(GameObject previewObject, Color skillColor)
+    {
+        var renderer = previewObject.GetComponent<Renderer>();
+        if (renderer != null)
+        {
+            var material = new Material(Shader.Find("Standard"));
+            var previewColor = skillColor;
+            previewColor.a = 0.25f; // Enhanced alpha for better visibility
+            material.color = previewColor;
+            
+            // Enhanced transparency settings
+            material.SetFloat("_Mode", 3);
+            material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+            material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+            material.SetInt("_ZWrite", 0);
+            material.DisableKeyword("_ALPHATEST_ON");
+            material.EnableKeyword("_ALPHABLEND_ON");
+            material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+            material.renderQueue = 3000;
+            
+            // Add emission for glow effect
+            material.EnableKeyword("_EMISSION");
+            material.SetColor("_EmissionColor", skillColor * 0.2f);
+            
+            renderer.material = material;
+        }
+    }
+
+    /// <summary>
+    /// Create enhanced direction line for projectiles
+    /// </summary>
+    private GameObject CreateEnhancedDirectionLine(Vector2 playerPosition, Vector2 direction, float range, Color skillColor)
+    {
+        GameObject directionLine = new GameObject("ProjectileDirectionLine_Enhanced");
+        var lineRenderer = directionLine.AddComponent<LineRenderer>();
+        
+        // Enhanced line renderer setup
+        lineRenderer.material = CreateEnhancedLineMaterial(skillColor);
+        lineRenderer.startWidth = 0.15f;
+        lineRenderer.endWidth = 0.05f;
+        lineRenderer.positionCount = 2;
+        lineRenderer.useWorldSpace = true;
+        
+        // Add glow effect
+        lineRenderer.material.EnableKeyword("_EMISSION");
+        lineRenderer.material.SetColor("_EmissionColor", skillColor * 0.5f);
+        
+        return directionLine;
+    }
+
+    /// <summary>
+    /// Update enhanced direction line
+    /// </summary>
+    private void UpdateProjectileDirectionLineEnhanced(Vector2 playerPosition, Vector2 direction, float range, Color skillColor)
+    {
+        var lineRenderer = currentProjectileDirectionLine.GetComponent<LineRenderer>();
+        if (lineRenderer != null)
+        {
+            Vector3 startPos = new Vector3(playerPosition.x, playerPosition.y, -0.1f);
+            Vector3 endPos = startPos + (Vector3)(direction * range);
+            
+            lineRenderer.SetPosition(0, startPos);
+            lineRenderer.SetPosition(1, endPos);
+            lineRenderer.material.color = skillColor;
+        }
+    }
+
+    /// <summary>
+    /// Create enhanced line material with glow effect
+    /// </summary>
+    private Material CreateEnhancedLineMaterial(Color color)
+    {
+        var material = new Material(Shader.Find("Sprites/Default"));
+        material.color = color;
+        
+        // Add emission for glow
+        if (material.HasProperty("_EmissionColor"))
+        {
+            material.EnableKeyword("_EMISSION");
+            material.SetColor("_EmissionColor", color * 0.3f);
+        }
+        
+        return material;
+    }
+
+    /// <summary>
+    /// Enhanced preview update with smooth transitions
+    /// </summary>
+    private void UpdateSkillPreviewEnhanced(SkillModule skill)
+    {
+        Vector2 playerPosition = transform.position;
+
+        switch (skill.skillType)
+        {
+            case SkillType.Area:
+                // Smooth area preview updates
+                if (currentPreviewDamageArea != null)
+                {
+                    Vector2 mousePos = GetEnhancedMouseWorldPosition();
+                    Vector2 validPos = GetValidTargetPositionEnhanced(mousePos, playerPosition, skill);
+                    
+                    // Smooth interpolation for better visual feedback
+                    Vector3 currentPos = currentPreviewDamageArea.transform.position;
+                    Vector3 targetPos = new Vector3(validPos.x, validPos.y, -0.1f);
+                    currentPreviewDamageArea.transform.position = Vector3.Lerp(currentPos, targetPos, Time.deltaTime * 10f);
+                }
+                break;
+                
+            case SkillType.Projectile:
+                // Smooth projectile direction updates
+                if (currentProjectileDirectionLine != null)
+                {
+                    Vector2 mousePos = GetEnhancedMouseWorldPosition();
+                    Vector2 direction = (mousePos - playerPosition).normalized;
+                    UpdateProjectileDirectionEnhanced(playerPosition, direction, skill.range);
+                }
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Enhanced projectile direction update
+    /// </summary>
+    private void UpdateProjectileDirectionEnhanced(Vector2 playerPosition, Vector2 direction, float range)
+    {
+        if (currentProjectileDirectionLine == null) return;
+        
+        Vector3 startPos = new Vector3(playerPosition.x, playerPosition.y, -0.1f);
+        Vector3 endPos = startPos + (Vector3)(direction * range);
+        Vector3 midPos = (startPos + endPos) / 2f;
+        
+        // Smooth position updates
+        Vector3 currentPos = currentProjectileDirectionLine.transform.position;
+        currentProjectileDirectionLine.transform.position = Vector3.Lerp(currentPos, midPos, Time.deltaTime * 15f);
+        
+        // Smooth rotation updates
+        if (direction != Vector2.zero)
+        {
+            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+            Quaternion targetRotation = Quaternion.AngleAxis(angle, Vector3.forward);
+            currentProjectileDirectionLine.transform.rotation = Quaternion.Lerp(
+                currentProjectileDirectionLine.transform.rotation, 
+                targetRotation, 
+                Time.deltaTime * 10f
+            );
+        }
+    }
+
+    /// <summary>
+    /// Enhanced preview hiding with cleanup
+    /// </summary>
+    private void HideSkillPreviewEnhanced()
+    {
+        if (currentPreviewDamageArea != null)
+        {
+            // Add fade-out effect before hiding
+            var fadeEffect = currentPreviewDamageArea.GetComponent<FadeOutEffect>();
+            if (fadeEffect == null)
+            {
+                fadeEffect = currentPreviewDamageArea.AddComponent<FadeOutEffect>();
+            }
+            fadeEffect.StartFadeOut(0f, 0.2f);
+            
+            currentPreviewDamageArea.SetActive(false);
+        }
+        
+        if (currentProjectileDirectionLine != null)
+        {
+            // Add fade-out effect for projectile line
+            var fadeEffect = currentProjectileDirectionLine.GetComponent<FadeOutEffect>();
+            if (fadeEffect == null)
+            {
+                fadeEffect = currentProjectileDirectionLine.AddComponent<FadeOutEffect>();
+            }
+            fadeEffect.StartFadeOut(0f, 0.2f);
+            
+            currentProjectileDirectionLine.SetActive(false);
         }
     }
 
@@ -223,6 +830,10 @@ public class ModularSkillManager : MonoBehaviour
             case SkillType.Projectile:
                 ShowProjectilePreview(skill, playerPosition);
                 break;
+            case SkillType.Instant:
+                // Instant skills không c?n preview - s? execute ngay l?p t?c
+                HideAllPreviews();
+                return;
             default:
                 // Support không hi?n th? preview
                 HideAllPreviews();
@@ -540,10 +1151,22 @@ public class ModularSkillManager : MonoBehaviour
             return;
         }
         
-        Vector3 mouseScreenPos = Input.mousePosition;
-        mouseScreenPos.z = 10f;
-        Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(mouseScreenPos);
-        Vector2 targetPos = new Vector2(mouseWorldPos.x, mouseWorldPos.y);
+        var skill = slot.equippedSkill;
+        Vector2 targetPos = Vector2.zero;
+        
+        // Instant skills don't need mouse position
+        if (skill.skillType != SkillType.Instant)
+        {
+            Vector3 mouseScreenPos = Input.mousePosition;
+            mouseScreenPos.z = 10f;
+            Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(mouseScreenPos);
+            targetPos = new Vector2(mouseWorldPos.x, mouseWorldPos.y);
+        }
+        else
+        {
+            // For instant skills, use player position as target
+            targetPos = player.transform.position;
+        }
         
         executor.Execute(player, targetPos);
         cooldownTimers[executor] = executor.GetCooldown();

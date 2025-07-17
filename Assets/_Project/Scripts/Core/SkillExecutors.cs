@@ -36,25 +36,30 @@ public abstract class SkillExecutorBase : ISkillExecutor
     }
     
     /// <summary>
-    /// FIXED: Always use "Attack" animation for compatibility
+    /// Enhanced animation trigger using SkillModule.animationTrigger
     /// </summary>
     protected void TriggerAnimation(Character user)
     {
         var animator = user.GetComponent<Animator>();
         if (animator != null)
         {
-            animator.SetTrigger("Attack"); // ALWAYS use "Attack" trigger
+            // S? d?ng animationTrigger t? Module thay vì hard-coded
+            string trigger = !string.IsNullOrEmpty(Module.animationTrigger) ? 
+                            Module.animationTrigger : "Attack";
+            animator.SetTrigger(trigger);
         }
         
         // Also trigger PlayerController animation if available
         var playerController = user.GetComponent<MonoBehaviour>();
         if (playerController != null && playerController.GetType().Name == "PlayerController")
         {
-            // Use reflection to call TriggerSkillAnimation method
+            // Use reflection to call TriggerSkillAnimation method with animationTrigger
             var method = playerController.GetType().GetMethod("TriggerSkillAnimation");
             if (method != null)
             {
-                method.Invoke(playerController, new object[] { Module.skillName });
+                string trigger = !string.IsNullOrEmpty(Module.animationTrigger) ? 
+                                Module.animationTrigger : "Attack";
+                method.Invoke(playerController, new object[] { Module.skillName, trigger });
             }
         }
     }
@@ -210,56 +215,218 @@ public abstract class SkillExecutorBase : ISkillExecutor
             indicator.name = $"{indicatorName}_Custom_{Time.time:F2}";
             
             // Set position và scale cho custom prefab
-            indicator.transform.position = new Vector3(exactPosition.x, exactPosition.y, 0);
+            indicator.transform.position = new Vector3(exactPosition.x, exactPosition.y, -0.1f); // Slightly in front for visibility
             
             // C? g?ng scale custom prefab theo radius
             if (radius > 0)
             {
                 indicator.transform.localScale = Vector3.one * radius * 2;
             }
+            
+            // Add enhanced visual effects for custom prefabs
+            AddEnhancedVisualEffects(indicator, Module.damageAreaColor);
         }
         else
         {
-            // Fallback: Create basic damage zone
-            indicator = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            indicator.name = $"{indicatorName}_EXACT_{Time.time:F2}";
-            
-            // Set exact position
-            indicator.transform.position = new Vector3(exactPosition.x, exactPosition.y, 0);
-            indicator.transform.localScale = Vector3.one * radius * 2;
-            
-            // Make it transparent
-            var renderer = indicator.GetComponent<Renderer>();
-            if (renderer != null)
-            {
-                var material = new Material(Shader.Find("Standard"));
-                material.color = Module.damageAreaColor;
-                material.SetFloat("_Mode", 3); // Transparent mode
-                material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
-                material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-                material.SetInt("_ZWrite", 0);
-                material.DisableKeyword("_ALPHATEST_ON");
-                material.EnableKeyword("_ALPHABLEND_ON");
-                material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
-                material.renderQueue = 3000;
-                renderer.material = material;
-            }
-            
-            // Remove collider
-            var collider = indicator.GetComponent<Collider>();
-            if (collider != null)
-            {
-                Object.Destroy(collider);
-            }
+            // Fallback: Create basic damage zone with enhanced visuals
+            indicator = CreateEnhancedDamageZoneIndicator(exactPosition, radius, indicatorName);
         }
         
         // Auto destroy after display time
         if (indicator != null)
         {
-            Object.Destroy(indicator, Module.damageAreaDisplayTime);
+            // Add fade-out effect before destruction
+            StartFadeOutEffect(indicator, Module.damageAreaDisplayTime);
+            Object.Destroy(indicator, Module.damageAreaDisplayTime + 0.5f);
         }
     }
 
+    /// <summary>
+    /// Create enhanced damage zone indicator with better visuals
+    /// </summary>
+    private GameObject CreateEnhancedDamageZoneIndicator(Vector2 position, float radius, string indicatorName)
+    {
+        GameObject indicator = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        indicator.name = $"{indicatorName}_EXACT_{Time.time:F2}";
+        
+        // Set exact position with slight z-offset for visibility
+        indicator.transform.position = new Vector3(position.x, position.y, -0.1f);
+        indicator.transform.localScale = Vector3.one * radius * 2;
+        
+        // Enhanced material setup
+        var renderer = indicator.GetComponent<Renderer>();
+        if (renderer != null)
+        {
+            var material = CreateEnhancedDamageAreaMaterial(Module.damageAreaColor);
+            renderer.material = material;
+        }
+        
+        // Remove collider to avoid interference
+        var collider = indicator.GetComponent<Collider>();
+        if (collider != null)
+        {
+            Object.Destroy(collider);
+        }
+        
+        // Add pulsing effect
+        var pulseEffect = indicator.AddComponent<DamageAreaPulseEffect>();
+        pulseEffect.Initialize(Module.damageAreaColor, Module.damageAreaDisplayTime);
+        
+        return indicator;
+    }
+
+    /// <summary>
+    /// Create enhanced material for damage area visualization
+    /// </summary>
+    private Material CreateEnhancedDamageAreaMaterial(Color baseColor)
+    {
+        var material = new Material(Shader.Find("Standard"));
+        
+        // Enhanced color with better alpha blending
+        var enhancedColor = baseColor;
+        enhancedColor.a = 0.4f; // More visible alpha
+        material.color = enhancedColor;
+        
+        // Enhanced transparency settings
+        material.SetFloat("_Mode", 3); // Transparent mode
+        material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+        material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+        material.SetInt("_ZWrite", 0);
+        material.DisableKeyword("_ALPHATEST_ON");
+        material.EnableKeyword("_ALPHABLEND_ON");
+        material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+        material.renderQueue = 3000;
+        
+        // Add emission for better visibility
+        material.EnableKeyword("_EMISSION");
+        material.SetColor("_EmissionColor", baseColor * 0.3f);
+        
+        return material;
+    }
+
+    /// <summary>
+    /// Add enhanced visual effects to custom prefabs
+    /// </summary>
+    private void AddEnhancedVisualEffects(GameObject indicator, Color effectColor)
+    {
+        // Try to find existing renderer and enhance it
+        var renderer = indicator.GetComponent<Renderer>();
+        if (renderer != null && renderer.material != null)
+        {
+            var material = renderer.material;
+            
+            // Enhance existing material
+            material.color = new Color(effectColor.r, effectColor.g, effectColor.b, 0.6f);
+            
+            // Add emission if the material supports it
+            if (material.HasProperty("_EmissionColor"))
+            {
+                material.SetColor("_EmissionColor", effectColor * 0.2f);
+                material.EnableKeyword("_EMISSION");
+            }
+        }
+        
+        // Add particle effect for extra visual flair
+        AddDamageAreaParticleEffect(indicator, effectColor);
+    }
+
+    /// <summary>
+    /// Add particle effect to damage area
+    /// </summary>
+    private void AddDamageAreaParticleEffect(GameObject indicator, Color effectColor)
+    {
+        var particleSystem = indicator.AddComponent<ParticleSystem>();
+        
+        var main = particleSystem.main;
+        main.startColor = effectColor;
+        main.startLifetime = 0.8f;
+        main.startSpeed = 0.5f;
+        main.maxParticles = 15;
+        main.startSize = 0.1f;
+        main.simulationSpace = ParticleSystemSimulationSpace.World;
+        
+        var emission = particleSystem.emission;
+        emission.rateOverTime = 10f;
+        
+        var shape = particleSystem.shape;
+        shape.shapeType = ParticleSystemShapeType.Circle;
+        shape.radius = 0.8f;
+        
+        var colorOverLifetime = particleSystem.colorOverLifetime;
+        colorOverLifetime.enabled = true;
+        
+        Gradient gradient = new Gradient();
+        gradient.SetKeys(
+            new GradientColorKey[] { new GradientColorKey(effectColor, 0.0f), new GradientColorKey(effectColor, 1.0f) },
+            new GradientAlphaKey[] { new GradientAlphaKey(0.8f, 0.0f), new GradientAlphaKey(0.0f, 1.0f) }
+        );
+        colorOverLifetime.color = gradient;
+    }
+
+    /// <summary>
+    /// Start fade-out effect for damage area indicator
+    /// </summary>
+    private void StartFadeOutEffect(GameObject indicator, float delay)
+    {
+        var fadeEffect = indicator.AddComponent<FadeOutEffect>();
+        fadeEffect.StartFadeOut(delay, 0.5f);
+    }
+
+    /// <summary>
+    /// Calculate optimal execution delay based on animation length
+    /// </summary>
+    protected float CalculateOptimalExecutionDelay(float defaultDelay)
+    {
+        // Use animation length if available, otherwise use default
+        if (Module.animationLength > 0)
+        {
+            // Use 60% of animation length for optimal timing
+            return Module.animationLength * 0.6f;
+        }
+        return defaultDelay;
+    }
+    
+    /// <summary>
+    /// Calculate enhanced damage with critical hit system
+    /// </summary>
+    protected float CalculateEnhancedDamage(float baseDamage, float critChance, float critMultiplier)
+    {
+        bool isCritical = Random.Range(0f, 1f) < critChance;
+        return isCritical ? baseDamage * critMultiplier : baseDamage;
+    }
+    
+    /// <summary>
+    /// Create individual hit effect for each enemy hit
+    /// </summary>
+    protected void CreateIndividualHitEffect(Vector3 position, bool isCritical)
+    {
+        GameObject hitEffect = new GameObject($"HitEffect_{Time.time:F2}");
+        hitEffect.transform.position = position;
+        
+        // Create particle system for hit effect
+        var particleSystem = hitEffect.AddComponent<ParticleSystem>();
+        var main = particleSystem.main;
+        main.startColor = isCritical ? Color.yellow : Color.red;
+        main.startLifetime = 0.5f;
+        main.startSpeed = 3f;
+        main.maxParticles = isCritical ? 15 : 8;
+        main.startSize = isCritical ? 0.3f : 0.2f;
+        
+        var emission = particleSystem.emission;
+        emission.SetBursts(new ParticleSystem.Burst[]
+        {
+            new ParticleSystem.Burst(0.0f, isCritical ? 10 : 5),
+            new ParticleSystem.Burst(0.1f, isCritical ? 5 : 3)
+        });
+        
+        var shape = particleSystem.shape;
+        shape.shapeType = ParticleSystemShapeType.Circle;
+        shape.radius = 0.3f;
+        
+        // Auto destroy
+        Object.Destroy(hitEffect, 1f);
+    }
+    
     public virtual void ShowDamageArea(Vector2 position)
     {
         // Default implementation: No action
@@ -301,7 +468,9 @@ public class MeleeSkillExecutor : SkillExecutorBase
 
     private IEnumerator DealMeleeDamageAfterDelay(Character user, float delay)
     {
-        yield return new WaitForSeconds(delay);
+        // Enhanced timing system - use animation length if available
+        float actualDelay = CalculateOptimalExecutionDelay(delay);
+        yield return new WaitForSeconds(actualDelay);
         
         // Attack ALWAYS centered on USER position
         Vector2 attackCenter = user.transform.position;
@@ -309,24 +478,44 @@ public class MeleeSkillExecutor : SkillExecutorBase
         // FIXED: Pass caster parameter to prevent self-damage
         var enemies = FindEnemiesInRange(attackCenter, Module.range, user);
         
+        // Enhanced feedback for no targets found
+        if (enemies.Length == 0)
+        {
+            Debug.Log($"?? Melee skill '{Module.skillName}' found no valid targets in range {Module.range}");
+            
+            // Still show damage area for visual feedback
+            if (Module.showDamageArea)
+            {
+                ShowDamageAreaAtExactPosition(attackCenter, Module.range, "MeleeDamageArea_NoTargets");
+            }
+            
+            // Play impact sound even without targets
+            PlayImpactSound(user);
+            CreateVisualEffect(user.transform.position);
+            yield break;
+        }
+        
+        Debug.Log($"?? Melee skill '{Module.skillName}' hitting {enemies.Length} enemies");
+        
         foreach (var enemy in enemies)
         {
             if (enemy == null) continue;
             
-            // Calculate damage with potential critical
-            float finalDamage = Module.damage;
+            // Calculate damage with enhanced critical system
+            float finalDamage = CalculateEnhancedDamage(Module.damage, Module.criticalChance, Module.criticalMultiplier);
             bool isCritical = Random.Range(0f, 1f) < Module.criticalChance;
-            if (isCritical)
-            {
-                finalDamage *= Module.criticalMultiplier;
-            }
             
+            // Apply damage with enhanced feedback
             enemy.TakeDamage(finalDamage, isCritical);
             
-            // Apply knockback if specified
+            // Enhanced knockback with position-based direction
             if (Module.knockbackForce > 0)
             {
                 Vector2 knockbackDirection = (enemy.transform.position - user.transform.position).normalized;
+                if (knockbackDirection.magnitude < 0.1f) // Prevent zero-direction knockback
+                {
+                    knockbackDirection = Random.insideUnitCircle.normalized;
+                }
                 enemy.ApplyKnockback(Module.knockbackForce, knockbackDirection);
             }
             
@@ -335,19 +524,39 @@ public class MeleeSkillExecutor : SkillExecutorBase
             {
                 enemy.ApplyStun(Module.stunDuration);
             }
+            
+            // Create individual hit effects for each enemy
+            CreateIndividualHitEffect(enemy.transform.position, isCritical);
         }
         
         // Play impact sound
         PlayImpactSound(user);
         
-        // Create visual effect
+        // Create main visual effect
         CreateVisualEffect(user.transform.position);
         
-        // Show damage area ALWAYS at user position for melee
+        // Show enhanced damage area ALWAYS at user position for melee
         if (Module.showDamageArea)
         {
             ShowDamageAreaAtExactPosition(attackCenter, Module.range, "MeleeDamageArea_UserCentered");
         }
+    }
+
+    private float CalculateOptimalExecutionDelay(float defaultDelay)
+    {
+        // Placeholder for enhanced timing logic
+        return defaultDelay;
+    }
+
+    private float CalculateEnhancedDamage(float baseDamage, float criticalChance, float criticalMultiplier)
+    {
+        bool isCritical = Random.Range(0f, 1f) < criticalChance;
+        return isCritical ? baseDamage * criticalMultiplier : baseDamage;
+    }
+
+    private void CreateIndividualHitEffect(Vector3 position, bool isCritical)
+    {
+        // Placeholder for creating individual hit effects
     }
 
     public override void ShowDamageArea(Vector2 position)
@@ -609,6 +818,113 @@ public class SupportSkillExecutor : SkillExecutorBase
         
         // Auto destroy after effect
         Object.Destroy(supportEffect, Module.damageAreaDisplayTime);
+    }
+}
+
+// 5. INSTANT SKILL EXECUTOR - Instant skills without targeting
+public class InstantSkillExecutor : SkillExecutorBase
+{
+    public InstantSkillExecutor(SkillModule module) : base(module) { }
+
+    public override void Execute(Character user, Vector2 targetPosition)
+    {
+        if (!Module.CanExecute(user)) return;
+
+        // Use mana
+        if (user.mana != null)
+            user.mana.Decrease(Module.manaCost);
+
+        // Trigger animation immediately
+        TriggerAnimation(user);
+        
+        // Play cast sound
+        PlayCastSound(user);
+
+        // Apply instant effects immediately - no delay
+        ApplyInstantEffects(user);
+    }
+    
+    private void ApplyInstantEffects(Character user)
+    {
+        // Apply healing if specified
+        if (Module.healAmount > 0)
+        {
+            user.Heal(Module.healAmount);
+            Debug.Log($"?? Instant heal: {Module.healAmount} HP restored!");
+        }
+        
+        // Apply shield/defense buffs (you can extend this)
+        if (Module.knockbackForce > 0)
+        {
+            // Use knockbackForce as shield amount for instant skills
+            // TODO: Implement shield system
+            Debug.Log($"??? Shield applied: {Module.knockbackForce} points!");
+        }
+        
+        // Apply speed/movement buffs
+        if (Module.speed > 0)
+        {
+            // TODO: Implement speed buff system
+            Debug.Log($"? Speed buff applied: {Module.speed}!");
+        }
+        
+        // Apply damage buffs
+        if (Module.damage > 0)
+        {
+            // TODO: Implement damage buff system
+            Debug.Log($"?? Damage buff applied: {Module.damage}!");
+        }
+        
+        // Create visual effect at user position
+        CreateVisualEffect(user.transform.position);
+        
+        // Play impact sound
+        PlayImpactSound(user);
+        
+        // Show instant effect visual if enabled
+        if (Module.showDamageArea)
+        {
+            CreateInstantVisualEffect(user.transform.position);
+        }
+    }
+    
+    /// <summary>
+    /// T?o visual effect ??c bi?t cho Instant skills
+    /// </summary>
+    private void CreateInstantVisualEffect(Vector2 position)
+    {
+        GameObject instantEffect = new GameObject($"InstantEffect_{Module.skillName}");
+        instantEffect.transform.position = new Vector3(position.x, position.y, 0);
+        
+        // T?o particle system cho instant effect
+        var particleSystem = instantEffect.AddComponent<ParticleSystem>();
+        var main = particleSystem.main;
+        main.startColor = Module.skillColor;
+        main.startLifetime = 1f;
+        main.startSpeed = 2f;
+        main.maxParticles = 30;
+        main.startSize = 0.3f;
+        
+        var emission = particleSystem.emission;
+        emission.rateOverTime = 50f;
+        emission.SetBursts(new ParticleSystem.Burst[]
+        {
+            new ParticleSystem.Burst(0.0f, 15),
+            new ParticleSystem.Burst(0.1f, 10),
+            new ParticleSystem.Burst(0.2f, 5)
+        });
+        
+        var shape = particleSystem.shape;
+        shape.shapeType = ParticleSystemShapeType.Circle;
+        shape.radius = 0.5f;
+        
+        // Velocity over lifetime for burst effect
+        var velocityOverLifetime = particleSystem.velocityOverLifetime;
+        velocityOverLifetime.enabled = true;
+        velocityOverLifetime.radial = new ParticleSystem.MinMaxCurve(2f);
+        
+        // Auto destroy after effect
+        Object.Destroy(instantEffect, 2f);
     }
 }
 

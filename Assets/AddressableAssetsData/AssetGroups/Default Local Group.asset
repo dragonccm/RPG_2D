@@ -15,6 +15,11 @@ MonoBehaviour:
   m_GroupName: Default Local Group
   m_GUID: 4a296186229a34043af811e6a1cf5cde
   m_SerializeEntries:
+  - m_GUID: b05955f2f34e2f34d871602791abbc4d
+    m_Address: Assets/_Project/Art/Tiny Swords (Update 010)/Terrain/Water/Rocks/Rocks_01.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: b529ac963b02a754ab820eee8e5ef1d2
     m_Address: Assets/_Project/Art/Terrain/Ground/Tilemap_Flat.png
     m_ReadOnly: 0

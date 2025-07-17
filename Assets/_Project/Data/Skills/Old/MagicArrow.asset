@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   skillName: MagicArrow
   description: Fast magical arrow that travels in straight line.
-  skillIcon: {fileID: 0}
+  skillIcon: {fileID: 21300000, guid: 1434dc95856fa30429595f1de8ab3280, type: 3}
   requiredLevel: 2
   damage: 20
   range: 8
