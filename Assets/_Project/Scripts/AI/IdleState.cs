@@ -26,12 +26,17 @@ public class IdleState : State
         if (aiController.playerTarget != null)
         {
             float distanceToPlayer = Vector3.Distance(aiController.transform.position, aiController.playerTarget.position);
+            Debug.Log($"[{aiController.enemyType}] IdleState: Player detected. Distance: {distanceToPlayer:F2}m. Detection Range: {detectionRange:F2}m.");
             // Nếu player trong vùng detection, chuyển sang ChaseState
             if (distanceToPlayer < detectionRange)
             {
                 Debug.Log($"[{aiController.enemyType}] Player detected, switching to ChaseState");
                 stateMachine.ChangeState(aiController.chaseState);
             }
+        }
+        else
+        {
+            // Debug.Log($"[{aiController.enemyType}] IdleState: No playerTarget.");
         }
     }
 

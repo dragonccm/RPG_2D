@@ -4,43 +4,43 @@ using System.Collections.Generic;
 using UnityEngine.Events;
 
 /// <summary>
-/// Qu?n l� t?t c? c�c AI agent trong scene
+/// Quản lý tất cả các AI agent trong scene.
 /// </summary>
 public class EnemyAIManager : MonoBehaviour
 {
     [Header("AI Management")]
-    [Tooltip("Danh s�ch t?t c? c�c AI agent ?ang ho?t ??ng")]
+    [Tooltip("Danh sách tất cả các AI agent đang hoạt động")]
     public List<EnemyAIController> activeAgents = new List<EnemyAIController>();
-    [Tooltip("Kho?ng th?i gian c?p nh?t cho c�c agent ? xa")]
+    [Tooltip("Khoảng thời gian cập nhật cho các agent ở xa")]
     public float distantAgentUpdateInterval = 1f;
-    [Tooltip("Kho?ng c�ch ?? coi m?t agent l� ? xa")]
+    [Tooltip("Khoảng cách để coi một agent là ở xa")]
     public float distantAgentThreshold = 50f;
-    
+
     [Header("AI Spawning")]
-    [Tooltip("C� cho ph�p sinh ra AI kh�ng")]
+    [Tooltip("Có cho phép sinh ra AI không")]
     public bool allowSpawning = true;
-    [Tooltip("S? l??ng AI t?i ?a trong scene")]
+    [Tooltip("Số lượng AI tối đa trong scene")]
     public int maxAgents = 50;
-    [Tooltip("Danh s�ch c�c spawner")]
+    [Tooltip("Danh sách các spawner")]
     public List<EnemySpawner> spawners = new List<EnemySpawner>();
-    
+
     [Header("AI Groups")]
-    [Tooltip("C� s? d?ng h? th?ng nh�m kh�ng")]
+    [Tooltip("Có sử dụng hệ thống nhóm không")]
     public bool useGrouping = true;
-    [Tooltip("Danh s�ch c�c nh�m AI")]
+    [Tooltip("Danh sách các nhóm AI")]
     public List<AIGroup> aiGroups = new List<AIGroup>();
-    
+
     [Header("AI Events")]
-    [Tooltip("S? ki?n khi m?t agent ???c th�m v�o")]
+    [Tooltip("Sự kiện khi một agent được thêm vào")]
     public UnityEvent<EnemyAIController> OnAgentAdded;
-    [Tooltip("S? ki?n khi m?t agent b? x�a")]
+    [Tooltip("Sự kiện khi một agent bị xóa")]
     public UnityEvent<EnemyAIController> OnAgentRemoved;
-    [Tooltip("S? ki?n khi m?t agent ch?t")]
+    [Tooltip("Sự kiện khi một agent chết")]
     public UnityEvent<EnemyAIController> OnAgentDeath;
-    
+
     // Singleton instance
     public static EnemyAIManager Instance { get; private set; }
-    
+
     private void Awake()
     {
         // Singleton pattern
@@ -53,86 +53,86 @@ public class EnemyAIManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
-    
+
     private void Start()
     {
-        // T�m t?t c? c�c spawner trong scene n?u ch?a ???c g�n
+        // Tìm tất cả các spawner trong scene nếu chưa được gán
         if (spawners.Count == 0)
         {
             spawners.AddRange(FindObjectsOfType<EnemySpawner>());
         }
-        
-        // B?t ??u coroutine c?p nh?t c�c agent ? xa
+
+        // Bắt đầu coroutine cập nhật các agent ở xa
         StartCoroutine(UpdateDistantAgents());
     }
-    
+
     /// <summary>
-    /// Th�m m?t agent v�o danh s�ch qu?n l�
+    /// Thêm một agent vào danh sách quản lý
     /// </summary>
     public void AddAgent(EnemyAIController agent)
     {
-        // N?u agent ch?a c� trong danh s�ch
+        // Nếu agent chưa có trong danh sách
         if (!activeAgents.Contains(agent))
         {
-            // Th�m v�o danh s�ch
+            // Thêm vào danh sách
             activeAgents.Add(agent);
-            
-            // ??ng k� s? ki?n khi agent ch?t
+
+            // Đăng ký sự kiện khi agent chết
             Character character = agent.GetComponent<Character>();
             if (character != null)
             {
                 // Correctly subscribe to the OnDeath event
                 character.OnDeath += () => HandleAgentDeath(agent);
             }
-            
-            // G?i s? ki?n
+
+            // Gọi sự kiện
             OnAgentAdded.Invoke(agent);
         }
     }
-    
+
     /// <summary>
-    /// X�a m?t agent kh?i danh s�ch qu?n l�
+    /// Xóa một agent khỏi danh sách quản lý
     /// </summary>
     public void RemoveAgent(EnemyAIController agent)
     {
-        // N?u agent c� trong danh s�ch
+        // Nếu agent có trong danh sách
         if (activeAgents.Contains(agent))
         {
-            // X�a kh?i danh s�ch
+            // Xóa khỏi danh sách
             activeAgents.Remove(agent);
-            
-            // H?y ??ng k� s? ki?n
+
+            // Hủy đăng ký sự kiện
             Character character = agent.GetComponent<Character>();
             if (character != null)
             {
                 character.OnDeath -= () => HandleAgentDeath(agent);
             }
-            
-            // G?i s? ki?n
+
+            // Gọi sự kiện
             OnAgentRemoved.Invoke(agent);
         }
     }
-    
+
     /// <summary>
-    /// X? l� s? ki?n khi m?t agent ch?t
+    /// Xử lý sự kiện khi một agent chết
     /// </summary>
     private void HandleAgentDeath(EnemyAIController agent)
     {
-        // G?i s? ki?n
+        // Gọi sự kiện
         OnAgentDeath.Invoke(agent);
-        
-        // X�a agent kh?i danh s�ch
+
+        // Xóa agent khỏi danh sách
         RemoveAgent(agent);
     }
-    
+
     /// <summary>
-    /// T�m agent g?n nh?t v?i m?t v? tr�
+    /// Tìm agent gần nhất với một vị trí
     /// </summary>
     public EnemyAIController FindNearestAgent(Vector3 position)
     {
         EnemyAIController nearestAgent = null;
         float minDistance = float.MaxValue;
-        
+
         foreach (EnemyAIController agent in activeAgents)
         {
             float distance = Vector3.Distance(position, agent.transform.position);
@@ -142,17 +142,17 @@ public class EnemyAIManager : MonoBehaviour
                 nearestAgent = agent;
             }
         }
-        
+
         return nearestAgent;
     }
-    
+
     /// <summary>
-    /// T�m t?t c? c�c agent trong m?t b�n k�nh
+    /// Tìm tất cả các agent trong một bán kính
     /// </summary>
     public List<EnemyAIController> FindAgentsInRadius(Vector3 position, float radius)
     {
         List<EnemyAIController> agentsInRadius = new List<EnemyAIController>();
-        
+
         foreach (EnemyAIController agent in activeAgents)
         {
             if (Vector3.Distance(position, agent.transform.position) <= radius)
@@ -160,47 +160,48 @@ public class EnemyAIManager : MonoBehaviour
                 agentsInRadius.Add(agent);
             }
         }
-        
+
         return agentsInRadius;
     }
-    
+
     /// <summary>
-    /// Coroutine c?p nh?t c�c agent ? xa
+    /// Coroutine cập nhật các agent ở xa
     /// </summary>
     private IEnumerator UpdateDistantAgents()
     {
         while (true)
         {
-            // T�m ng??i ch?i
+            // Tìm người chơi
             GameObject player = GameObject.FindGameObjectWithTag("Player");
             if (player != null)
             {
                 Vector3 playerPosition = player.transform.position;
-                
-                // C?p nh?t c�c agent ? xa
+
+                // Cập nhật các agent ở xa
                 foreach (EnemyAIController agent in activeAgents)
                 {
-                    if (Vector3.Distance(playerPosition, agent.transform.position) > distantAgentThreshold)
-                    {
-                        // Gi?m t?n su?t c?p nh?t c?a agent
-                        // (V� d?: v� hi?u h�a m?t s? component ho?c gi?m t?n su?t c?p nh?t c?a ch�ng)
-                        agent.enabled = false; // T?m th?i v� hi?u h�a to�n b? component
-                    }
-                    else
-                    {
-                        // K�ch ho?t l?i agent
-                        agent.enabled = true;
-                    }
+                    // Loại bỏ logic vô hiệu hóa component để tránh phá vỡ State Machine
+                    // Thay vào đó, nếu cần tối ưu, có thể giảm tần suất tính toán bên trong AI
+                    // hoặc sử dụng một hệ thống "cập nhật thấp tần số" riêng biệt.
+                    // Hiện tại, chúng ta sẽ để AI luôn hoạt động.
+                    // if (Vector3.Distance(playerPosition, agent.transform.position) > distantAgentThreshold)
+                    // {
+                    //     agent.enabled = false; 
+                    // }
+                    // else
+                    // {
+                    //     agent.enabled = true;
+                    // }
                 }
             }
-            
-            // Ch? m?t kho?ng th?i gian
+
+            // Chờ một khoảng thời gian
             yield return new WaitForSeconds(distantAgentUpdateInterval);
         }
     }
-    
+
     /// <summary>
-    /// T?o m?t nh�m AI m?i
+    /// Tạo một nhóm AI mới
     /// </summary>
     public AIGroup CreateGroup()
     {
@@ -208,14 +209,14 @@ public class EnemyAIManager : MonoBehaviour
         {
             return null;
         }
-        
+
         AIGroup newGroup = new AIGroup();
         aiGroups.Add(newGroup);
         return newGroup;
     }
-    
+
     /// <summary>
-    /// Th�m m?t agent v�o m?t nh�m
+    /// Thêm một agent vào một nhóm
     /// </summary>
     public void AddAgentToGroup(EnemyAIController agent, AIGroup group)
     {
@@ -225,9 +226,9 @@ public class EnemyAIManager : MonoBehaviour
             agent.group = group;
         }
     }
-    
+
     /// <summary>
-    /// X�a m?t agent kh?i m?t nh�m
+    /// Xóa một agent khỏi một nhóm
     /// </summary>
     public void RemoveAgentFromGroup(EnemyAIController agent, AIGroup group)
     {
@@ -237,13 +238,13 @@ public class EnemyAIManager : MonoBehaviour
             agent.group = null;
         }
     }
-    
+
     /// <summary>
-    /// X�a t?t c? c�c agent
+    /// Xóa tất cả các agent
     /// </summary>
     public void ClearAllAgents()
     {
-        // X�a t?t c? c�c agent
+        // Xóa tất cả các agent
         for (int i = activeAgents.Count - 1; i >= 0; i--)
         {
             if (activeAgents[i] != null)
@@ -251,28 +252,28 @@ public class EnemyAIManager : MonoBehaviour
                 Destroy(activeAgents[i].gameObject);
             }
         }
-        
-        // X�a danh s�ch
+
+        // Xóa danh sách
         activeAgents.Clear();
-        
-        // X�a c�c nh�m
+
+        // Xóa các nhóm
         aiGroups.Clear();
     }
 }
 
 /// <summary>
-/// L?p ??i di?n cho m?t nh�m AI
+/// Lớp đại diện cho một nhóm AI
 /// </summary>
 [System.Serializable]
 public class AIGroup
 {
-    [Tooltip("Danh s�ch c�c th�nh vi�n trong nh�m")]
+    [Tooltip("Danh sách các thành viên trong nhóm")]
     public List<EnemyAIController> members = new List<EnemyAIController>();
-    [Tooltip("M?c ti�u chung c?a nh�m")]
+    [Tooltip("Mục tiêu chung của nhóm")]
     public Transform groupTarget;
-    
+
     /// <summary>
-    /// Th�ng b�o cho t?t c? c�c th�nh vi�n trong nh�m v? m?t m?c ti�u
+    /// Thông báo cho tất cả các thành viên trong nhóm về một mục tiêu
     /// </summary>
     public void AlertAllMembers(Transform target)
     {

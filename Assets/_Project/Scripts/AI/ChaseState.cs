@@ -18,6 +18,7 @@ public class ChaseState : State
         {
             // EnemyMovementController sẽ tự động di chuyển đến playerTarget
             moveCtrl.playerTarget = aiController.playerTarget;
+            Debug.Log($"[{aiController.enemyType}] ChaseState: Set MovementController target to {moveCtrl.playerTarget?.name}");
         }
     }
 
@@ -29,32 +30,31 @@ public class ChaseState : State
 
         // Lấy phạm vi truy đuổi và tấn công từ Enemy và EnemyAttackController
         float chaseRange = enemy != null ? enemy.chaseRange : 20f;
-        float attackRange = attackController != null ? attackController.attackRange : 2f; // Sử dụng AttackRange property
+        float attackRange = attackController != null ? attackController.AttackRange : 2f; // Sử dụng AttackRange property
 
         if (aiController.playerTarget == null)
         {
-            Debug.Log($"[{aiController.enemyType}] Lost target, switching to PatrolState");
+            Debug.Log($"[{aiController.enemyType}] ChaseState: Lost target, switching to PatrolState");
             stateMachine.ChangeState(aiController.patrolState); // Hoặc idleState nếu không có tuần tra
             return;
         }
 
         float distanceToPlayer = Vector3.Distance(aiController.transform.position, aiController.playerTarget.position);
 
-        // Nếu player ra khỏi vùng chaseRange → Patrol/Idle
         if (distanceToPlayer > chaseRange)
         {
-            Debug.Log($"[{aiController.enemyType}] Player out of chase range, switching to PatrolState");
-            stateMachine.ChangeState(aiController.patrolState); // Hoặc idleState nếu không có tuần tra
+            stateMachine.ChangeState(aiController.patrolState);
             return;
         }
 
-        // Nếu trong vùng tấn công, chuyển sang Attack
-        if (attackController != null && distanceToPlayer <= attackRange)
+        if (aiController is RangedEnemyAI rangedAI && distanceToPlayer < rangedAI.safeDistance)
         {
-            Debug.Log($"[{aiController.enemyType}] Player in attack range, switching to AttackState");
+            stateMachine.ChangeState(rangedAI.repositionState);
+        }
+        else if (distanceToPlayer <= attackRange)
+        {
             stateMachine.ChangeState(aiController.attackState);
         }
-        // Không cần gọi MoveTo nữa vì EnemyMovementController.Update sẽ tự động set destination
     }
 
     public override void Exit()
@@ -65,6 +65,7 @@ public class ChaseState : State
         if (moveCtrl != null)
         {
             moveCtrl.playerTarget = null; // Dừng di chuyển theo player khi thoát trạng thái Chase
+            Debug.Log($"[{aiController.enemyType}] ChaseState: Cleared MovementController target.");
         }
     }
 }

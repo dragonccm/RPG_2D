@@ -121,7 +121,7 @@ GameObject:
   - component: {fileID: 342842889143735439}
   - component: {fileID: 2272584851557909624}
   - component: {fileID: 1954196316648329661}
-  - component: {fileID: 7350633848550666245}
+  - component: {fileID: 3374169590093411285}
   m_Layer: 3
   m_Name: Enemy_Sheep
   m_TagString: Enemy
@@ -364,8 +364,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e544bbe398ffc8d4399e076279f7ee19, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerTarget: {fileID: 0}
-  attackRange: 2
+  attackRange: 1
   attackCooldown: 1
 --- !u!114 &1954196316648329661
 MonoBehaviour:
@@ -379,13 +378,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5916ce48c3f51954ca24d5b97ecf1e34, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  detectionRange: 5
+  detectionRange: 10
+  chaseRange: 8
   playerLayerMask:
     serializedVersion: 2
     m_Bits: 64
   target: {fileID: 0}
-  agent: {fileID: 0}
---- !u!114 &7350633848550666245
+  agent: {fileID: 1423370794444418169}
+--- !u!114 &3374169590093411285
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

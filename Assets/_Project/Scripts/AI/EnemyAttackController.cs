@@ -56,7 +56,11 @@ public class EnemyAttackController : MonoBehaviour
         Character targetCharacter = target.GetComponent<Character>();
         if (targetCharacter != null)
         {
-            targetCharacter.TakeDamage(10); // Ví dụ sát thương
+            var enemy = GetComponentInParent<Enemy>();
+                if (enemy != null)
+                {
+                    targetCharacter.TakeDamage(enemy.baseDamage);
+                }
             Debug.Log($"[{gameObject.name}] dealt 10 damage to {target.name}. Current HP: {targetCharacter.CurrentHealth:F2}");
         }
         else
