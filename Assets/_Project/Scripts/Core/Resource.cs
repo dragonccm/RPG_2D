@@ -1,10 +1,10 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System;
 
 public class Resource : MonoBehaviour
 {
-    public float currentValue { get; private set; }
-    public float maxValue { get; private set; }
+    public float currentValue { get; set; }
+    public float maxValue { get; set; }
     public float regenRate;
     public event Action<float, float> OnValueChanged;
 

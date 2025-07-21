@@ -6,7 +6,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     public float moveSpeed = 3.5f;
-    public float smoothMoveTime = 0.1f; // Thời gian làm mượt di chuyển
+    public float smoothMoveTime = 0.2f; // Thời gian làm mượt di chuyển
     public float flipSmoothTime = 0.08f; // Thời gian làm mượt lật
 
     public Rigidbody2D rb;

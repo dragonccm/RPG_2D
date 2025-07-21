@@ -37,6 +37,14 @@ public class SkillModule : ScriptableObject
     public GameObject effectPrefab;
     public GameObject projectilePrefab;
     
+    [Header("Enhanced Effect Settings")]
+    [Tooltip("Custom lifetime for effect (0 = auto-detect from animation)")]
+    public float customEffectLifetime = 0f;
+    [Tooltip("Offset position for effect relative to impact point")]
+    public Vector3 effectPositionOffset = Vector3.zero;
+    [Tooltip("Enable enhanced effect features (scaling, screen shake, etc.)")]
+    public bool enableEnhancedEffects = true;
+
     [Header("Animation")]
     [Tooltip("All skills use the existing 'Attack' animation")]
     public string animationTrigger = "Attack";

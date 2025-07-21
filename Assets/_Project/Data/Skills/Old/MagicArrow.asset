@@ -29,8 +29,13 @@ MonoBehaviour:
   skillColor: {r: 0.6, g: 0.1960784, b: 0.8000001, a: 1}
   castSound: {fileID: 0}
   impactSound: {fileID: 0}
-  effectPrefab: {fileID: 0}
-  projectilePrefab: {fileID: 0}
+  effectPrefab: {fileID: -2253911629886400664, guid: 148f7304e3b7f4b47a2bf848eff296ba,
+    type: 3}
+  projectilePrefab: {fileID: 6156162653969815475, guid: 002c8e5aa831dd1468372ecfd4b58ad0,
+    type: 3}
+  customEffectLifetime: 0
+  effectPositionOffset: {x: 0, y: 0, z: 0}
+  enableEnhancedEffects: 1
   animationTrigger: Attack
   animationLength: 1
   skillType: 1

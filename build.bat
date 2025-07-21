@@ -1,0 +1,1 @@
+"C:\Program Files\Unity\Hub\Editor\6000.1.3f1\Editor\Unity.exe" -projectPath "%~dp0" -executeMethod BuildCommand.Build

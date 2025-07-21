@@ -1,7 +1,7 @@
-﻿using System.Collections;
+using System.Collections;
 using UnityEngine;
 
-public class Character : MonoBehaviour
+public class Character : MonoBehaviour, IDamageable
 {
     [Header("Health & Mana")]
     public Resource health;
@@ -17,15 +17,29 @@ public class Character : MonoBehaviour
     
     public bool isStunned { get; private set; }
     public bool isBeingKnockedBack { get; private set; }
+    public bool isPoisoned { get; private set; }
 
     private Rigidbody2D rb;
     private SpriteRenderer spriteRenderer;
     private Color originalColor;
     private Coroutine currentKnockbackCoroutine;
     private Coroutine currentFlashCoroutine;
+    private Coroutine currentPoisonCoroutine;
 
     public System.Action<float> OnDamageTaken;
     public System.Action OnDeath;
+
+    public float MaxHealth
+    {
+        get => health.maxValue;
+        set => health.maxValue = value;
+    }
+
+    public float CurrentHealth
+    {
+        get => health.currentValue;
+        set => health.currentValue = value;
+    }
 
     protected virtual void Awake()
     {
@@ -41,6 +55,11 @@ public class Character : MonoBehaviour
         {
             originalColor = spriteRenderer.color;
         }
+    }
+
+    public void TakeDamage(float damage)
+    {
+        TakeDamage(damage, false);
     }
 
     public void TakeDamage(float damage, bool isCritical = false)
@@ -85,6 +104,51 @@ public class Character : MonoBehaviour
         {
             Die();
         }
+    }
+
+    public void ApplyPoison(float damagePerSecond, float duration)
+    {
+        // Stop any existing poison effect
+        if (currentPoisonCoroutine != null)
+        {
+            StopCoroutine(currentPoisonCoroutine);
+        }
+
+        currentPoisonCoroutine = StartCoroutine(PoisonCoroutine(damagePerSecond, duration));
+    }
+
+    private IEnumerator PoisonCoroutine(float damagePerSecond, float duration)
+    {
+        isPoisoned = true;
+        float elapsedTime = 0f;
+        float tickInterval = 0.5f; // Damage every half second
+        float tickDamage = damagePerSecond * tickInterval;
+
+        var effectsManager = FindCombatEffectsManager();
+
+        while (elapsedTime < duration)
+        {
+            if (health.currentValue <= 0) break;
+
+            // Apply poison damage
+            TakeDamage(tickDamage);
+
+            // Visual feedback
+            if (effectsManager != null)
+            {
+                effectsManager.CreateImpactEffect(
+                    transform.position,
+                    new Color(0.5f, 0f, 0.5f), // Purple for poison
+                    0.5f
+                );
+            }
+
+            elapsedTime += tickInterval;
+            yield return new WaitForSeconds(tickInterval);
+        }
+
+        isPoisoned = false;
+        currentPoisonCoroutine = null;
     }
 
     public void TakeDamageWithKnockback(float damage, float knockbackForce, Vector2 knockbackDirection, bool isCritical = false)
@@ -208,6 +272,10 @@ public class Character : MonoBehaviour
         {
             StopCoroutine(currentFlashCoroutine);
         }
+        if (currentPoisonCoroutine != null)
+        {
+            StopCoroutine(currentPoisonCoroutine);
+        }
         
         var effectsManager = FindCombatEffectsManager();
         if (effectsManager != null)
@@ -282,6 +350,10 @@ public class Character : MonoBehaviour
         if (currentFlashCoroutine != null)
         {
             StopCoroutine(currentFlashCoroutine);
+        }
+        if (currentPoisonCoroutine != null)
+        {
+            StopCoroutine(currentPoisonCoroutine);
         }
     }
 }

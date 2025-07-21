@@ -88,11 +88,55 @@ public abstract class SkillExecutorBase : ISkillExecutor
         }
     }
     
+    /// <summary>
+    /// Enhanced visual effect creation v?i auto-destroy và collision positioning
+    /// </summary>
     protected void CreateVisualEffect(Vector3 position)
     {
         if (Module.effectPrefab != null)
         {
-            Object.Instantiate(Module.effectPrefab, position, Quaternion.identity);
+            // S? d?ng Enhanced Effect Manager ?? t?o effect v?i auto-destroy
+            EnhancedEffectManager.CreateEffectAtPosition(
+                Module.effectPrefab, 
+                position, 
+                Quaternion.identity, 
+                null, 
+                Module.damageAreaDisplayTime // Use skill's display time as lifetime
+            );
+        }
+    }
+    
+    /// <summary>
+    /// T?o effect va ch?m t?i v? trí chính xác v?i direction
+    /// </summary>
+    protected void CreateImpactEffect(Vector3 impactPosition, Vector3 impactDirection, GameObject target = null)
+    {
+        if (Module.effectPrefab != null)
+        {
+            // T?o effect t?i v? trí va ch?m chính xác
+            EnhancedEffectManager.CreateImpactEffect(
+                Module.effectPrefab,
+                impactPosition,
+                impactDirection,
+                target,
+                Module.damageAreaDisplayTime
+            );
+        }
+    }
+    
+    /// <summary>
+    /// T?o effect theo dõi target (cho projectile)
+    /// </summary>
+    protected void CreateFollowEffect(Transform target, Vector3 offset = default)
+    {
+        if (Module.effectPrefab != null && target != null)
+        {
+            EnhancedEffectManager.CreateFollowEffect(
+                Module.effectPrefab,
+                target,
+                offset,
+                Module.damageAreaDisplayTime
+            );
         }
     }
     
@@ -489,9 +533,9 @@ public class MeleeSkillExecutor : SkillExecutorBase
                 ShowDamageAreaAtExactPosition(attackCenter, Module.range, "MeleeDamageArea_NoTargets");
             }
             
-            // Play impact sound even without targets
+            // Play impact sound and create effect even without targets
             PlayImpactSound(user);
-            CreateVisualEffect(user.transform.position);
+            CreateVisualEffect(user.transform.position); // Enhanced effect creation
             yield break;
         }
         
@@ -525,14 +569,16 @@ public class MeleeSkillExecutor : SkillExecutorBase
                 enemy.ApplyStun(Module.stunDuration);
             }
             
-            // Create individual hit effects for each enemy
+            // Create individual impact effects for each enemy v?i v? trí chính xác
+            Vector3 impactDirection = (enemy.transform.position - user.transform.position).normalized;
+            CreateImpactEffect(enemy.transform.position, impactDirection, enemy.gameObject);
             CreateIndividualHitEffect(enemy.transform.position, isCritical);
         }
         
         // Play impact sound
         PlayImpactSound(user);
         
-        // Create main visual effect
+        // Create main visual effect t?i v? trí user
         CreateVisualEffect(user.transform.position);
         
         // Show enhanced damage area ALWAYS at user position for melee
@@ -693,6 +739,16 @@ public class AreaSkillExecutor : SkillExecutorBase
         // FIXED: Pass caster parameter to prevent self-damage
         var enemies = FindEnemiesInRange(targetPosition, Module.areaRadius, user);
         
+        // Enhanced feedback for area skills
+        if (enemies.Length == 0)
+        {
+            Debug.Log($"?? Area skill '{Module.skillName}' found no targets at {targetPosition}");
+        }
+        else
+        {
+            Debug.Log($"?? Area skill '{Module.skillName}' hitting {enemies.Length} enemies in area");
+        }
+        
         foreach (var enemy in enemies)
         {
             if (enemy == null) continue;
@@ -711,12 +767,19 @@ public class AreaSkillExecutor : SkillExecutorBase
             {
                 enemy.ApplyStun(Module.stunDuration);
             }
+            
+            // Create individual impact effects t?i v? trí t?ng enemy
+            Vector3 impactDirection = (enemy.transform.position - (Vector3)targetPosition).normalized;
+            if (impactDirection.magnitude < 0.1f) impactDirection = Vector3.up; // Fallback direction
+            
+            CreateImpactEffect(enemy.transform.position, impactDirection, enemy.gameObject);
+            CreateIndividualHitEffect(enemy.transform.position, isCritical);
         }
         
         // Play impact sound
         PlayImpactSound(user);
         
-        // Create visual effect at target position
+        // Create main visual effect EXACTLY at target position (mouse click)
         CreateVisualEffect(targetPosition);
         
         // Damage area EXACTLY at mouse click position
@@ -774,50 +837,72 @@ public class SupportSkillExecutor : SkillExecutorBase
         if (Module.healAmount > 0)
         {
             user.Heal(Module.healAmount);
+            Debug.Log($"?? Support skill '{Module.skillName}' healed {user.name} for {Module.healAmount} HP");
         }
         
         // Apply buff effects (you can extend this)
         // TODO: Add buff system integration here
         
-        // Create visual effect at user position
+        // Create enhanced visual effect t?i v? trí user
         CreateVisualEffect(user.transform.position);
         
         // Play impact sound
         PlayImpactSound(user);
         
-        // Support skills don't show damage areas but can show special effects
+        // Support skills show special enhanced effects
         if (Module.showDamageArea)
         {
-            CreateSupportVisualEffect(user.transform.position);
+            CreateEnhancedSupportVisualEffect(user.transform.position);
         }
     }
     
     /// <summary>
-    /// T?o visual effect ??c bi?t cho Support skills
+    /// T?o enhanced visual effect ??c bi?t cho Support skills
     /// </summary>
-    private void CreateSupportVisualEffect(Vector2 position)
+    private void CreateEnhancedSupportVisualEffect(Vector2 position)
     {
-        GameObject supportEffect = new GameObject($"SupportEffect_{Module.skillName}");
+        GameObject supportEffect = new GameObject($"SupportEffect_{Module.skillName}_{Time.time:F2}");
         supportEffect.transform.position = new Vector3(position.x, position.y, 0);
         
-        // T?o particle system cho support effect
+        // T?o enhanced particle system cho support effect
         var particleSystem = supportEffect.AddComponent<ParticleSystem>();
         var main = particleSystem.main;
         main.startColor = Module.skillColor;
-        main.startLifetime = 2f;
-        main.startSpeed = 1f;
-        main.maxParticles = 20;
-        main.startSize = 0.5f;
+        main.startLifetime = 2.5f;
+        main.startSpeed = 1.2f;
+        main.maxParticles = 25;
+        main.startSize = 0.6f;
+        main.simulationSpace = ParticleSystemSimulationSpace.World;
         
         var emission = particleSystem.emission;
-        emission.rateOverTime = 10f;
+        emission.rateOverTime = 12f;
         
         var shape = particleSystem.shape;
         shape.shapeType = ParticleSystemShapeType.Circle;
-        shape.radius = 1f;
+        shape.radius = 1.2f;
         
-        // Auto destroy after effect
-        Object.Destroy(supportEffect, Module.damageAreaDisplayTime);
+        // Enhanced color over lifetime
+        var colorOverLifetime = particleSystem.colorOverLifetime;
+        colorOverLifetime.enabled = true;
+        
+        Gradient gradient = new Gradient();
+        gradient.SetKeys(
+            new GradientColorKey[] { 
+                new GradientColorKey(Module.skillColor, 0.0f), 
+                new GradientColorKey(Color.white, 0.5f),
+                new GradientColorKey(Module.skillColor, 1.0f) 
+            },
+            new GradientAlphaKey[] { 
+                new GradientAlphaKey(0.8f, 0.0f), 
+                new GradientAlphaKey(1.0f, 0.3f),
+                new GradientAlphaKey(0.0f, 1.0f) 
+            }
+        );
+        colorOverLifetime.color = gradient;
+        
+        // Auto destroy v?i enhanced system
+        var autoDestroy = supportEffect.AddComponent<EffectAutoDestroy>();
+        autoDestroy.Initialize(Module.damageAreaDisplayTime, true);
     }
 }
 
@@ -850,7 +935,7 @@ public class InstantSkillExecutor : SkillExecutorBase
         if (Module.healAmount > 0)
         {
             user.Heal(Module.healAmount);
-            Debug.Log($"?? Instant heal: {Module.healAmount} HP restored!");
+            Debug.Log($"? Instant heal: {Module.healAmount} HP restored to {user.name}!");
         }
         
         // Apply shield/defense buffs (you can extend this)
@@ -858,73 +943,84 @@ public class InstantSkillExecutor : SkillExecutorBase
         {
             // Use knockbackForce as shield amount for instant skills
             // TODO: Implement shield system
-            Debug.Log($"??? Shield applied: {Module.knockbackForce} points!");
+            Debug.Log($"??? Shield applied: {Module.knockbackForce} points to {user.name}!");
         }
         
         // Apply speed/movement buffs
         if (Module.speed > 0)
         {
             // TODO: Implement speed buff system
-            Debug.Log($"? Speed buff applied: {Module.speed}!");
+            Debug.Log($"?? Speed buff applied: {Module.speed} to {user.name}!");
         }
         
         // Apply damage buffs
         if (Module.damage > 0)
         {
             // TODO: Implement damage buff system
-            Debug.Log($"?? Damage buff applied: {Module.damage}!");
+            Debug.Log($"?? Damage buff applied: {Module.damage} to {user.name}!");
         }
         
-        // Create visual effect at user position
+        // Create enhanced visual effect t?i v? trí user
         CreateVisualEffect(user.transform.position);
         
         // Play impact sound
         PlayImpactSound(user);
         
-        // Show instant effect visual if enabled
+        // Show enhanced instant effect visual if enabled
         if (Module.showDamageArea)
         {
-            CreateInstantVisualEffect(user.transform.position);
+            CreateEnhancedInstantVisualEffect(user.transform.position);
         }
     }
     
     /// <summary>
-    /// T?o visual effect ??c bi?t cho Instant skills
+    /// T?o enhanced visual effect ??c bi?t cho Instant skills
     /// </summary>
-    private void CreateInstantVisualEffect(Vector2 position)
+    private void CreateEnhancedInstantVisualEffect(Vector2 position)
     {
-        GameObject instantEffect = new GameObject($"InstantEffect_{Module.skillName}");
+        GameObject instantEffect = new GameObject($"InstantEffect_{Module.skillName}_{Time.time:F2}");
         instantEffect.transform.position = new Vector3(position.x, position.y, 0);
         
-        // T?o particle system cho instant effect
+        // T?o enhanced particle system cho instant effect
         var particleSystem = instantEffect.AddComponent<ParticleSystem>();
         var main = particleSystem.main;
         main.startColor = Module.skillColor;
-        main.startLifetime = 1f;
-        main.startSpeed = 2f;
-        main.maxParticles = 30;
-        main.startSize = 0.3f;
+        main.startLifetime = 1.5f;
+        main.startSpeed = 3f;
+        main.maxParticles = 40;
+        main.startSize = 0.4f;
+        main.simulationSpace = ParticleSystemSimulationSpace.World;
         
         var emission = particleSystem.emission;
-        emission.rateOverTime = 50f;
+        emission.rateOverTime = 60f;
         emission.SetBursts(new ParticleSystem.Burst[]
         {
-            new ParticleSystem.Burst(0.0f, 15),
-            new ParticleSystem.Burst(0.1f, 10),
-            new ParticleSystem.Burst(0.2f, 5)
+            new ParticleSystem.Burst(0.0f, 20),
+            new ParticleSystem.Burst(0.2f, 15),
+            new ParticleSystem.Burst(0.4f, 10)
         });
         
         var shape = particleSystem.shape;
         shape.shapeType = ParticleSystemShapeType.Circle;
-        shape.radius = 0.5f;
+        shape.radius = 0.3f;
         
-        // Velocity over lifetime for burst effect
+        // Enhanced velocity over lifetime for burst effect
         var velocityOverLifetime = particleSystem.velocityOverLifetime;
         velocityOverLifetime.enabled = true;
-        velocityOverLifetime.radial = new ParticleSystem.MinMaxCurve(2f);
+        velocityOverLifetime.radial = new ParticleSystem.MinMaxCurve(3f);
         
-        // Auto destroy after effect
-        Object.Destroy(instantEffect, 2f);
+        // Enhanced size over lifetime
+        var sizeOverLifetime = particleSystem.sizeOverLifetime;
+        sizeOverLifetime.enabled = true;
+        AnimationCurve sizeCurve = new AnimationCurve();
+        sizeCurve.AddKey(0f, 0f);
+        sizeCurve.AddKey(0.2f, 1f);
+        sizeCurve.AddKey(1f, 0f);
+        sizeOverLifetime.size = new ParticleSystem.MinMaxCurve(1f, sizeCurve);
+        
+        // Auto destroy v?i enhanced system
+        var autoDestroy = instantEffect.AddComponent<EffectAutoDestroy>();
+        autoDestroy.Initialize(2.5f, true);
     }
 }
 
@@ -1069,7 +1165,7 @@ public class EnhancedProjectileBehavior : MonoBehaviour
         
         enemy.TakeDamage(finalDamage, isCritical);
         
-        // Apply knockback
+        // Apply knockback v?i direction c?a projectile
         if (skillModule.knockbackForce > 0)
         {
             enemy.ApplyKnockback(skillModule.knockbackForce, direction);
@@ -1085,13 +1181,61 @@ public class EnhancedProjectileBehavior : MonoBehaviour
             }
         }
         
-        // Create impact effect
+        // Create enhanced impact effect t?i v? trí va ch?m chính xác
+        Vector3 impactPosition = transform.position;
+        Vector3 impactDirection = direction;
+        
         if (skillModule.effectPrefab != null)
         {
-            Instantiate(skillModule.effectPrefab, transform.position, Quaternion.identity);
+            // S? d?ng Enhanced Effect Manager cho impact effect
+            EnhancedEffectManager.CreateImpactEffect(
+                skillModule.effectPrefab,
+                impactPosition,
+                impactDirection,
+                enemy.gameObject,
+                skillModule.damageAreaDisplayTime
+            );
         }
         
+        // Create individual hit effect with critical differentiation
+        CreateProjectileHitEffect(impactPosition, isCritical);
+        
+        Debug.Log($"?? Projectile '{skillModule.skillName}' hit {enemy.name} at {impactPosition} for {finalDamage} damage");
+        
         Destroy(gameObject);
+    }
+    
+    /// <summary>
+    /// T?o hit effect ??c bi?t cho projectile
+    /// </summary>
+    private void CreateProjectileHitEffect(Vector3 position, bool isCritical)
+    {
+        GameObject hitEffect = new GameObject($"ProjectileHit_{skillModule.skillName}_{Time.time:F2}");
+        hitEffect.transform.position = position;
+        
+        // Create particle system for projectile hit
+        var particleSystem = hitEffect.AddComponent<ParticleSystem>();
+        var main = particleSystem.main;
+        main.startColor = isCritical ? Color.yellow : skillModule.skillColor;
+        main.startLifetime = 0.8f;
+        main.startSpeed = isCritical ? 5f : 3f;
+        main.maxParticles = isCritical ? 20 : 12;
+        main.startSize = isCritical ? 0.4f : 0.25f;
+        
+        var emission = particleSystem.emission;
+        emission.SetBursts(new ParticleSystem.Burst[]
+        {
+            new ParticleSystem.Burst(0.0f, isCritical ? 15 : 8),
+            new ParticleSystem.Burst(0.1f, isCritical ? 8 : 4)
+        });
+        
+        var shape = particleSystem.shape;
+        shape.shapeType = ParticleSystemShapeType.Circle;
+        shape.radius = 0.3f;
+        
+        // Auto destroy with enhanced system
+        var autoDestroy = hitEffect.AddComponent<EffectAutoDestroy>();
+        autoDestroy.Initialize(1.5f, true);
     }
 
     private void OnDrawGizmos()
