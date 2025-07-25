@@ -14,6 +14,7 @@ public class AttackState : State
         base.Enter();
         Debug.Log($"[{aiController.enemyType}] Enter AttackState");
         aiController.GetComponent<EnemyMovementController>()?.Stop(); // Dừng di chuyển khi tấn công
+        aiController.animatorController?.PlayAttackAnimation();
     }
 
     public override void Execute()
@@ -21,6 +22,7 @@ public class AttackState : State
         base.Execute();
         var enemy = aiController.GetComponent<Enemy>();
         var attackController = aiController.GetComponent<EnemyAttackController>();
+        var skillManager = aiController.GetComponent<EnemySkillManager>(); // Lấy script quản lý kỹ năng
 
         // Lấy phạm vi truy đuổi và tấn công từ Enemy và EnemyAttackController
         float chaseRange = enemy != null ? enemy.chaseRange : 20f;
@@ -28,7 +30,6 @@ public class AttackState : State
 
         if (aiController.playerTarget == null)
         {
-            Debug.Log($"[{aiController.enemyType}] AttackState: Lost target, switching to IdleState");
             stateMachine.ChangeState(aiController.idleState);
             return;
         }
@@ -38,7 +39,6 @@ public class AttackState : State
         // Nếu player ra khỏi vùng chaseRange → Patrol/Idle
         if (distanceToPlayer > chaseRange)
         {
-            Debug.Log($"[{aiController.enemyType}] AttackState: Player out of chase range ({distanceToPlayer:F2}m > {chaseRange:F2}m), switching to PatrolState");
             stateMachine.ChangeState(aiController.patrolState);
             return;
         }
@@ -46,15 +46,24 @@ public class AttackState : State
         // Nếu player ra khỏi vùng attack nhưng vẫn trong vùng chaseRange → Chase
         if (attackController != null && distanceToPlayer > attackRange)
         {
-            Debug.Log($"[{aiController.enemyType}] AttackState: Player out of attack range ({distanceToPlayer:F2}m > {attackRange:F2}m), switching to ChaseState");
             stateMachine.ChangeState(aiController.chaseState);
             return;
         }
 
         // Nếu vẫn trong vùng attack → tấn công
-        if (attackController != null && distanceToPlayer <= attackRange)
+        if (distanceToPlayer <= attackRange)
         {
-            attackController.Attack(aiController.playerTarget);
+            // Ưu tiên dùng kỹ năng nếu có EnemySkillManager
+            if (skillManager != null && skillManager.CanUseSkill())
+            {
+                // Gọi kỹ năng module (có thể random hoặc theo thứ tự)
+                skillManager.UseSkill();
+            }
+            else if (attackController != null)
+            {
+                // Nếu không có kỹ năng module, dùng tấn công cơ bản
+                attackController.Attack(aiController.playerTarget);
+            }
         }
     }
 
@@ -62,5 +71,6 @@ public class AttackState : State
     {
         base.Exit();
         Debug.Log($"[{aiController.enemyType}] Exit AttackState");
+        aiController.animatorController?.PlayIdleAnimation();
     }
 }

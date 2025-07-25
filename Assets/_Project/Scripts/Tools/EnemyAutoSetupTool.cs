@@ -32,12 +32,6 @@ public class EnemyAutoSetupTool : MonoBehaviour
         AddIfMissing<EnemyDeathHandler>(enemyInstance);
         AddIfMissing<AttackableCharacter>(enemyInstance);
 
-        // Nếu là enemy tầm xa, thêm EnemyRangedAttack nếu chưa có
-        if (enemyInstance.GetComponent<EnemyRanged>() != null)
-        {
-            AddIfMissing<EnemyRangedAttack>(enemyInstance);
-        }
-
         // Thêm Collider nếu chưa có (ví dụ BoxCollider2D cho 2D)
         if (enemyInstance.GetComponent<Collider>() == null && enemyInstance.GetComponent<Collider2D>() == null)
         {
@@ -95,4 +89,7 @@ public class EnemyAutoSetupToolEditor : Editor
         }
     }
 }
-#endif 
+#endif
+
+// File này đã được loại bỏ vì không còn class EnemyRanged. Hãy sử dụng RangedEnemyAI.cs cho AI tầm xa.
+// Nếu cần tự động setup, hãy cập nhật lại logic kiểm tra loại AI phù hợp.

@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 /// <summary>
-/// Qu?n lý k? thù tinh nhu? v?i kh? n?ng ??c bi?t và thu?c tính m?nh h?n
+/// Qu?n lï¿½ k? thï¿½ tinh nhu? v?i kh? n?ng ??c bi?t vï¿½ thu?c tï¿½nh m?nh h?n
 /// </summary>
 public class EnemyElite : MonoBehaviour
 {
@@ -77,14 +77,14 @@ public class EnemyElite : MonoBehaviour
     [SerializeField] private float pulseRate = 1f;
     [SerializeField] private float pulseAmount = 0.2f;
     
-    // Các component
+    // Cï¿½c component
     private Enemy enemy;
-    private Animator animator;
+    // private Animator animator; // Removed direct Animator reference
     private SpriteRenderer spriteRenderer;
     private Material originalMaterial;
     private Material outlineMaterial;
     
-    // Tr?ng thái tinh nhu?
+    // Tr?ng thï¿½i tinh nhu?
     private bool isBerserking = false;
     private bool isEnraged = false;
     private bool isImmune = false;
@@ -106,16 +106,16 @@ public class EnemyElite : MonoBehaviour
     public enum EliteRank
     {
         Elite,      // Tinh nhu? th??ng
-        Champion,   // Quán quân
+        Champion,   // Quï¿½n quï¿½n
         Legendary,  // Huy?n tho?i
         Mythic      // Th?n tho?i
     }
     
     private void Awake()
     {
-        // L?y các component c?n thi?t
+        // L?y cï¿½c component c?n thi?t
         enemy = GetComponent<Enemy>();
-        animator = GetComponent<Animator>();
+        // animator = GetComponent<Animator>(); // Removed direct Animator reference
         spriteRenderer = GetComponent<SpriteRenderer>();
         
         // L?u material g?c
@@ -124,7 +124,7 @@ public class EnemyElite : MonoBehaviour
             originalMaterial = spriteRenderer.material;
         }
         
-        // ??ng ký s? ki?n
+        // ??ng kï¿½ s? ki?n
         if (enemy != null)
         {
             enemy.OnDamageTaken += HandleDamageTaken;
@@ -133,7 +133,7 @@ public class EnemyElite : MonoBehaviour
             enemy.OnDealDamage += HandleDealDamage;
         }
         
-        // N?u ng?u nhiên hóa kh? n?ng, ch?n ng?u nhiên
+        // N?u ng?u nhiï¿½n hï¿½a kh? n?ng, ch?n ng?u nhiï¿½n
         if (randomizeAbilities)
         {
             RandomizeAbilities();
@@ -142,19 +142,19 @@ public class EnemyElite : MonoBehaviour
     
     private void Start()
     {
-        // N?u không ph?i tinh nhu?, không làm gì c?
+        // N?u khï¿½ng ph?i tinh nhu?, khï¿½ng lï¿½m gï¿½ c?
         if (!isElite)
         {
             return;
         }
         
-        // Áp d?ng thu?c tính tinh nhu?
+        // ï¿½p d?ng thu?c tï¿½nh tinh nhu?
         ApplyEliteStats();
         
         // T?o hi?u ?ng tinh nhu?
         CreateEliteEffects();
         
-        // B?t ??u tái t?o máu n?u có
+        // B?t ??u tï¿½i t?o mï¿½u n?u cï¿½
         if (hasRegeneration)
         {
             regenerationCoroutine = StartCoroutine(RegenerateHealth());
@@ -175,25 +175,25 @@ public class EnemyElite : MonoBehaviour
     
     private void Update()
     {
-        // N?u không ph?i tinh nhu?, không làm gì c?
+        // N?u khï¿½ng ph?i tinh nhu?, khï¿½ng lï¿½m gï¿½ c?
         if (!isElite)
         {
             return;
         }
         
-        // X? lý d?ch chuy?n n?u có
+        // X? lï¿½ d?ch chuy?n n?u cï¿½
         if (hasTeleport)
         {
             HandleTeleport();
         }
         
-        // X? lý mi?n nhi?m n?u có
+        // X? lï¿½ mi?n nhi?m n?u cï¿½
         if (hasImmunity)
         {
             HandleImmunity();
         }
         
-        // X? lý cu?ng n? n?u có
+        // X? lï¿½ cu?ng n? n?u cï¿½
         if (hasFrenzy)
         {
             HandleFrenzy();
@@ -202,7 +202,7 @@ public class EnemyElite : MonoBehaviour
     
     private void OnDestroy()
     {
-        // H?y ??ng ký s? ki?n
+        // H?y ??ng kï¿½ s? ki?n
         if (enemy != null)
         {
             enemy.OnDamageTaken -= HandleDamageTaken;
@@ -227,7 +227,7 @@ public class EnemyElite : MonoBehaviour
     }
     
     /// <summary>
-    /// Ng?u nhiên hóa kh? n?ng
+    /// Ng?u nhiï¿½n hï¿½a kh? n?ng
     /// </summary>
     private void RandomizeAbilities()
     {
@@ -243,7 +243,7 @@ public class EnemyElite : MonoBehaviour
         hasImmunity = false;
         hasTeleport = false;
         
-        // Danh sách kh? n?ng
+        // Danh sï¿½ch kh? n?ng
         List<System.Action> abilities = new List<System.Action>
         {
             () => hasRegeneration = true,
@@ -258,7 +258,7 @@ public class EnemyElite : MonoBehaviour
             () => hasTeleport = true
         };
         
-        // Xáo tr?n danh sách
+        // Xï¿½o tr?n danh sï¿½ch
         for (int i = 0; i < abilities.Count; i++)
         {
             int randomIndex = Random.Range(i, abilities.Count);
@@ -267,29 +267,29 @@ public class EnemyElite : MonoBehaviour
             abilities[randomIndex] = temp;
         }
         
-        // Ch?n s? l??ng kh? n?ng ng?u nhiên
+        // Ch?n s? l??ng kh? n?ng ng?u nhiï¿½n
         int abilityCount = Random.Range(minRandomAbilities, maxRandomAbilities + 1);
         abilityCount = Mathf.Min(abilityCount, abilities.Count);
         
-        // Kích ho?t kh? n?ng
+        // Kï¿½ch ho?t kh? n?ng
         for (int i = 0; i < abilityCount; i++)
         {
             abilities[i]();
         }
         
-        // ?i?u ch?nh thu?c tính d?a trên c?p b?c
+        // ?i?u ch?nh thu?c tï¿½nh d?a trï¿½n c?p b?c
         AdjustStatsByRank();
     }
     
     /// <summary>
-    /// ?i?u ch?nh thu?c tính d?a trên c?p b?c
+    /// ?i?u ch?nh thu?c tï¿½nh d?a trï¿½n c?p b?c
     /// </summary>
     private void AdjustStatsByRank()
     {
         switch (eliteRank)
         {
             case EliteRank.Elite:
-                // Gi? nguyên
+                // Gi? nguyï¿½n
                 break;
                 
             case EliteRank.Champion:
@@ -325,17 +325,17 @@ public class EnemyElite : MonoBehaviour
     }
     
     /// <summary>
-    /// Áp d?ng thu?c tính tinh nhu?
+    /// ï¿½p d?ng thu?c tï¿½nh tinh nhu?
     /// </summary>
     private void ApplyEliteStats()
     {
-        // N?u không có component Enemy, không làm gì c?
+        // N?u khï¿½ng cï¿½ component Enemy, khï¿½ng lï¿½m gï¿½ c?
         if (enemy == null)
         {
             return;
         }
         
-        // Áp d?ng thu?c tính
+        // ï¿½p d?ng thu?c tï¿½nh
         enemy.SetMaxHealthMultiplier(healthMultiplier);
         enemy.SetDamageMultiplier(damageMultiplier);
         enemy.SetSpeedMultiplier(speedMultiplier);
@@ -343,23 +343,23 @@ public class EnemyElite : MonoBehaviour
         enemy.SetCurrencyMultiplier(currencyMultiplier);
         enemy.SetItemDropChanceMultiplier(itemDropChanceMultiplier);
         
-        // Áp d?ng gi?m sát th??ng n?u có giáp
+        // ï¿½p d?ng gi?m sï¿½t th??ng n?u cï¿½ giï¿½p
         if (hasArmor)
         {
             enemy.SetDamageReduction(damageReduction);
         }
         
-        // ??t kích th??c
+        // ??t kï¿½ch th??c
         transform.localScale *= sizeMultiplier;
         
-        // ??t tiêu ?? n?u có
+        // ??t tiï¿½u ?? n?u cï¿½
         if (!string.IsNullOrEmpty(eliteTitle))
         {
             enemy.SetNamePrefix(eliteTitle);
         }
         else
         {
-            // ??t tiêu ?? d?a trên c?p b?c
+            // ??t tiï¿½u ?? d?a trï¿½n c?p b?c
             switch (eliteRank)
             {
                 case EliteRank.Elite:
@@ -367,7 +367,7 @@ public class EnemyElite : MonoBehaviour
                     break;
                     
                 case EliteRank.Champion:
-                    enemy.SetNamePrefix("Quán Quân");
+                    enemy.SetNamePrefix("Quï¿½n Quï¿½n");
                     break;
                     
                 case EliteRank.Legendary:
@@ -382,31 +382,31 @@ public class EnemyElite : MonoBehaviour
     }
     
     /// <summary>
-    /// X? lý s? ki?n nh?n sát th??ng
+    /// X? lï¿½ s? ki?n nh?n sï¿½t th??ng
     /// </summary>
     private void HandleDamageTaken(Enemy enemy, float damage, float newHealth)
     {
-        // N?u không ph?i tinh nhu?, không làm gì c?
+        // N?u khï¿½ng ph?i tinh nhu?, khï¿½ng lï¿½m gï¿½ c?
         if (!isElite)
         {
             return;
         }
         
-        // N?u ?ang mi?n nhi?m, không nh?n sát th??ng
+        // N?u ?ang mi?n nhi?m, khï¿½ng nh?n sï¿½t th??ng
         if (isImmune)
         {
             damageTaken = 0f;
             return;
         }
         
-        // N?u có gai, ph?n l?i sát th??ng
+        // N?u cï¿½ gai, ph?n l?i sï¿½t th??ng
         if (hasThorns)
         {
-            // Tìm ng??i gây sát th??ng
+            // Tï¿½m ng??i gï¿½y sï¿½t th??ng
             GameObject attacker = FindAttacker();
             if (attacker != null)
             {
-                // Gây sát th??ng ph?n l?i
+                // Gï¿½y sï¿½t th??ng ph?n l?i
                 float thornsDamage = damage * thornsDamagePercent;
                 IDamageable damageable = attacker.GetComponent<IDamageable>();
                 if (damageable != null)
@@ -418,26 +418,26 @@ public class EnemyElite : MonoBehaviour
     }
     
     /// <summary>
-    /// X? lý s? ki?n thay ??i máu
+    /// X? lï¿½ s? ki?n thay ??i mï¿½u
     /// </summary>
     private void HandleHealthChanged(float currentHealth, float maxHealth)
     {
-        // N?u không ph?i tinh nhu?, không làm gì c?
+        // N?u khï¿½ng ph?i tinh nhu?, khï¿½ng lï¿½m gï¿½ c?
         if (!isElite)
         {
             return;
         }
         
-        // Tính toán ph?n tr?m máu
+        // Tï¿½nh toï¿½n ph?n tr?m mï¿½u
         float healthPercent = currentHealth / maxHealth;
         
-        // N?u có berserker và máu d??i ng??ng
+        // N?u cï¿½ berserker vï¿½ mï¿½u d??i ng??ng
         if (hasBerserker && !isBerserking && healthPercent <= berserkerHealthThreshold)
         {
             ActivateBerserker();
         }
         
-        // N?u có enrage và máu d??i ng??ng
+        // N?u cï¿½ enrage vï¿½ mï¿½u d??i ng??ng
         if (hasEnrage && !isEnraged && healthPercent <= enrageHealthThreshold)
         {
             ActivateEnrage();
@@ -445,17 +445,17 @@ public class EnemyElite : MonoBehaviour
     }
     
     /// <summary>
-    /// X? lý s? ki?n ch?t
+    /// X? lï¿½ s? ki?n ch?t
     /// </summary>
     private void HandleDeath()
     {
-        // N?u không ph?i tinh nhu?, không làm gì c?
+        // N?u khï¿½ng ph?i tinh nhu?, khï¿½ng lï¿½m gï¿½ c?
         if (!isElite)
         {
             return;
         }
         
-        // N?u có n? khi ch?t
+        // N?u cï¿½ n? khi ch?t
         if (hasExplosionOnDeath)
         {
             Explode();
@@ -463,49 +463,49 @@ public class EnemyElite : MonoBehaviour
     }
     
     /// <summary>
-    /// X? lý s? ki?n gây sát th??ng
+    /// X? lï¿½ s? ki?n gï¿½y sï¿½t th??ng
     /// </summary>
     private void HandleDealDamage(GameObject target, float damage)
     {
-        // N?u không ph?i tinh nhu?, không làm gì c?
+        // N?u khï¿½ng ph?i tinh nhu?, khï¿½ng lï¿½m gï¿½ c?
         if (!isElite)
         {
             return;
         }
         
-        // N?u có hút máu
+        // N?u cï¿½ hï¿½t mï¿½u
         if (hasLifesteal && enemy != null)
         {
-            // Tính toán l??ng máu hút
+            // Tï¿½nh toï¿½n l??ng mï¿½u hï¿½t
             float healAmount = damage * lifestealPercent;
             
-            // H?i máu
+            // H?i mï¿½u
             enemy.Heal(healAmount);
         }
     }
     
     /// <summary>
-    /// Kích ho?t berserker
+    /// Kï¿½ch ho?t berserker
     /// </summary>
     private void ActivateBerserker()
     {
-        // N?u ?ã kích ho?t, không làm gì c?
+        // N?u ?ï¿½ kï¿½ch ho?t, khï¿½ng lï¿½m gï¿½ c?
         if (isBerserking)
         {
             return;
         }
         
-        // C?p nh?t tr?ng thái
+        // C?p nh?t tr?ng thï¿½i
         isBerserking = true;
         
-        // T?ng sát th??ng và t?c ??
+        // T?ng sï¿½t th??ng vï¿½ t?c ??
         enemy.SetDamageMultiplier(damageMultiplier * (1f + berserkerDamageBonus));
         enemy.SetSpeedMultiplier(speedMultiplier * (1f + berserkerSpeedBonus));
         
-        // Kích ho?t animation n?u có
-        if (animator != null)
+        // Kï¿½ch ho?t animation n?u cï¿½
+        if (enemy.EnemyAnimatorController != null)
         {
-            animator.SetBool("Berserk", true);
+            enemy.EnemyAnimatorController.SetBool("Berserk", true);
         }
         
         // Hi?n th? hi?u ?ng
@@ -513,27 +513,27 @@ public class EnemyElite : MonoBehaviour
     }
     
     /// <summary>
-    /// Kích ho?t enrage
+    /// Kï¿½ch ho?t enrage
     /// </summary>
     private void ActivateEnrage()
     {
-        // N?u ?ã kích ho?t, không làm gì c?
+        // N?u ?ï¿½ kï¿½ch ho?t, khï¿½ng lï¿½m gï¿½ c?
         if (isEnraged)
         {
             return;
         }
         
-        // C?p nh?t tr?ng thái
+        // C?p nh?t tr?ng thï¿½i
         isEnraged = true;
         
-        // T?ng sát th??ng và t?c ??
+        // T?ng sï¿½t th??ng vï¿½ t?c ??
         enemy.SetDamageMultiplier(damageMultiplier * (1f + enrageDamageBonus));
         enemy.SetSpeedMultiplier(speedMultiplier * (1f + enrageSpeedBonus));
         
-        // Kích ho?t animation n?u có
-        if (animator != null)
+        // Kï¿½ch ho?t animation n?u cï¿½
+        if (enemy.EnemyAnimatorController != null)
         {
-            animator.SetBool("Enraged", true);
+            enemy.EnemyAnimatorController.SetBool("Enraged", true);
         }
         
         // Hi?n th? hi?u ?ng
@@ -541,26 +541,26 @@ public class EnemyElite : MonoBehaviour
     }
     
     /// <summary>
-    /// X? lý d?ch chuy?n
+    /// X? lï¿½ d?ch chuy?n
     /// </summary>
     private void HandleTeleport()
     {
-        // N?u ch?a h?t cooldown, không làm gì c?
+        // N?u ch?a h?t cooldown, khï¿½ng lï¿½m gï¿½ c?
         if (Time.time < lastTeleportTime + teleportCooldown)
         {
             return;
         }
         
-        // Ki?m tra n?u máu th?p ho?c b? bao vây
+        // Ki?m tra n?u mï¿½u th?p ho?c b? bao vï¿½y
         bool shouldTeleport = false;
         
-        // N?u máu th?p
+        // N?u mï¿½u th?p
         if (enemy != null && enemy.GetHealthPercent() < 0.3f)
         {
             shouldTeleport = true;
         }
         
-        // N?u b? bao vây
+        // N?u b? bao vï¿½y
         if (!shouldTeleport)
         {
             int nearbyEnemies = Physics2D.OverlapCircleAll(transform.position, 2f, LayerMask.GetMask("Player")).Length;
@@ -570,7 +570,7 @@ public class EnemyElite : MonoBehaviour
             }
         }
         
-        // N?u nên d?ch chuy?n
+        // N?u nï¿½n d?ch chuy?n
         if (shouldTeleport)
         {
             Teleport();
@@ -585,77 +585,77 @@ public class EnemyElite : MonoBehaviour
         // C?p nh?t th?i gian d?ch chuy?n
         lastTeleportTime = Time.time;
         
-        // Tìm v? trí d?ch chuy?n
+        // Tï¿½m v? trï¿½ d?ch chuy?n
         Vector2 teleportPosition = FindTeleportPosition();
         
-        // Hi?n th? hi?u ?ng t?i v? trí c?
+        // Hi?n th? hi?u ?ng t?i v? trï¿½ c?
         ShowTeleportEffect(transform.position);
         
         // D?ch chuy?n
         transform.position = teleportPosition;
         
-        // Hi?n th? hi?u ?ng t?i v? trí m?i
+        // Hi?n th? hi?u ?ng t?i v? trï¿½ m?i
         ShowTeleportEffect(transform.position);
         
-        // Kích ho?t animation n?u có
-        if (animator != null)
+        // Kï¿½ch ho?t animation n?u cï¿½
+        if (enemy.EnemyAnimatorController != null)
         {
-            animator.SetTrigger("Teleport");
+            enemy.EnemyAnimatorController.SetTrigger("Teleport");
         }
     }
     
     /// <summary>
-    /// Tìm v? trí d?ch chuy?n
+    /// Tï¿½m v? trï¿½ d?ch chuy?n
     /// </summary>
     private Vector2 FindTeleportPosition()
     {
-        // Tìm m?c tiêu g?n nh?t
+        // Tï¿½m m?c tiï¿½u g?n nh?t
         Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 10f, LayerMask.GetMask("Player"));
         if (colliders.Length > 0)
         {
-            // L?y m?c tiêu ??u tiên
+            // L?y m?c tiï¿½u ??u tiï¿½n
             Transform target = colliders[0].transform;
             
-            // Tính toán h??ng ng?u nhiên
+            // Tï¿½nh toï¿½n h??ng ng?u nhiï¿½n
             Vector2 randomDirection = Random.insideUnitCircle.normalized;
             
-            // Tính toán v? trí d?ch chuy?n
+            // Tï¿½nh toï¿½n v? trï¿½ d?ch chuy?n
             Vector2 teleportPosition = (Vector2)target.position + randomDirection * teleportDistance;
             
             // Ki?m tra va ch?m
             RaycastHit2D hit = Physics2D.Raycast(transform.position, teleportPosition - (Vector2)transform.position, teleportDistance, LayerMask.GetMask("Obstacle"));
             if (hit.collider != null)
             {
-                // N?u có va ch?m, d?ch chuy?n ??n v? trí va ch?m
+                // N?u cï¿½ va ch?m, d?ch chuy?n ??n v? trï¿½ va ch?m
                 teleportPosition = hit.point - randomDirection * 0.5f;
             }
             
             return teleportPosition;
         }
         
-        // N?u không có m?c tiêu, d?ch chuy?n ng?u nhiên
+        // N?u khï¿½ng cï¿½ m?c tiï¿½u, d?ch chuy?n ng?u nhiï¿½n
         Vector2 randomOffset = Random.insideUnitCircle.normalized * teleportDistance;
         return (Vector2)transform.position + randomOffset;
     }
     
     /// <summary>
-    /// X? lý mi?n nhi?m
+    /// X? lï¿½ mi?n nhi?m
     /// </summary>
     private void HandleImmunity()
     {
-        // N?u ?ang mi?n nhi?m, không làm gì c?
+        // N?u ?ang mi?n nhi?m, khï¿½ng lï¿½m gï¿½ c?
         if (isImmune)
         {
             return;
         }
         
-        // N?u ch?a h?t cooldown, không làm gì c?
+        // N?u ch?a h?t cooldown, khï¿½ng lï¿½m gï¿½ c?
         if (Time.time < lastImmunityTime + immunityCooldown)
         {
             return;
         }
         
-        // Ki?m tra n?u máu th?p
+        // Ki?m tra n?u mï¿½u th?p
         if (enemy != null && enemy.GetHealthPercent() < 0.2f)
         {
             ActivateImmunity();
@@ -663,18 +663,18 @@ public class EnemyElite : MonoBehaviour
     }
     
     /// <summary>
-    /// Kích ho?t mi?n nhi?m
+    /// Kï¿½ch ho?t mi?n nhi?m
     /// </summary>
     private void ActivateImmunity()
     {
-        // C?p nh?t tr?ng thái
+        // C?p nh?t tr?ng thï¿½i
         isImmune = true;
         lastImmunityTime = Time.time;
         
-        // Kích ho?t animation n?u có
-        if (animator != null)
+        // Kï¿½ch ho?t animation n?u cï¿½
+        if (enemy.EnemyAnimatorController != null)
         {
-            animator.SetBool("Immune", true);
+            enemy.EnemyAnimatorController.SetBool("Immune", true);
         }
         
         // Hi?n th? hi?u ?ng
@@ -692,13 +692,13 @@ public class EnemyElite : MonoBehaviour
         // ??i m?t kho?ng th?i gian
         yield return new WaitForSeconds(immunityDuration);
         
-        // C?p nh?t tr?ng thái
+        // C?p nh?t tr?ng thï¿½i
         isImmune = false;
         
-        // Kích ho?t animation n?u có
-        if (animator != null)
+        // Kï¿½ch ho?t animation n?u cï¿½
+        if (enemy.EnemyAnimatorController != null)
         {
-            animator.SetBool("Immune", false);
+            enemy.EnemyAnimatorController.SetBool("Immune", false);
         }
         
         // ?n hi?u ?ng
@@ -706,23 +706,23 @@ public class EnemyElite : MonoBehaviour
     }
     
     /// <summary>
-    /// X? lý cu?ng n?
+    /// X? lï¿½ cu?ng n?
     /// </summary>
     private void HandleFrenzy()
     {
-        // N?u ?ang cu?ng n?, không làm gì c?
+        // N?u ?ang cu?ng n?, khï¿½ng lï¿½m gï¿½ c?
         if (isFrenzied)
         {
             return;
         }
         
-        // N?u ch?a h?t cooldown, không làm gì c?
+        // N?u ch?a h?t cooldown, khï¿½ng lï¿½m gï¿½ c?
         if (Time.time < lastFrenzyTime + frenzyCooldown)
         {
             return;
         }
         
-        // Ki?m tra n?u có m?c tiêu g?n
+        // Ki?m tra n?u cï¿½ m?c tiï¿½u g?n
         Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 3f, LayerMask.GetMask("Player"));
         if (colliders.Length > 0)
         {
@@ -731,25 +731,25 @@ public class EnemyElite : MonoBehaviour
     }
     
     /// <summary>
-    /// Kích ho?t cu?ng n?
+    /// Kï¿½ch ho?t cu?ng n?
     /// </summary>
     private void ActivateFrenzy()
     {
-        // C?p nh?t tr?ng thái
+        // C?p nh?t tr?ng thï¿½i
         isFrenzied = true;
         lastFrenzyTime = Time.time;
         
-        // T?ng t?c ?? t?n công
+        // T?ng t?c ?? t?n cï¿½ng
         if (enemy != null && enemy.GetComponent<EnemyRangedAttack>() != null)
         {
             EnemyRangedAttack rangedAttack = enemy.GetComponent<EnemyRangedAttack>();
             rangedAttack.SetCooldownMultiplier(1f - frenzyAttackSpeedBonus);
         }
         
-        // Kích ho?t animation n?u có
-        if (animator != null)
+        // Kï¿½ch ho?t animation n?u cï¿½
+        if (enemy.EnemyAnimatorController != null)
         {
-            animator.SetBool("Frenzy", true);
+            enemy.EnemyAnimatorController.SetBool("Frenzy", true);
         }
         
         // Hi?n th? hi?u ?ng
@@ -767,20 +767,20 @@ public class EnemyElite : MonoBehaviour
         // ??i m?t kho?ng th?i gian
         yield return new WaitForSeconds(frenzyDuration);
         
-        // C?p nh?t tr?ng thái
+        // C?p nh?t tr?ng thï¿½i
         isFrenzied = false;
         
-        // ??t l?i t?c ?? t?n công
+        // ??t l?i t?c ?? t?n cï¿½ng
         if (enemy != null && enemy.GetComponent<EnemyRangedAttack>() != null)
         {
             EnemyRangedAttack rangedAttack = enemy.GetComponent<EnemyRangedAttack>();
             rangedAttack.SetCooldownMultiplier(1f);
         }
         
-        // Kích ho?t animation n?u có
-        if (animator != null)
+        // Kï¿½ch ho?t animation n?u cï¿½
+        if (enemy.EnemyAnimatorController != null)
         {
-            animator.SetBool("Frenzy", false);
+            enemy.EnemyAnimatorController.SetBool("Frenzy", false);
         }
         
         // ?n hi?u ?ng
@@ -788,13 +788,13 @@ public class EnemyElite : MonoBehaviour
     }
     
     /// <summary>
-    /// Tái t?o máu
+    /// Tï¿½i t?o mï¿½u
     /// </summary>
     private IEnumerator RegenerateHealth()
     {
         while (true)
         {
-            // N?u có component Enemy, h?i máu
+            // N?u cï¿½ component Enemy, h?i mï¿½u
             if (enemy != null)
             {
                 enemy.Heal(regenerationAmount);
@@ -816,10 +816,10 @@ public class EnemyElite : MonoBehaviour
             Instantiate(explosionEffectPrefab, transform.position, Quaternion.identity);
         }
         
-        // Tìm t?t c? m?c tiêu trong ph?m vi
+        // Tï¿½m t?t c? m?c tiï¿½u trong ph?m vi
         Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, explosionRadius, LayerMask.GetMask("Player"));
         
-        // Gây sát th??ng cho t?ng m?c tiêu
+        // Gï¿½y sï¿½t th??ng cho t?ng m?c tiï¿½u
         foreach (Collider2D collider in colliders)
         {
             IDamageable damageable = collider.GetComponent<IDamageable>();
@@ -831,14 +831,14 @@ public class EnemyElite : MonoBehaviour
     }
     
     /// <summary>
-    /// Tìm ng??i gây sát th??ng
+    /// Tï¿½m ng??i gï¿½y sï¿½t th??ng
     /// </summary>
     private GameObject FindAttacker()
     {
-        // Tìm t?t c? m?c tiêu trong ph?m vi
+        // Tï¿½m t?t c? m?c tiï¿½u trong ph?m vi
         Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 5f, LayerMask.GetMask("Player"));
         
-        // N?u có m?c tiêu, tr? v? m?c tiêu ??u tiên
+        // N?u cï¿½ m?c tiï¿½u, tr? v? m?c tiï¿½u ??u tiï¿½n
         if (colliders.Length > 0)
         {
             return colliders[0].gameObject;
@@ -859,7 +859,7 @@ public class EnemyElite : MonoBehaviour
             eliteEffect.transform.SetParent(transform);
             eliteEffect.transform.localPosition = Vector3.zero;
             
-            // ??t màu
+            // ??t mï¿½u
             ParticleSystem particleSystem = eliteEffect.GetComponent<ParticleSystem>();
             if (particleSystem != null)
             {
@@ -868,14 +868,14 @@ public class EnemyElite : MonoBehaviour
             }
         }
         
-        // T?o ch? báo tinh nhu?
+        // T?o ch? bï¿½o tinh nhu?
         if (eliteIndicatorPrefab != null)
         {
             eliteIndicator = Instantiate(eliteIndicatorPrefab, transform.position, Quaternion.identity);
             eliteIndicator.transform.SetParent(transform);
             eliteIndicator.transform.localPosition = new Vector3(0f, 1.5f, 0f);
             
-            // ??t màu
+            // ??t mï¿½u
             SpriteRenderer indicatorRenderer = eliteIndicator.GetComponent<SpriteRenderer>();
             if (indicatorRenderer != null)
             {
@@ -896,7 +896,7 @@ public class EnemyElite : MonoBehaviour
             eliteEffect = null;
         }
         
-        // H?y ch? báo tinh nhu?
+        // H?y ch? bï¿½o tinh nhu?
         if (eliteIndicator != null)
         {
             Destroy(eliteIndicator);
@@ -909,7 +909,7 @@ public class EnemyElite : MonoBehaviour
     /// </summary>
     private void CreateOutline()
     {
-        // N?u không có SpriteRenderer, không làm gì c?
+        // N?u khï¿½ng cï¿½ SpriteRenderer, khï¿½ng lï¿½m gï¿½ c?
         if (spriteRenderer == null)
         {
             return;
@@ -920,7 +920,7 @@ public class EnemyElite : MonoBehaviour
         outlineMaterial.SetColor("_OutlineColor", GetEliteColor());
         outlineMaterial.SetFloat("_OutlineWidth", outlineWidth);
         
-        // Áp d?ng material
+        // ï¿½p d?ng material
         spriteRenderer.material = outlineMaterial;
     }
     
@@ -934,10 +934,10 @@ public class EnemyElite : MonoBehaviour
         
         while (true)
         {
-            // Tính toán kích th??c pulse
+            // Tï¿½nh toï¿½n kï¿½ch th??c pulse
             float pulse = 1f + Mathf.Sin(time * pulseRate) * pulseAmount;
             
-            // Áp d?ng kích th??c
+            // ï¿½p d?ng kï¿½ch th??c
             transform.localScale = originalScale * pulse;
             
             // T?ng th?i gian
@@ -952,13 +952,13 @@ public class EnemyElite : MonoBehaviour
     /// </summary>
     private void ShowBerserkerEffect()
     {
-        // ??i màu outline n?u có
+        // ??i mï¿½u outline n?u cï¿½
         if (outlineMaterial != null)
         {
             outlineMaterial.SetColor("_OutlineColor", Color.red);
         }
         
-        // ??i màu hi?u ?ng n?u có
+        // ??i mï¿½u hi?u ?ng n?u cï¿½
         if (eliteEffect != null)
         {
             ParticleSystem particleSystem = eliteEffect.GetComponent<ParticleSystem>();
@@ -975,13 +975,13 @@ public class EnemyElite : MonoBehaviour
     /// </summary>
     private void ShowEnrageEffect()
     {
-        // ??i màu outline n?u có
+        // ??i mï¿½u outline n?u cï¿½
         if (outlineMaterial != null)
         {
             outlineMaterial.SetColor("_OutlineColor", new Color(1f, 0.5f, 0f));
         }
         
-        // ??i màu hi?u ?ng n?u có
+        // ??i mï¿½u hi?u ?ng n?u cï¿½
         if (eliteEffect != null)
         {
             ParticleSystem particleSystem = eliteEffect.GetComponent<ParticleSystem>();
@@ -998,7 +998,7 @@ public class EnemyElite : MonoBehaviour
     /// </summary>
     private void ShowTeleportEffect(Vector3 position)
     {
-        // N?u không có prefab, không làm gì c?
+        // N?u khï¿½ng cï¿½ prefab, khï¿½ng lï¿½m gï¿½ c?
         if (teleportEffectPrefab == null)
         {
             return;
@@ -1007,7 +1007,7 @@ public class EnemyElite : MonoBehaviour
         // T?o hi?u ?ng
         GameObject effect = Instantiate(teleportEffectPrefab, position, Quaternion.identity);
         
-        // ??t màu
+        // ??t mï¿½u
         ParticleSystem particleSystem = effect.GetComponent<ParticleSystem>();
         if (particleSystem != null)
         {
@@ -1024,13 +1024,13 @@ public class EnemyElite : MonoBehaviour
     /// </summary>
     private void ShowImmunityEffect()
     {
-        // ??i màu outline n?u có
+        // ??i mï¿½u outline n?u cï¿½
         if (outlineMaterial != null)
         {
             outlineMaterial.SetColor("_OutlineColor", Color.white);
         }
         
-        // ??i màu hi?u ?ng n?u có
+        // ??i mï¿½u hi?u ?ng n?u cï¿½
         if (eliteEffect != null)
         {
             ParticleSystem particleSystem = eliteEffect.GetComponent<ParticleSystem>();
@@ -1047,13 +1047,13 @@ public class EnemyElite : MonoBehaviour
     /// </summary>
     private void HideImmunityEffect()
     {
-        // ??t l?i màu outline n?u có
+        // ??t l?i mï¿½u outline n?u cï¿½
         if (outlineMaterial != null)
         {
             outlineMaterial.SetColor("_OutlineColor", GetEliteColor());
         }
         
-        // ??t l?i màu hi?u ?ng n?u có
+        // ??t l?i mï¿½u hi?u ?ng n?u cï¿½
         if (eliteEffect != null)
         {
             ParticleSystem particleSystem = eliteEffect.GetComponent<ParticleSystem>();
@@ -1070,13 +1070,13 @@ public class EnemyElite : MonoBehaviour
     /// </summary>
     private void ShowFrenzyEffect()
     {
-        // ??i màu outline n?u có
+        // ??i mï¿½u outline n?u cï¿½
         if (outlineMaterial != null)
         {
             outlineMaterial.SetColor("_OutlineColor", new Color(1f, 0f, 1f));
         }
         
-        // ??i màu hi?u ?ng n?u có
+        // ??i mï¿½u hi?u ?ng n?u cï¿½
         if (eliteEffect != null)
         {
             ParticleSystem particleSystem = eliteEffect.GetComponent<ParticleSystem>();
@@ -1093,13 +1093,13 @@ public class EnemyElite : MonoBehaviour
     /// </summary>
     private void HideFrenzyEffect()
     {
-        // ??t l?i màu outline n?u có
+        // ??t l?i mï¿½u outline n?u cï¿½
         if (outlineMaterial != null)
         {
             outlineMaterial.SetColor("_OutlineColor", GetEliteColor());
         }
         
-        // ??t l?i màu hi?u ?ng n?u có
+        // ??t l?i mï¿½u hi?u ?ng n?u cï¿½
         if (eliteEffect != null)
         {
             ParticleSystem particleSystem = eliteEffect.GetComponent<ParticleSystem>();
@@ -1112,7 +1112,7 @@ public class EnemyElite : MonoBehaviour
     }
     
     /// <summary>
-    /// L?y màu tinh nhu? d?a trên c?p b?c
+    /// L?y mï¿½u tinh nhu? d?a trï¿½n c?p b?c
     /// </summary>
     private Color GetEliteColor()
     {
@@ -1140,7 +1140,7 @@ public class EnemyElite : MonoBehaviour
     /// </summary>
     private void OnDrawGizmosSelected()
     {
-        // V? ph?m vi n? n?u có
+        // V? ph?m vi n? n?u cï¿½
         if (hasExplosionOnDeath)
         {
             Gizmos.color = Color.red;
@@ -1148,7 +1148,7 @@ public class EnemyElite : MonoBehaviour
         }
     }
 
-    // --- B? sung property và method cho EliteController ---
+    // --- B? sung property vï¿½ method cho EliteController ---
     public bool IsElite { get => isElite; set => isElite = value; }
     public void SetElite(bool value) { isElite = value; }
     public void SetEliteRank(EliteRank rank) { eliteRank = rank; }

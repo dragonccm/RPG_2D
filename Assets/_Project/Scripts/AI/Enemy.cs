@@ -8,7 +8,8 @@ using System;
 using Random = UnityEngine.Random;
 
 /// <summary>
-/// Lớp cơ sở cho tất cả kẻ địch, quản lý việc tìm kiếm mục tiêu và di chuyển cơ bản.
+/// Lớp cơ sở cho tất cả kẻ địch trong game. Quản lý target, di chuyển, máu, sự kiện, và tích hợp với AI Controller.
+/// Đảm bảo mọi kẻ địch đều chỉ cần gắn script này + AIController phù hợp để hoạt động.
 /// </summary>
 public class Enemy : MonoBehaviour
 {
@@ -78,6 +79,9 @@ public class Enemy : MonoBehaviour
     public float GetHealthPercent() { return _maxHealth > 0 ? _currentHealth / _maxHealth : 0f; }
     public void Heal(float amount) { _currentHealth = Mathf.Min(_currentHealth + amount, _maxHealth); OnHealthChanged?.Invoke(_currentHealth, _maxHealth); }
 
+    /// <summary>
+    /// Khởi tạo agent, đăng ký với AIManager, chuẩn bị NavMeshAgent.
+    /// </summary>
     protected virtual void Start()
     {
         Debug.Log("--------------------------------------------------------------------------------------");
@@ -105,6 +109,9 @@ public class Enemy : MonoBehaviour
         Debug.Log($"[{gameObject.name}] Player Layer Mask: {playerLayerMask.value} (binary: {System.Convert.ToString(playerLayerMask.value, 2)})");
     }
 
+    /// <summary>
+    /// Update: Cập nhật target định kỳ và xử lý di chuyển.
+    /// </summary>
     protected virtual void Update()
     {
         // Chỉ cập nhật mục tiêu theo khoảng thời gian để tối ưu hiệu suất
@@ -118,7 +125,7 @@ public class Enemy : MonoBehaviour
     }
 
     /// <summary>
-    /// Tìm tất cả players trong scene với nhiều phương pháp khác nhau
+    /// Tìm tất cả player trong scene bằng nhiều phương pháp (tag, layer, component).
     /// </summary>
     private Transform[] FindAllPlayers()
     {
@@ -189,7 +196,7 @@ public class Enemy : MonoBehaviour
     }
 
     /// <summary>
-    /// Cập nhật mục tiêu chính của kẻ địch với logic cải tiến
+    /// Cập nhật target tốt nhất cho kẻ địch dựa trên khoảng cách, nhóm, v.v.
     /// </summary>
     protected virtual void UpdateTarget()
     {
@@ -300,7 +307,7 @@ public class Enemy : MonoBehaviour
     }
 
     /// <summary>
-    /// Kiểm tra xem một transform có phải là target hợp lệ không
+    /// Kiểm tra một transform có phải là target hợp lệ không (tag, layer, active, máu...)
     /// </summary>
     private bool IsValidTarget(Transform t)
     {
@@ -327,7 +334,7 @@ public class Enemy : MonoBehaviour
     }
 
     /// <summary>
-    /// Cập nhật AI Controller state
+    /// Cập nhật trạng thái AI Controller dựa trên target hiện tại.
     /// </summary>
     private void UpdateAIController(EnemyAIController aiController)
     {
@@ -359,7 +366,7 @@ public class Enemy : MonoBehaviour
     }
 
     /// <summary>
-    /// Đánh giá và chọn target tốt nhất từ danh sách ứng cử viên
+    /// Đánh giá và chọn target tốt nhất từ danh sách ứng cử viên (ưu tiên gần, máu thấp...)
     /// </summary>
     protected virtual Transform EvaluatePlayerTargetCandidates(List<Transform> candidates)
     {
@@ -384,7 +391,7 @@ public class Enemy : MonoBehaviour
     }
 
     /// <summary>
-    /// Tính toán điểm số cho một target (có thể override trong subclass)
+    /// Tính điểm cho một target (có thể override để thêm logic ưu tiên khác).
     /// </summary>
     protected virtual float CalculateTargetScore(Transform candidate)
     {
@@ -403,6 +410,9 @@ public class Enemy : MonoBehaviour
         return distanceScore + healthScore;
     }
 
+    /// <summary>
+    /// Xử lý di chuyển của kẻ địch (theo target hoặc dừng lại).
+    /// </summary>
     protected virtual void HandleMovement()
     {
         if (agent == null) return;
@@ -429,6 +439,9 @@ public class Enemy : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Vẽ Gizmos debug phạm vi detection, chase, attack, line tới target.
+    /// </summary>
     protected virtual void OnDrawGizmosSelected()
     {
         // Vẽ detection range
@@ -462,8 +475,16 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    // === Các phương thức khác giữ nguyên ===
+    /// <summary>
+    /// Truy cập nhanh AnimatorController của enemy (nếu có).
+    /// </summary>
+    public EnemyAnimatorController EnemyAnimatorController => GetComponent<EnemyAnimatorController>();
 
+    // === Các phương thức combat, chết, buff, v.v. ===
+
+    /// <summary>
+    /// Nhận sát thương (gọi tới Character nếu có).
+    /// </summary>
     public virtual void TakeDamage(float damage)
     {
         var character = GetComponent<Character>();
@@ -474,6 +495,9 @@ public class Enemy : MonoBehaviour
         OnDamageTaken?.Invoke(this, damage, _currentHealth);
     }
 
+    /// <summary>
+    /// Xử lý chết: chuyển state, gọi event, unregister khỏi manager, hủy object.
+    /// </summary>
     public virtual void Die()
     {
         var aiController = GetComponent<EnemyAIController>();

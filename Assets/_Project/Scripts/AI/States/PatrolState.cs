@@ -16,6 +16,7 @@ public class PatrolState : State
         Debug.Log($"[{aiController.enemyType}] Enter PatrolState");
         currentPatrolIndex = 0;
         MoveToNextPatrolPoint();
+        aiController.animatorController?.PlayMoveAnimation(aiController.GetComponent<EnemyMovementController>()?.Agent.speed ?? 0f);
     }
 
     public override void Execute()
@@ -57,5 +58,6 @@ public class PatrolState : State
     {
         base.Exit();
         Debug.Log($"[{aiController.enemyType}] Exit PatrolState");
+        aiController.animatorController?.PlayIdleAnimation();
     }
 }

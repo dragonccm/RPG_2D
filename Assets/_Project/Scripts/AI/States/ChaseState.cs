@@ -19,6 +19,7 @@ public class ChaseState : State
             // EnemyMovementController sẽ tự động di chuyển đến playerTarget
             moveCtrl.playerTarget = aiController.playerTarget;
             Debug.Log($"[{aiController.enemyType}] ChaseState: Set MovementController target to {moveCtrl.playerTarget?.name}");
+            aiController.animatorController?.PlayMoveAnimation(moveCtrl.Agent.speed);
         }
     }
 
@@ -34,7 +35,6 @@ public class ChaseState : State
 
         if (aiController.playerTarget == null)
         {
-            Debug.Log($"[{aiController.enemyType}] ChaseState: Lost target, switching to PatrolState");
             stateMachine.ChangeState(aiController.patrolState); // Hoặc idleState nếu không có tuần tra
             return;
         }
@@ -67,5 +67,6 @@ public class ChaseState : State
             moveCtrl.playerTarget = null; // Dừng di chuyển theo player khi thoát trạng thái Chase
             Debug.Log($"[{aiController.enemyType}] ChaseState: Cleared MovementController target.");
         }
+        aiController.animatorController?.PlayIdleAnimation();
     }
 }

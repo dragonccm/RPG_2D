@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 public class DeadState : State
 {
@@ -10,8 +10,7 @@ public class DeadState : State
     {
         base.Enter();
         Debug.Log($"[{aiController.enemyType}] Enter DeadState");
-        // TODO: Trigger death animation and effects
-        // Object.Destroy(aiController.gameObject, 2f); // Logic này đã được chuyển vào Enemy.Die()
+        aiController.animatorController?.PlayDeathAnimation();
     }
 
     public override void Execute()

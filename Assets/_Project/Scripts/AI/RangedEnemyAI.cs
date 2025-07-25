@@ -2,7 +2,8 @@ using UnityEngine;
 using System.Collections.Generic;
 
 /// <summary>
-/// AI cho kẻ địch tầm xa.
+/// AI cho kẻ địch tầm xa. Kế thừa EnemyAIController, chỉ cần gắn script này lên prefab là đủ cho AI tầm xa.
+/// Tích hợp logic giữ khoảng cách an toàn, chuyển state khi được alert.
 /// </summary>
 [DisallowMultipleComponent]
 public class RangedEnemyAI : EnemyAIController
@@ -13,6 +14,7 @@ public class RangedEnemyAI : EnemyAIController
 
     private Enemy enemy; // Cache tham chiếu đến Enemy component
 
+    // === Khởi tạo, cache component, thiết lập loại AI ===
     protected override void Awake()
     {
         base.Awake();
@@ -29,17 +31,17 @@ public class RangedEnemyAI : EnemyAIController
     }
 
     /// <summary>
-    /// Kiểm tra xem mục tiêu có trong một phạm vi cụ thể không.
+    /// Kiểm tra mục tiêu có trong phạm vi chỉ định không (dùng cho alert, chase, attack).
     /// </summary>
-    /// <param name="target">Mục tiêu cần kiểm tra.</param>
-    /// <param name="range">Phạm vi để kiểm tra.</param>
-    /// <returns>True nếu mục tiêu trong phạm vi, ngược lại False.</returns>
     private bool IsTargetInSpecificRange(Transform target, float range)
     {
         if (target == null) return false;
         return Vector3.Distance(transform.position, target.position) <= range;
     }
 
+    /// <summary>
+    /// Xử lý khi AI được "báo động" về một mục tiêu (ví dụ: bị phát hiện, bị tấn công).
+    /// </summary>
     public override void Alert(Transform target)
     {
         Debug.Log($"[RangedAI] Alerted to target: {target?.name}");
@@ -50,8 +52,5 @@ public class RangedEnemyAI : EnemyAIController
             ChangeState(chaseState); // Chuyển sang trạng thái truy đuổi
         }
     }
-
-    // Phương thức GetPriorityTarget đã được loại bỏ ở đây vì Enemy.cs là nơi quản lý mục tiêu chính.
-
-
+    // Không override GetPriorityTarget: sử dụng logic mặc định của Enemy.cs
 }

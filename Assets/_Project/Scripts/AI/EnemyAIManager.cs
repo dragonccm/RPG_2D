@@ -4,10 +4,11 @@ using System.Collections.Generic;
 using UnityEngine.Events;
 
 /// <summary>
-/// Quản lý tất cả các AI agent trong scene.
+/// Quản lý tất cả các AI agent trong scene. Singleton duy nhất, hỗ trợ group, spawner, event, tìm kiếm agent.
 /// </summary>
 public class EnemyAIManager : MonoBehaviour
 {
+    // === Các thuộc tính quản lý agent, group, spawner, event ===
     [Header("AI Management")]
     [Tooltip("Danh sách tất cả các AI agent đang hoạt động")]
     public List<EnemyAIController> activeAgents = new List<EnemyAIController>();
@@ -41,6 +42,7 @@ public class EnemyAIManager : MonoBehaviour
     // Singleton instance
     public static EnemyAIManager Instance { get; private set; }
 
+    // === Khởi tạo Singleton, tìm spawner, khởi động coroutine ===
     private void Awake()
     {
         // Singleton pattern
@@ -66,8 +68,9 @@ public class EnemyAIManager : MonoBehaviour
         StartCoroutine(UpdateDistantAgents());
     }
 
+    // === Các phương thức quản lý agent (add, remove, death, tìm kiếm) ===
     /// <summary>
-    /// Thêm một agent vào danh sách quản lý
+    /// Thêm một agent vào danh sách quản lý (tự động đăng ký event chết).
     /// </summary>
     public void AddAgent(EnemyAIController agent)
     {
@@ -91,7 +94,7 @@ public class EnemyAIManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Xóa một agent khỏi danh sách quản lý
+    /// Xóa một agent khỏi danh sách quản lý (tự động hủy đăng ký event chết).
     /// </summary>
     public void RemoveAgent(EnemyAIController agent)
     {
@@ -114,7 +117,7 @@ public class EnemyAIManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Xử lý sự kiện khi một agent chết
+    /// Xử lý sự kiện khi một agent chết (gọi event, xóa khỏi danh sách).
     /// </summary>
     private void HandleAgentDeath(EnemyAIController agent)
     {
@@ -126,7 +129,7 @@ public class EnemyAIManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Tìm agent gần nhất với một vị trí
+    /// Tìm agent gần nhất với một vị trí.
     /// </summary>
     public EnemyAIController FindNearestAgent(Vector3 position)
     {
@@ -147,7 +150,7 @@ public class EnemyAIManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Tìm tất cả các agent trong một bán kính
+    /// Tìm tất cả agent trong một bán kính.
     /// </summary>
     public List<EnemyAIController> FindAgentsInRadius(Vector3 position, float radius)
     {
@@ -165,7 +168,7 @@ public class EnemyAIManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Coroutine cập nhật các agent ở xa
+    /// Coroutine cập nhật các agent ở xa (có thể tối ưu performance).
     /// </summary>
     private IEnumerator UpdateDistantAgents()
     {
@@ -200,8 +203,9 @@ public class EnemyAIManager : MonoBehaviour
         }
     }
 
+    // === Quản lý group AI ===
     /// <summary>
-    /// Tạo một nhóm AI mới
+    /// Tạo một nhóm AI mới.
     /// </summary>
     public AIGroup CreateGroup()
     {
@@ -216,7 +220,7 @@ public class EnemyAIManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Thêm một agent vào một nhóm
+    /// Thêm một agent vào một nhóm.
     /// </summary>
     public void AddAgentToGroup(EnemyAIController agent, AIGroup group)
     {
@@ -228,7 +232,7 @@ public class EnemyAIManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Xóa một agent khỏi một nhóm
+    /// Xóa một agent khỏi một nhóm.
     /// </summary>
     public void RemoveAgentFromGroup(EnemyAIController agent, AIGroup group)
     {
@@ -240,7 +244,7 @@ public class EnemyAIManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Xóa tất cả các agent
+    /// Xóa tất cả các agent và group khỏi scene.
     /// </summary>
     public void ClearAllAgents()
     {

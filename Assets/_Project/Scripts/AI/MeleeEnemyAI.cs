@@ -2,7 +2,8 @@ using UnityEngine;
 using System.Collections.Generic;
 
 /// <summary>
-/// AI cho kẻ địch cận chiến.
+/// AI cho kẻ địch cận chiến. Kế thừa EnemyAIController, chỉ cần gắn script này lên prefab là đủ cho AI cận chiến.
+/// Tích hợp sẵn logic ưu tiên target máu thấp nhất, chuyển state khi được alert.
 /// </summary>
 [DisallowMultipleComponent] // Đảm bảo chỉ có một instance của script này trên GameObject
 public class MeleeEnemyAI : EnemyAIController
@@ -15,6 +16,7 @@ public class MeleeEnemyAI : EnemyAIController
         enemyType = EnemyType.Melee; // Thiết lập loại kẻ địch là cận chiến
     }
 
+    // === Khởi tạo, cache component, thiết lập loại AI ===
     protected override void Awake()
     {
         base.Awake(); // Gọi Awake của lớp cha (EnemyAIController) để khởi tạo StateMachine
@@ -28,7 +30,7 @@ public class MeleeEnemyAI : EnemyAIController
         Debug.Log($"[{gameObject.name}] MeleeEnemyAI Awake. Enemy component found.");
     }
     /// <summary>
-    /// Kiểm tra xem mục tiêu có trong một phạm vi cụ thể không.
+    /// Kiểm tra mục tiêu có trong phạm vi chỉ định không (dùng cho alert, chase, attack).
     /// </summary>
     /// <param name="target">Mục tiêu cần kiểm tra.</param>
     /// <param name="range">Phạm vi để kiểm tra.</param>
@@ -40,7 +42,7 @@ public class MeleeEnemyAI : EnemyAIController
     }
 
     /// <summary>
-    /// Xử lý khi AI được "báo động" về một mục tiêu.
+    /// Xử lý khi AI được "báo động" về một mục tiêu (ví dụ: bị phát hiện, bị tấn công).
     /// </summary>
     /// <param name="target">Mục tiêu được báo động.</param>
     public override void Alert(Transform target)
@@ -56,6 +58,9 @@ public class MeleeEnemyAI : EnemyAIController
         }
     }
 
+    /// <summary>
+    /// Ưu tiên target player máu thấp nhất trong vùng detection (override logic mặc định).
+    /// </summary>
     public override Transform GetPriorityTarget(List<Transform> availableTargets)
     {
         // CHANGED: Luôn ưu tiên player máu thấp nhất trong vùng detection

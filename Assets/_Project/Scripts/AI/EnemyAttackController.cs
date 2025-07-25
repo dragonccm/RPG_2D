@@ -1,13 +1,12 @@
 using UnityEngine;
 
 /// <summary>
-/// Điều khiển hành vi tấn công của kẻ địch.
+/// Điều khiển hành vi tấn công của kẻ địch. Có thể dùng cho mọi loại AI (Melee, Ranged, Boss).
+/// Tích hợp với EnemyAIController để lấy target và kiểm soát cooldown, phạm vi tấn công.
 /// </summary>
 public class EnemyAttackController : MonoBehaviour
 {
-    // playerTarget không còn là public field để tránh gán nhầm từ Inspector.
-    // Nó sẽ được lấy từ EnemyAIController.playerTarget.
-    // private Transform _playerTarget; // Không cần thiết ở đây vì Attack() nhận target trực tiếp
+    // === Các thuộc tính cấu hình tấn công ===
 
     [Tooltip("Phạm vi tấn công của kẻ địch.")]
     public float attackRange = 2f;
@@ -20,17 +19,10 @@ public class EnemyAttackController : MonoBehaviour
     // Property để truy cập attackRange từ bên ngoài (ví dụ: Gizmos)
     public float AttackRange => attackRange;
 
-    /// <summary>
-    /// Cập nhật mục tiêu người chơi cho bộ điều khiển tấn công.
-    /// Lưu ý: Phương thức này có thể không cần thiết nếu Attack() luôn nhận target trực tiếp.
-    /// </summary>
-    // public void SetPlayerTarget(Transform newTarget)
-    // {
-    //     _playerTarget = newTarget;
-    // }
+    // === Các phương thức chính ===
 
     /// <summary>
-    /// Kiểm tra player có trong phạm vi tấn công không.
+    /// Kiểm tra mục tiêu có trong phạm vi tấn công không.
     /// </summary>
     public virtual bool IsInAttackRange(Transform target)
     {
@@ -39,7 +31,7 @@ public class EnemyAttackController : MonoBehaviour
     }
 
     /// <summary>
-    /// Hành vi tấn công mục tiêu. Ghi đè ở các class con nếu cần.
+    /// Thực hiện tấn công mục tiêu (có kiểm tra cooldown). Có thể override để mở rộng logic.
     /// </summary>
     /// <param name="target">Mục tiêu cần tấn công.</param>
     public virtual void Attack(Transform target)
@@ -52,22 +44,12 @@ public class EnemyAttackController : MonoBehaviour
         }
 
         Debug.Log($"[{gameObject.name}] attacks {target.name}!");
-        // Gây sát thương hoặc thực hiện hành động tấn công khác
-        Character targetCharacter = target.GetComponent<Character>();
-        if (targetCharacter != null)
+        // Gọi animation tấn công nếu có EnemyAnimatorController
+        var enemy = GetComponentInParent<Enemy>();
+        if (enemy != null && enemy.EnemyAnimatorController != null)
         {
-            var enemy = GetComponentInParent<Enemy>();
-                if (enemy != null)
-                {
-                    targetCharacter.TakeDamage(enemy.baseDamage);
-                }
-            Debug.Log($"[{gameObject.name}] dealt 10 damage to {target.name}. Current HP: {targetCharacter.CurrentHealth:F2}");
+            enemy.EnemyAnimatorController.PlayAttackAnimation();
         }
-        else
-        {
-            Debug.LogWarning($"[{gameObject.name}] Target {target.name} does not have a Character component to take damage.");
-        }
-
         lastAttackTime = Time.time; // Cập nhật thời gian tấn công cuối cùng
     }
 }

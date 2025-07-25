@@ -2,7 +2,8 @@ using UnityEngine;
 using System.Collections.Generic;
 
 /// <summary>
-/// AI cho Boss. Luôn ưu tiên player làm mục tiêu chính, chỉ truy đuổi khi player trong vùng target.
+/// AI cho Boss. Kế thừa EnemyAIController, chỉ cần gắn script này lên prefab là đủ cho AI Boss.
+/// Luôn ưu tiên player máu thấp nhất, chỉ truy đuổi khi player trong vùng detection.
 /// </summary>
 [DisallowMultipleComponent]
 public class BossAI : EnemyAIController
@@ -12,6 +13,9 @@ public class BossAI : EnemyAIController
         enemyType = EnemyType.Boss;
     }
 
+    /// <summary>
+    /// Kiểm tra playerTarget có còn trong vùng detection không (nếu ra khỏi thì dừng truy đuổi).
+    /// </summary>
     private bool IsPlayerInDetectionRange()
     {
         var enemy = GetComponent<Enemy>();
@@ -21,6 +25,9 @@ public class BossAI : EnemyAIController
         return distance <= detectionRange;
     }
 
+    /// <summary>
+    /// Xử lý khi AI được "báo động" về một mục tiêu (chỉ nhận player).
+    /// </summary>
     public override void Alert(Transform target)
     {
         Debug.Log($"[BossAI] Alerted to target: {target?.name}");
@@ -37,6 +44,9 @@ public class BossAI : EnemyAIController
         }
     }
 
+    /// <summary>
+    /// Ưu tiên player máu thấp nhất trong vùng detection (override logic mặc định).
+    /// </summary>
     public override Transform GetPriorityTarget(List<Transform> availableTargets)
     {
         // CHANGED: Luôn ưu tiên player máu thấp nhất trong vùng detection
@@ -58,6 +68,9 @@ public class BossAI : EnemyAIController
         return priority;
     }
 
+    /// <summary>
+    /// Update: Nếu playerTarget ra khỏi detection thì dừng truy đuổi, chuyển Idle.
+    /// </summary>
     protected override void Update()
     {
         if (playerTarget != null && !IsPlayerInDetectionRange())

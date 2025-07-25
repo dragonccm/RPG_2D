@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 
 /// <summary>
-/// X? lý kh? n?ng phòng th? v?i lá ch?n c?a k? thù
+/// X? lï¿½ kh? n?ng phï¿½ng th? v?i lï¿½ ch?n c?a k? thï¿½
 /// </summary>
 public class EnemyShield : MonoBehaviour
 {
@@ -40,12 +40,12 @@ public class EnemyShield : MonoBehaviour
     [SerializeField] private AudioClip shieldHitSound;
     [SerializeField] private float soundVolume = 0.5f;
     
-    // Các component
+    // Cï¿½c component
     private Enemy enemy;
-    private Animator animator;
+    // private Animator animator; // Removed direct Animator reference
     private AudioSource audioSource;
     
-    // Tr?ng thái lá ch?n
+    // Tr?ng thï¿½i lï¿½ ch?n
     private bool isShieldActive = false;
     private float lastShieldActivateTime = -999f;
     private float lastShieldHitTime = -999f;
@@ -53,7 +53,7 @@ public class EnemyShield : MonoBehaviour
     private int activationCount = 0;
     private float damageTaken = 0f;
     
-    // ??i t??ng lá ch?n
+    // ??i t??ng lï¿½ ch?n
     private GameObject shieldVisual;
     private SpriteRenderer shieldRenderer;
     
@@ -63,12 +63,12 @@ public class EnemyShield : MonoBehaviour
     
     private void Awake()
     {
-        // L?y các component c?n thi?t
+        // L?y cï¿½c component c?n thi?t
         enemy = GetComponent<Enemy>();
-        animator = GetComponent<Animator>();
+        // animator = GetComponent<Animator>(); // Removed direct Animator reference
         audioSource = GetComponent<AudioSource>();
         
-        // T?o AudioSource n?u ch?a có
+        // T?o AudioSource n?u ch?a cï¿½
         if (audioSource == null)
         {
             audioSource = gameObject.AddComponent<AudioSource>();
@@ -77,7 +77,7 @@ public class EnemyShield : MonoBehaviour
             audioSource.volume = soundVolume;
         }
         
-        // ??ng ký s? ki?n nh?n sát th??ng
+        // ??ng kï¿½ s? ki?n nh?n sï¿½t th??ng
         if (enemy != null)
         {
             enemy.OnDamageTaken += HandleDamageTaken;
@@ -87,7 +87,7 @@ public class EnemyShield : MonoBehaviour
     
     private void OnDestroy()
     {
-        // H?y ??ng ký s? ki?n
+        // H?y ??ng kï¿½ s? ki?n
         if (enemy != null)
         {
             enemy.OnDamageTaken -= HandleDamageTaken;
@@ -96,11 +96,11 @@ public class EnemyShield : MonoBehaviour
     }
     
     /// <summary>
-    /// X? lý s? ki?n thay ??i máu
+    /// X? lï¿½ s? ki?n thay ??i mï¿½u
     /// </summary>
     private void HandleHealthChanged(float currentHealth, float maxHealth)
     {
-        // N?u ?ã kích ho?t t? ??ng và máu gi?m xu?ng d??i ng??ng
+        // N?u ?ï¿½ kï¿½ch ho?t t? ??ng vï¿½ mï¿½u gi?m xu?ng d??i ng??ng
         if (autoActivateAtHealthPercent && !isShieldActive && CanActivateShield())
         {
             float healthPercent = currentHealth / maxHealth;
@@ -112,87 +112,87 @@ public class EnemyShield : MonoBehaviour
     }
     
     /// <summary>
-    /// X? lý s? ki?n nh?n sát th??ng
+    /// X? lï¿½ s? ki?n nh?n sï¿½t th??ng
     /// </summary>
     private void HandleDamageTaken(Enemy enemy, float damage, float newHealth)
     {
-        // N?u lá ch?n không ho?t ??ng, không làm gì c?
+        // N?u lï¿½ ch?n khï¿½ng ho?t ??ng, khï¿½ng lï¿½m gï¿½ c?
         if (!isShieldActive)
         {
             return;
         }
         
-        // C?p nh?t th?i gian b? ?ánh cu?i
+        // C?p nh?t th?i gian b? ?ï¿½nh cu?i
         lastShieldHitTime = Time.time;
         
-        // N?u ch?n t?t c? sát th??ng
+        // N?u ch?n t?t c? sï¿½t th??ng
         if (blockAllDamageWhenActive)
         {
-            // Gi?m l??ng lá ch?n
+            // Gi?m l??ng lï¿½ ch?n
             shieldHealth -= damage;
             
-            // ??t sát th??ng nh?n ???c v? 0
+            // ??t sï¿½t th??ng nh?n ???c v? 0
             damageTaken = 0f;
         }
         else
         {
-            // Tính toán sát th??ng gi?m
+            // Tï¿½nh toï¿½n sï¿½t th??ng gi?m
             float reducedDamage = damage * (1f - damageReduction);
             
-            // Gi?m l??ng lá ch?n
+            // Gi?m l??ng lï¿½ ch?n
             shieldHealth -= damage * damageReduction;
             
-            // ??t sát th??ng nh?n ???c
+            // ??t sï¿½t th??ng nh?n ???c
             damageTaken = reducedDamage;
         }
         
-        // Hi?u ?ng khi b? ?ánh
+        // Hi?u ?ng khi b? ?ï¿½nh
         if (flashOnHit)
         {
             StartCoroutine(FlashShield());
         }
         
-        // Phát âm thanh b? ?ánh
+        // Phï¿½t ï¿½m thanh b? ?ï¿½nh
         if (audioSource != null && shieldHitSound != null)
         {
             audioSource.PlayOneShot(shieldHitSound);
         }
         
-        // Hi?n th? hi?u ?ng b? ?ánh
+        // Hi?n th? hi?u ?ng b? ?ï¿½nh
         if (shieldHitEffectPrefab != null)
         {
             Instantiate(shieldHitEffectPrefab, transform.position, Quaternion.identity);
         }
         
-        // C?p nh?t hi?u ?ng lá ch?n
+        // C?p nh?t hi?u ?ng lï¿½ ch?n
         UpdateShieldVisual();
         
-        // N?u lá ch?n ?ã h?t
+        // N?u lï¿½ ch?n ?ï¿½ h?t
         if (shieldHealth <= 0f)
         {
-            // V? lá ch?n
+            // V? lï¿½ ch?n
             BreakShield();
         }
     }
     
     /// <summary>
-    /// Ki?m tra xem có th? kích ho?t lá ch?n không
+    /// Ki?m tra xem cï¿½ th? kï¿½ch ho?t lï¿½ ch?n khï¿½ng
     /// </summary>
     public bool CanActivateShield()
     {
-        // N?u lá ch?n ?ang ho?t ??ng, không th? kích ho?t
+        // N?u lï¿½ ch?n ?ang ho?t ??ng, khï¿½ng th? kï¿½ch ho?t
         if (isShieldActive)
         {
             return false;
         }
         
-        // N?u ch?a h?t cooldown, không th? kích ho?t
+        // N?u ch?a h?t cooldown, khï¿½ng th? kï¿½ch ho?t
         if (Time.time < lastShieldActivateTime + shieldCooldown)
         {
             return false;
         }
         
-        // N?u không th? kích ho?t nhi?u l?n và ?ã kích ho?t tr??c ?ó
+        // N?u khï¿½ng th? kï¿½ch ho?t nhi?u l?n vï¿½ ?ï¿½ kï¿½ch ho?t tr??c ?ï¿½
         if (!canActivateMultipleTimes && activationCount > 0)
         {
             return false;
@@ -202,7 +202,7 @@ public class EnemyShield : MonoBehaviour
     }
     
     /// <summary>
-    /// Kích ho?t lá ch?n
+    /// Kï¿½ch ho?t lï¿½ ch?n
     /// </summary>
     public void ActivateShield()
     {
@@ -211,71 +211,71 @@ public class EnemyShield : MonoBehaviour
             return;
         }
         
-        // C?p nh?t tr?ng thái
+        // C?p nh?t tr?ng thï¿½i
         isShieldActive = true;
         lastShieldActivateTime = Time.time;
         shieldDeactivateTime = Time.time + shieldDuration;
         activationCount++;
         
-        // ??t l?i l??ng lá ch?n
+        // ??t l?i l??ng lï¿½ ch?n
         shieldHealth = maxShieldHealth;
         
-        // Kích ho?t animation n?u có
-        if (animator != null)
+        // Kï¿½ch ho?t animation n?u cï¿½
+        if (enemy.EnemyAnimatorController != null)
         {
-            animator.SetBool("ShieldActive", true);
+            enemy.EnemyAnimatorController.SetBool("ShieldActive", true);
         }
         
-        // T?o hi?u ?ng lá ch?n
+        // T?o hi?u ?ng lï¿½ ch?n
         CreateShieldVisual();
         
-        // Phát âm thanh kích ho?t
+        // Phï¿½t ï¿½m thanh kï¿½ch ho?t
         if (audioSource != null && shieldActivateSound != null)
         {
             audioSource.PlayOneShot(shieldActivateSound);
         }
         
-        // Hi?n th? hi?u ?ng kích ho?t
+        // Hi?n th? hi?u ?ng kï¿½ch ho?t
         if (shieldActivateEffectPrefab != null)
         {
             Instantiate(shieldActivateEffectPrefab, transform.position, Quaternion.identity);
         }
         
-        // B?t ??u tái t?o lá ch?n
+        // B?t ??u tï¿½i t?o lï¿½ ch?n
         if (regenCoroutine != null)
         {
             StopCoroutine(regenCoroutine);
         }
         regenCoroutine = StartCoroutine(RegenerateShield());
         
-        // T? ??ng t?t lá ch?n sau m?t kho?ng th?i gian
+        // T? ??ng t?t lï¿½ ch?n sau m?t kho?ng th?i gian
         StartCoroutine(DeactivateShieldAfterDuration());
     }
     
     /// <summary>
-    /// T?t lá ch?n
+    /// T?t lï¿½ ch?n
     /// </summary>
     public void DeactivateShield()
     {
-        // N?u lá ch?n không ho?t ??ng, không làm gì c?
+        // N?u lï¿½ ch?n khï¿½ng ho?t ??ng, khï¿½ng lï¿½m gï¿½ c?
         if (!isShieldActive)
         {
             return;
         }
         
-        // C?p nh?t tr?ng thái
+        // C?p nh?t tr?ng thï¿½i
         isShieldActive = false;
         
-        // Kích ho?t animation n?u có
-        if (animator != null)
+        // Kï¿½ch ho?t animation n?u cï¿½
+        if (enemy.EnemyAnimatorController != null)
         {
-            animator.SetBool("ShieldActive", false);
+            enemy.EnemyAnimatorController.SetBool("ShieldActive", false);
         }
         
-        // H?y hi?u ?ng lá ch?n
+        // H?y hi?u ?ng lï¿½ ch?n
         DestroyShieldVisual();
         
-        // D?ng tái t?o lá ch?n
+        // D?ng tï¿½i t?o lï¿½ ch?n
         if (regenCoroutine != null)
         {
             StopCoroutine(regenCoroutine);
@@ -284,32 +284,32 @@ public class EnemyShield : MonoBehaviour
     }
     
     /// <summary>
-    /// V? lá ch?n
+    /// V? lï¿½ ch?n
     /// </summary>
     private void BreakShield()
     {
-        // Phát âm thanh v? lá ch?n
+        // Phï¿½t ï¿½m thanh v? lï¿½ ch?n
         if (audioSource != null && shieldBreakSound != null)
         {
             audioSource.PlayOneShot(shieldBreakSound);
         }
         
-        // Hi?n th? hi?u ?ng v? lá ch?n
+        // Hi?n th? hi?u ?ng v? lï¿½ ch?n
         if (shieldBreakEffectPrefab != null)
         {
             Instantiate(shieldBreakEffectPrefab, transform.position, Quaternion.identity);
         }
         
-        // T?t lá ch?n
+        // T?t lï¿½ ch?n
         DeactivateShield();
     }
     
     /// <summary>
-    /// T?o hi?u ?ng lá ch?n
+    /// T?o hi?u ?ng lï¿½ ch?n
     /// </summary>
     private void CreateShieldVisual()
     {
-        // N?u ?ã có hi?u ?ng, h?y
+        // N?u ?ï¿½ cï¿½ hi?u ?ng, h?y
         DestroyShieldVisual();
         
         // T?o hi?u ?ng m?i
@@ -339,7 +339,7 @@ public class EnemyShield : MonoBehaviour
     }
     
     /// <summary>
-    /// H?y hi?u ?ng lá ch?n
+    /// H?y hi?u ?ng lï¿½ ch?n
     /// </summary>
     private void DestroyShieldVisual()
     {
@@ -350,7 +350,7 @@ public class EnemyShield : MonoBehaviour
             pulseCoroutine = null;
         }
         
-        // H?y ??i t??ng lá ch?n
+        // H?y ??i t??ng lï¿½ ch?n
         if (shieldVisual != null)
         {
             Destroy(shieldVisual);
@@ -360,27 +360,27 @@ public class EnemyShield : MonoBehaviour
     }
     
     /// <summary>
-    /// C?p nh?t hi?u ?ng lá ch?n
+    /// C?p nh?t hi?u ?ng lï¿½ ch?n
     /// </summary>
     private void UpdateShieldVisual()
     {
-        // N?u không có renderer, không làm gì c?
+        // N?u khï¿½ng cï¿½ renderer, khï¿½ng lï¿½m gï¿½ c?
         if (shieldRenderer == null)
         {
             return;
         }
         
-        // Tính toán ?? trong su?t d?a trên l??ng lá ch?n còn l?i
+        // Tï¿½nh toï¿½n ?? trong su?t d?a trï¿½n l??ng lï¿½ ch?n cï¿½n l?i
         float alpha = 0.2f + 0.8f * (shieldHealth / maxShieldHealth);
         
-        // C?p nh?t màu lá ch?n
+        // C?p nh?t mï¿½u lï¿½ ch?n
         Color color = shieldColor;
         color.a = alpha;
         shieldRenderer.color = color;
     }
     
     /// <summary>
-    /// Hi?u ?ng pulse cho lá ch?n
+    /// Hi?u ?ng pulse cho lï¿½ ch?n
     /// </summary>
     private IEnumerator PulseShield()
     {
@@ -394,10 +394,10 @@ public class EnemyShield : MonoBehaviour
         
         while (shieldVisual != null)
         {
-            // Tính toán kích th??c pulse
+            // Tï¿½nh toï¿½n kï¿½ch th??c pulse
             float pulse = 1f + Mathf.Sin(time * pulseRate) * pulseAmount;
             
-            // Áp d?ng kích th??c
+            // ï¿½p d?ng kï¿½ch th??c
             shieldVisual.transform.localScale = originalScale * pulse;
             
             // T?ng th?i gian
@@ -408,54 +408,54 @@ public class EnemyShield : MonoBehaviour
     }
     
     /// <summary>
-    /// Hi?u ?ng nh?p nháy khi b? ?ánh
+    /// Hi?u ?ng nh?p nhï¿½y khi b? ?ï¿½nh
     /// </summary>
     private IEnumerator FlashShield()
     {
-        // N?u không có renderer, không làm gì c?
+        // N?u khï¿½ng cï¿½ renderer, khï¿½ng lï¿½m gï¿½ c?
         if (shieldRenderer == null)
         {
             yield break;
         }
         
-        // L?u màu g?c
+        // L?u mï¿½u g?c
         Color originalColor = shieldRenderer.color;
         
-        // Thay ??i màu
+        // Thay ??i mï¿½u
         shieldRenderer.color = hitColor;
         
         // ??i m?t kho?ng th?i gian
         yield return new WaitForSeconds(flashDuration);
         
-        // Tr? v? màu g?c
+        // Tr? v? mï¿½u g?c
         shieldRenderer.color = originalColor;
     }
     
     /// <summary>
-    /// Tái t?o lá ch?n
+    /// Tï¿½i t?o lï¿½ ch?n
     /// </summary>
     private IEnumerator RegenerateShield()
     {
         while (isShieldActive)
         {
-            // N?u v?a b? ?ánh, ??i m?t kho?ng th?i gian
+            // N?u v?a b? ?ï¿½nh, ??i m?t kho?ng th?i gian
             if (Time.time < lastShieldHitTime + shieldRegenDelay)
             {
                 yield return null;
                 continue;
             }
             
-            // N?u lá ch?n ?ã ??y, không làm gì c?
+            // N?u lï¿½ ch?n ?ï¿½ ??y, khï¿½ng lï¿½m gï¿½ c?
             if (shieldHealth >= maxShieldHealth)
             {
                 yield return null;
                 continue;
             }
             
-            // T?ng l??ng lá ch?n
+            // T?ng l??ng lï¿½ ch?n
             shieldHealth = Mathf.Min(shieldHealth + shieldRegenRate * Time.deltaTime, maxShieldHealth);
             
-            // C?p nh?t hi?u ?ng lá ch?n
+            // C?p nh?t hi?u ?ng lï¿½ ch?n
             UpdateShieldVisual();
             
             yield return null;
@@ -463,14 +463,14 @@ public class EnemyShield : MonoBehaviour
     }
     
     /// <summary>
-    /// T? ??ng t?t lá ch?n sau m?t kho?ng th?i gian
+    /// T? ??ng t?t lï¿½ ch?n sau m?t kho?ng th?i gian
     /// </summary>
     private IEnumerator DeactivateShieldAfterDuration()
     {
         // ??i ??n th?i ?i?m t?t
         yield return new WaitForSeconds(shieldDuration);
         
-        // N?u lá ch?n v?n còn ho?t ??ng, t?t
+        // N?u lï¿½ ch?n v?n cï¿½n ho?t ??ng, t?t
         if (isShieldActive)
         {
             DeactivateShield();
@@ -478,7 +478,7 @@ public class EnemyShield : MonoBehaviour
     }
     
     /// <summary>
-    /// L?y tr?ng thái lá ch?n
+    /// L?y tr?ng thï¿½i lï¿½ ch?n
     /// </summary>
     public bool IsShieldActive()
     {
@@ -486,7 +486,7 @@ public class EnemyShield : MonoBehaviour
     }
     
     /// <summary>
-    /// L?y l??ng lá ch?n hi?n t?i
+    /// L?y l??ng lï¿½ ch?n hi?n t?i
     /// </summary>
     public float GetShieldHealth()
     {
@@ -494,7 +494,7 @@ public class EnemyShield : MonoBehaviour
     }
     
     /// <summary>
-    /// L?y ph?n tr?m lá ch?n
+    /// L?y ph?n tr?m lï¿½ ch?n
     /// </summary>
     public float GetShieldPercent()
     {
@@ -506,7 +506,7 @@ public class EnemyShield : MonoBehaviour
     /// </summary>
     private void OnDrawGizmosSelected()
     {
-        // V? ph?m vi lá ch?n
+        // V? ph?m vi lï¿½ ch?n
         Gizmos.color = shieldColor;
         Gizmos.DrawWireSphere(transform.position, 1.2f);
     }

@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 
 /// <summary>
-/// AI cho kẻ địch hỗ trợ.
+/// AI cho kẻ địch hỗ trợ. Kế thừa EnemyAIController, chỉ cần gắn script này lên prefab là đủ cho AI support.
+/// Tích hợp logic ưu tiên hỗ trợ đồng minh máu thấp nhất, hoặc phát hiện player gần nhất.
 /// </summary>
 [DisallowMultipleComponent]
 public class SupportEnemyAI : EnemyAIController
@@ -12,6 +13,7 @@ public class SupportEnemyAI : EnemyAIController
 
     private Enemy enemy; // Cache tham chiếu đến Enemy component
 
+    // === Khởi tạo, cache component, thiết lập loại AI ===
     protected override void Awake()
     {
         base.Awake();
@@ -26,7 +28,7 @@ public class SupportEnemyAI : EnemyAIController
     }
 
     /// <summary>
-    /// Kiểm tra xem mục tiêu có trong phạm vi hỗ trợ không.
+    /// Kiểm tra mục tiêu có trong phạm vi hỗ trợ không (dùng cho alert, support).
     /// </summary>
     /// <param name="target">Mục tiêu cần kiểm tra.</param>
     /// <returns>True nếu mục tiêu trong phạm vi hỗ trợ, ngược lại False.</returns>
@@ -37,7 +39,7 @@ public class SupportEnemyAI : EnemyAIController
     }
 
     /// <summary>
-    /// Kiểm tra xem mục tiêu có trong một phạm vi cụ thể không.
+    /// Kiểm tra mục tiêu có trong phạm vi chỉ định không (dùng cho alert, chase, attack).
     /// </summary>
     /// <param name="target">Mục tiêu cần kiểm tra.</param>
     /// <param name="range">Phạm vi để kiểm tra.</param>
@@ -48,6 +50,9 @@ public class SupportEnemyAI : EnemyAIController
         return Vector3.Distance(transform.position, target.position) <= range;
     }
 
+    /// <summary>
+    /// Xử lý khi AI được "báo động" về một mục tiêu (đồng minh hoặc player).
+    /// </summary>
     public override void Alert(Transform target)
     {
         Debug.Log($"[SupportAI] Alerted to target: {target?.name}");
@@ -62,6 +67,9 @@ public class SupportEnemyAI : EnemyAIController
         }
     }
 
+    /// <summary>
+    /// Ưu tiên hỗ trợ đồng minh máu thấp nhất, nếu không có thì chọn player gần nhất.
+    /// </summary>
     public override Transform GetPriorityTarget(List<Transform> availableTargets)
     {
         // Logic này sẽ được gọi bởi Enemy.cs để xác định target chung.
@@ -103,6 +111,9 @@ public class SupportEnemyAI : EnemyAIController
         return closestPlayer;
     }
 
+    /// <summary>
+    /// Update: Thực thi logic giữ vị trí hỗ trợ, di chuyển đến gần đồng minh hoặc player.
+    /// </summary>
     protected override void Update()
     {
         base.Update(); // Gọi Update của lớp cha để thực thi trạng thái hiện tại

@@ -34,7 +34,7 @@ public class EnemyShielder : MonoBehaviour
     [SerializeField] private bool shieldStacksWithExisting = false;
     
     // C�c component
-    private Animator animator;
+    // private Animator animator; // Removed direct Animator reference
     private AudioSource audioSource;
     
     // Th?i gian t? l?n t?o l� ch?n cu?i
@@ -67,7 +67,7 @@ public class EnemyShielder : MonoBehaviour
     private void Awake()
     {
         // L?y c�c component c?n thi?t
-        animator = GetComponent<Animator>();
+        // animator = GetComponent<Animator>(); // Removed direct Animator reference
         audioSource = GetComponent<AudioSource>();
         
         // T?o AudioSource n?u ch?a c�
@@ -157,10 +157,10 @@ public class EnemyShielder : MonoBehaviour
         }
         
         // K�ch ho?t animation t?o l� ch?n n?u c�
-        if (animator != null)
-        {
-            animator.SetTrigger("Shield");
-        }
+        // if (animator != null)
+        // {
+        //     animator.SetTrigger("Shield");
+        // } // Animation handled by EnemyAnimatorController
         
         // Ph�t �m thanh t?o l� ch?n
         if (audioSource != null && shieldCreateSound != null)

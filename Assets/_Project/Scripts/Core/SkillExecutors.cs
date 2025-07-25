@@ -485,6 +485,36 @@ public abstract class SkillExecutorBase : ISkillExecutor
     {
         // Default implementation: No action
     }
+
+    protected Character[] FindSkillTargetsInRange(Vector2 center, float range, Character caster)
+    {
+        var targets = new System.Collections.Generic.List<Character>();
+        var allCharacters = Object.FindObjectsByType<Character>(FindObjectsSortMode.None);
+        foreach (var character in allCharacters)
+        {
+            if (character == null || character == caster) continue;
+            // N?u caster là player thì ch? t?n công enemy
+            if (caster.gameObject.CompareTag("Player"))
+            {
+                if (!character.gameObject.CompareTag("Enemy")) continue;
+            }
+            // N?u caster là enemy thì ch? t?n công player
+            else if (caster.gameObject.CompareTag("Enemy"))
+            {
+                if (!character.gameObject.CompareTag("Player")) continue;
+            }
+            // Ki?m tra máu
+            if (character.health != null && character.health.currentValue > 0)
+            {
+                float distance = Vector2.Distance(center, character.transform.position);
+                if (distance <= range)
+                {
+                    targets.Add(character);
+                }
+            }
+        }
+        return targets.ToArray();
+    }
 }
 
 // 1. MELEE SKILL EXECUTOR - C?n chi?n v?i collider t? ??ng
@@ -520,7 +550,7 @@ public class MeleeSkillExecutor : SkillExecutorBase
         Vector2 attackCenter = user.transform.position;
         
         // FIXED: Pass caster parameter to prevent self-damage
-        var enemies = FindEnemiesInRange(attackCenter, Module.range, user);
+        var enemies = FindSkillTargetsInRange(attackCenter, Module.range, user);
         
         // Enhanced feedback for no targets found
         if (enemies.Length == 0)
@@ -737,7 +767,7 @@ public class AreaSkillExecutor : SkillExecutorBase
         
         // Area damage EXACTLY at target position (mouse click)
         // FIXED: Pass caster parameter to prevent self-damage
-        var enemies = FindEnemiesInRange(targetPosition, Module.areaRadius, user);
+        var enemies = FindSkillTargetsInRange(targetPosition, Module.areaRadius, user);
         
         // Enhanced feedback for area skills
         if (enemies.Length == 0)

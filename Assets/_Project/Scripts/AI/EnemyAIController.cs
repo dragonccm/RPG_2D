@@ -1,12 +1,15 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections.Generic;
 
 /// <summary>
-/// Lớp trừu tượng điều khiển AI của kẻ địch, quản lý máy trạng thái và các tham chiếu chung.
+/// Lớp trừu tượng điều khiển AI của kẻ địch. Quản lý state machine, animator, target, và các trạng thái cơ bản.
+/// Mọi AI cụ thể (Melee, Ranged, Boss, Support) đều kế thừa từ đây để mở rộng logic riêng.
 /// </summary>
 public abstract class EnemyAIController : MonoBehaviour
 {
+    // === Các trường, thuộc tính chung cho mọi AI ===
     public StateMachine stateMachine; // Máy trạng thái điều khiển AI
+    public EnemyAnimatorController animatorController; // Bộ điều khiển Animator cho kẻ địch
 
     public EnemyType enemyType; // Loại kẻ địch (cận chiến, tầm xa, hỗ trợ, boss)
     [HideInInspector] // Ẩn khỏi Inspector vì nó sẽ được Enemy.cs tự động cập nhật
@@ -23,9 +26,15 @@ public abstract class EnemyAIController : MonoBehaviour
 
     public Vector3[] patrolPoints; // Các điểm tuần tra cho trạng thái Patrol
 
+    // === Khởi tạo state machine và các trạng thái ===
     protected virtual void Awake()
     {
         stateMachine = new StateMachine();
+        animatorController = GetComponent<EnemyAnimatorController>();
+        if (animatorController == null)
+        {
+            Debug.LogWarning($"[{gameObject.name}] EnemyAnimatorController not found on this GameObject.", this);
+        }
 
         // Khởi tạo các trạng thái
         idleState = new IdleState(this, stateMachine);
@@ -38,6 +47,9 @@ public abstract class EnemyAIController : MonoBehaviour
         stateMachine.Initialize(idleState);
     }
 
+    /// <summary>
+    /// Update: Thực thi trạng thái hiện tại của AI (state machine pattern).
+    /// </summary>
     protected virtual void Update()
     {
         // Logic quản lý target (xác định và bỏ target) đã được chuyển hoàn toàn sang lớp Enemy.cs.
@@ -48,16 +60,20 @@ public abstract class EnemyAIController : MonoBehaviour
     }
 
     /// <summary>
-    /// Phương thức ảo để các lớp con ghi đè logic khi AI được "báo động" về một mục tiêu.
+    /// Phương thức ảo: Cho phép các lớp con ghi đè logic khi AI được "báo động" về một mục tiêu (alert).
     /// </summary>
     /// <param name="target">Mục tiêu được báo động.</param>
     public virtual void Alert(Transform target) { }
 
     /// <summary>
-    /// Thay đổi trạng thái hiện tại của máy trạng thái.
+    /// Đổi trạng thái hiện tại của AI sang trạng thái mới.
     /// </summary>
     /// <param name="newState">Trạng thái mới cần chuyển đến.</param>
     public void ChangeState(State newState) => stateMachine.ChangeState(newState);
+
+    /// <summary>
+    /// Lấy target ưu tiên từ danh sách (mặc định: player gần nhất). Có thể override ở lớp con.
+    /// </summary>
     public virtual Transform GetPriorityTarget(List<Transform> availableTargets)
     {
         Debug.Log("---------call GetPriorityTarget---------");

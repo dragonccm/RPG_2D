@@ -1,6 +1,2 @@
-using UnityEngine;
-
-public class EnemyRanged : Enemy
-{
-    // This class is for ranged enemies.
-}
+// File này ?ã ???c lo?i b? vì không còn c?n thi?t. Logic AI t?m xa ?ã ???c tích h?p vào RangedEnemyAI.cs.
+// N?u c?n m? r?ng, hãy s? d?ng RangedEnemyAI.cs ho?c EnemyAIController.cs.
