@@ -15,7 +15,7 @@ public abstract class EnemyAIController : MonoBehaviour
     [HideInInspector] // Ẩn khỏi Inspector vì nó sẽ được Enemy.cs tự động cập nhật
     public Transform playerTarget; // Mục tiêu người chơi mà AI này đang tập trung vào (được cập nhật từ Enemy.cs)
 
-    public AIGroup group; // Nhóm AI mà kẻ địch này thuộc về
+    public EnemyGroupFormationManager group; // Nhóm AI mà kẻ địch này thuộc về
 
     // Các trạng thái AI cơ bản
     public IdleState idleState;
@@ -70,6 +70,15 @@ public abstract class EnemyAIController : MonoBehaviour
     /// </summary>
     /// <param name="newState">Trạng thái mới cần chuyển đến.</param>
     public void ChangeState(State newState) => stateMachine.ChangeState(newState);
+
+    public void SetNavDestination(Vector3 destination)
+    {
+        var movementController = GetComponent<EnemyMovementController>();
+        if (movementController != null && movementController.Agent != null)
+        {
+            movementController.MoveTo(destination);
+        }
+    }
 
     /// <summary>
     /// Lấy target ưu tiên từ danh sách (mặc định: player gần nhất). Có thể override ở lớp con.

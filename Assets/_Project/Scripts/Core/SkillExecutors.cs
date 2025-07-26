@@ -248,8 +248,16 @@ public abstract class SkillExecutorBase : ISkillExecutor
     /// <summary>
     /// Enhanced damage area visualization v?i auto-generation và custom prefab support
     /// </summary>
+    private GameObject currentMeleeIndicator;
+
     protected void ShowDamageAreaAtExactPosition(Vector2 exactPosition, float radius, string indicatorName = "DamageAreaIndicator")
     {
+        // H?y hi?u ?ng c? n?u còn t?n t?i
+        if (currentMeleeIndicator != null)
+        {
+            Object.Destroy(currentMeleeIndicator);
+            currentMeleeIndicator = null;
+        }
         GameObject indicator = null;
         
         // ?u tiên s? d?ng custom prefab t? SkillModule
@@ -276,12 +284,14 @@ public abstract class SkillExecutorBase : ISkillExecutor
             indicator = CreateEnhancedDamageZoneIndicator(exactPosition, radius, indicatorName);
         }
         
-        // Auto destroy after display time
+        currentMeleeIndicator = indicator;
+        
+        // Lifetime ng?n h?n: ch? t?n t?i 0.2s
         if (indicator != null)
         {
             // Add fade-out effect before destruction
-            StartFadeOutEffect(indicator, Module.damageAreaDisplayTime);
-            Object.Destroy(indicator, Module.damageAreaDisplayTime + 0.5f);
+            StartFadeOutEffect(indicator, 0.15f);
+            Object.Destroy(indicator, 0.2f);
         }
     }
 

@@ -29,7 +29,7 @@ public class EnemyAIManager : MonoBehaviour
     [Tooltip("Có sử dụng hệ thống nhóm không")]
     public bool useGrouping = true;
     [Tooltip("Danh sách các nhóm AI")]
-    public List<AIGroup> aiGroups = new List<AIGroup>();
+    public List<EnemyGroupFormationManager> aiGroups = new List<EnemyGroupFormationManager>();
 
     [Header("AI Events")]
     [Tooltip("Sự kiện khi một agent được thêm vào")]
@@ -207,14 +207,15 @@ public class EnemyAIManager : MonoBehaviour
     /// <summary>
     /// Tạo một nhóm AI mới.
     /// </summary>
-    public AIGroup CreateGroup()
+    public EnemyGroupFormationManager CreateGroup()
     {
         if (!useGrouping)
         {
             return null;
         }
 
-        AIGroup newGroup = new AIGroup();
+        GameObject groupObject = new GameObject("EnemyGroup");
+        EnemyGroupFormationManager newGroup = groupObject.AddComponent<EnemyGroupFormationManager>();
         aiGroups.Add(newGroup);
         return newGroup;
     }
@@ -222,7 +223,7 @@ public class EnemyAIManager : MonoBehaviour
     /// <summary>
     /// Thêm một agent vào một nhóm.
     /// </summary>
-    public void AddAgentToGroup(EnemyAIController agent, AIGroup group)
+    public void AddAgentToGroup(EnemyAIController agent, EnemyGroupFormationManager group)
     {
         if (useGrouping && group != null && !group.members.Contains(agent))
         {
@@ -234,7 +235,7 @@ public class EnemyAIManager : MonoBehaviour
     /// <summary>
     /// Xóa một agent khỏi một nhóm.
     /// </summary>
-    public void RemoveAgentFromGroup(EnemyAIController agent, AIGroup group)
+    public void RemoveAgentFromGroup(EnemyAIController agent, EnemyGroupFormationManager group)
     {
         if (useGrouping && group != null && group.members.Contains(agent))
         {
@@ -262,32 +263,5 @@ public class EnemyAIManager : MonoBehaviour
 
         // Xóa các nhóm
         aiGroups.Clear();
-    }
-}
-
-/// <summary>
-/// Lớp đại diện cho một nhóm AI
-/// </summary>
-[System.Serializable]
-public class AIGroup
-{
-    [Tooltip("Danh sách các thành viên trong nhóm")]
-    public List<EnemyAIController> members = new List<EnemyAIController>();
-    [Tooltip("Mục tiêu chung của nhóm")]
-    public Transform groupTarget;
-
-    /// <summary>
-    /// Thông báo cho tất cả các thành viên trong nhóm về một mục tiêu
-    /// </summary>
-    public void AlertAllMembers(Transform target)
-    {
-        groupTarget = target;
-        foreach (EnemyAIController member in members)
-        {
-            if (member != null)
-            {
-                member.Alert(target);
-            }
-        }
     }
 }

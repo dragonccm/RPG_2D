@@ -19,8 +19,8 @@ MonoBehaviour:
   damage: 40
   range: 3
   speed: 5
-  cooldown: 5
-  manaCost: 35
+  cooldown: 1
+  manaCost: 1
   stunDuration: 0
   knockbackForce: 12
   healAmount: 0
@@ -29,9 +29,12 @@ MonoBehaviour:
   skillColor: {r: 1, g: 0.14091702, b: 0, a: 1}
   castSound: {fileID: 0}
   impactSound: {fileID: 0}
-  effectPrefab: {fileID: -2253911629886400664, guid: 515d54d12962d724aa20463e9a2a0eaf,
+  effectPrefab: {fileID: 7547582892948683698, guid: b1b0cc8d6c1c8b945ad11ffa10dfaa5a,
     type: 3}
   projectilePrefab: {fileID: 0}
+  customEffectLifetime: 0
+  effectPositionOffset: {x: 0, y: 0, z: 0}
+  enableEnhancedEffects: 1
   animationTrigger: Attack
   animationLength: 2
   skillType: 2

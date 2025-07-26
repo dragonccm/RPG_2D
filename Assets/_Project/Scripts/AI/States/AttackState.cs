@@ -14,7 +14,7 @@ public class AttackState : State
         base.Enter();
         Debug.Log($"[{aiController.enemyType}] Enter AttackState");
         aiController.GetComponent<EnemyMovementController>()?.Stop(); // Dừng di chuyển khi tấn công
-        aiController.animatorController?.PlayAttackAnimation();
+        // KHÔNG gọi PlayAttackAnimation ở đây nữa, chỉ gọi khi thực sự tấn công trong AttackController hoặc SkillManager
     }
 
     public override void Execute()

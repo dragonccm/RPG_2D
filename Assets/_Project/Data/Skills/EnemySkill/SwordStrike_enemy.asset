@@ -16,8 +16,8 @@ MonoBehaviour:
   description: Basic sword strike dealing moderate damage to nearby enemies.
   skillIcon: {fileID: 21300000, guid: 8ebf48e8b8b271d41adb6fa2511b29fb, type: 3}
   requiredLevel: 1
-  damage: 25
-  range: 1
+  damage: 1
+  range: 1.5
   speed: 10
   cooldown: 0.1
   manaCost: 10
@@ -31,6 +31,9 @@ MonoBehaviour:
   impactSound: {fileID: 0}
   effectPrefab: {fileID: 0}
   projectilePrefab: {fileID: 0}
+  customEffectLifetime: 0
+  effectPositionOffset: {x: 0, y: 0, z: 0}
+  enableEnhancedEffects: 1
   animationTrigger: Attack
   animationLength: 1
   skillType: 0

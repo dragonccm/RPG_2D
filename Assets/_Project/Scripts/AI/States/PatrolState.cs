@@ -38,6 +38,9 @@ public class PatrolState : State
             }
         }
 
+        // Nếu AI là một phần của một nhóm, không thực hiện logic tuần tra độc lập
+        if (aiController.group != null) return;
+
         // Logic đi tuần tra
         if (patrolPoints == null || patrolPoints.Length == 0) return;
 

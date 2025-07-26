@@ -48,7 +48,7 @@ public class EnemyAnimatorController : MonoBehaviour
     /// <param name="paramName">Tên trigger.</param>
     public void SetTrigger(string paramName)
     {
-          animator.SetTrigger(paramName);
+        animator.SetTrigger(paramName ?? "Attack");
     }
 
     /// <summary>
