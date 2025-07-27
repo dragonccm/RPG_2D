@@ -89,8 +89,6 @@ public class EnemyUI : MonoBehaviour
 
             // Initial update
             UpdateHealthUI(enemyCharacter.health.currentValue, enemyCharacter.health.maxValue);
-            
-            Debug.Log($"? EnemyUI initialized successfully for {gameObject.name}");
         }
     }
 
@@ -130,8 +128,6 @@ public class EnemyUI : MonoBehaviour
         
         // Setup slider references
         healthSlider.fillRect = fill.GetComponent<RectTransform>();
-        
-        Debug.Log($"Created basic health slider for {gameObject.name}");
     }
 
     private void UpdateHealthUI(float currentValue, float maxValue)

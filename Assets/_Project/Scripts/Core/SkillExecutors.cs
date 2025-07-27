@@ -565,8 +565,6 @@ public class MeleeSkillExecutor : SkillExecutorBase
         // Enhanced feedback for no targets found
         if (enemies.Length == 0)
         {
-            Debug.Log($"?? Melee skill '{Module.skillName}' found no valid targets in range {Module.range}");
-            
             // Still show damage area for visual feedback
             if (Module.showDamageArea)
             {
@@ -578,8 +576,6 @@ public class MeleeSkillExecutor : SkillExecutorBase
             CreateVisualEffect(user.transform.position); // Enhanced effect creation
             yield break;
         }
-        
-        Debug.Log($"?? Melee skill '{Module.skillName}' hitting {enemies.Length} enemies");
         
         foreach (var enemy in enemies)
         {
@@ -1239,8 +1235,6 @@ public class EnhancedProjectileBehavior : MonoBehaviour
         
         // Create individual hit effect with critical differentiation
         CreateProjectileHitEffect(impactPosition, isCritical);
-        
-        Debug.Log($"?? Projectile '{skillModule.skillName}' hit {enemy.name} at {impactPosition} for {finalDamage} damage");
         
         Destroy(gameObject);
     }

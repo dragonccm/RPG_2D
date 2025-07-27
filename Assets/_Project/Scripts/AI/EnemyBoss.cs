@@ -67,70 +67,45 @@ public class EnemyBoss : Enemy
     }
 
     /// <summary>
-    /// Ghi đè phương thức điều khiển di chuyển của lớp Enemy để tùy chỉnh hành vi của Boss.
-    /// Boss sẽ di chuyển để duy trì khoảng cách tối ưu với mục tiêu, lùi lại nếu quá gần và tiến lên nếu quá xa.
+    /// Update: Ghi đè để thêm logic Boss movement đặc biệt.
     /// </summary>
-    protected override void HandleMovement()
+    protected override void Update()
     {
-        // Đảm bảo NavMeshAgent đã được gán
-        if (agent == null)
+        base.Update(); // Gọi logic Enemy cơ bản
+        
+        // Boss logic đặc biệt - chỉ thực hiện khi có target và không trong patrol state
+        if (target != null && IsValidTarget(target))
         {
-            Debug.LogWarning($"NavMeshAgent is not assigned to EnemyBoss: {gameObject.name}", this);
-            return;
+            HandleBossMovement();
         }
+    }
 
-        // Nếu có mục tiêu
-        if (target != null)
+    /// <summary>
+    /// Xử lý di chuyển đặc biệt của Boss để duy trì khoảng cách tối ưu.
+    /// </summary>
+    private void HandleBossMovement()
+    {
+        if (movementController == null) return;
+
+        float distanceToTarget = Vector3.Distance(transform.position, target.position);
+
+        // Nếu mục tiêu quá xa phạm vi hành động của Boss, tiếp tục đuổi theo
+        if (distanceToTarget > bossActionRange)
         {
-            float distanceToTarget = Vector3.Distance(transform.position, target.position);
-            // Debug.Log($"[EnemyBoss-HandleMovement] Distance to target {target.name}: {distanceToTarget:F2}m");
-
-            // Nếu mục tiêu quá xa phạm vi hành động của Boss, tiếp tục đuổi theo
-            if (distanceToTarget > bossActionRange)
-            {
-                agent.SetDestination(target.position);
-                agent.isStopped = false;
-                // Debug.Log($"[EnemyBoss-HandleMovement] Chasing target to {target.position}.");
-            }
-            // Nếu mục tiêu quá gần khoảng cách tối thiểu, lùi lại
-            else if (distanceToTarget < bossMinDistance)
-            {
-                Vector3 directionAway = (transform.position - target.position).normalized;
-                // Tính toán vị trí lùi lại, xa hơn một chút so với bossMinDistance
-                Vector3 retreatPosition = transform.position + directionAway * (bossMinDistance + 1f);
-
-                NavMeshHit hit;
-                // Tìm một vị trí hợp lệ trên NavMesh để lùi lại
-                if (NavMesh.SamplePosition(retreatPosition, out hit, 5f, NavMesh.AllAreas))
-                {
-                    agent.SetDestination(hit.position);
-                    agent.isStopped = false;
-                    // Debug.Log($"[EnemyBoss-HandleMovement] Retreating to {hit.position}.");
-                }
-                else
-                {
-                    // Nếu không tìm được điểm lùi hợp lệ, dừng lại
-                    agent.isStopped = true;
-                    if (agent.hasPath) agent.ResetPath();
-                    // Debug.Log($"[EnemyBoss-HandleMovement] Cannot find retreat position, stopping.");
-                }
-            }
-            // Nếu mục tiêu trong khoảng bossMinDistance và bossActionRange (phạm vi hành động tối ưu)
-            else
-            {
-                // Dừng di chuyển và thực hiện hành động tấn công/skill
-                agent.isStopped = true;
-                if (agent.hasPath) agent.ResetPath();
-                // Debug.Log($"[EnemyBoss-HandleMovement] In optimal action range. Stopping movement and attempting attack.");
-                HandleBossAttack(); // Gọi phương thức xử lý tấn công/skill của Boss
-            }
+            movementController.MoveTo(target.position);
         }
-        else // Nếu không có mục tiêu
+        // Nếu mục tiêu quá gần khoảng cách tối thiểu, lùi lại
+        else if (distanceToTarget < bossMinDistance)
         {
-            // Boss đứng yên
-            agent.isStopped = true;
-            if (agent.hasPath) agent.ResetPath();
-            // Debug.Log($"[EnemyBoss-HandleMovement] No target, stopping movement.");
+            Vector3 directionAway = (transform.position - target.position).normalized;
+            Vector3 retreatPosition = transform.position + directionAway * (bossMinDistance + 1f);
+            movementController.MoveTo(retreatPosition);
+        }
+        // Nếu ở khoảng cách tối ưu, dừng di chuyển và tấn công
+        else
+        {
+            movementController.Stop();
+            HandleBossAttack();
         }
     }
 
@@ -147,13 +122,11 @@ public class EnemyBoss : Enemy
         if (attackController != null && target != null)
         {
             // Sử dụng logic Attack của EnemyAttackController
-            // Debug.Log($"[EnemyBoss-HandleBossAttack] Calling Attack on {target.name}.");
             attackController.Attack(target);
         }
         else
         {
             // Nếu không có EnemyAttackController hoặc không có mục tiêu, Boss thực hiện skill đặc biệt
-            Debug.Log($"Boss {gameObject.name} đang dùng skill đặc biệt! (Không có EnemyAttackController hoặc không có mục tiêu)");
             // TODO: Thêm logic skill đặc biệt của Boss ở đây
         }
     }

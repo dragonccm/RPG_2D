@@ -43,7 +43,18 @@ public class EnemyAttackController : MonoBehaviour
             return;
         }
 
-        Debug.Log($"[{gameObject.name}] attacks {target.name}!");
+        // Lật sprite về phía target nếu có
+        if (target != null)
+        {
+            var spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+            if (spriteRenderer != null)
+            {
+                float dx = target.position.x - transform.position.x;
+                if (Mathf.Abs(dx) > 0.01f)
+                    spriteRenderer.flipX = dx < 0f;
+            }
+        }
+
         // Gọi animation tấn công nếu có EnemyAnimatorController
         var enemy = GetComponentInParent<Enemy>();
         if (enemy != null && enemy.EnemyAnimatorController != null)

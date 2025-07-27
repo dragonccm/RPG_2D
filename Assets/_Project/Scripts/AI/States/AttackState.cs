@@ -5,28 +5,36 @@ using UnityEngine;
 /// </summary>
 public class AttackState : State
 {
+    private float stateUpdateInterval = 0.2f;
+    private float nextStateUpdate;
+    private EnemyMovementController movementController;
+
     public AttackState(EnemyAIController aiController, StateMachine stateMachine) : base(aiController, stateMachine)
     {
+        movementController = aiController.GetComponent<EnemyMovementController>();
     }
 
     public override void Enter()
     {
         base.Enter();
-        Debug.Log($"[{aiController.enemyType}] Enter AttackState");
-        aiController.GetComponent<EnemyMovementController>()?.Stop(); // Dừng di chuyển khi tấn công
-        // KHÔNG gọi PlayAttackAnimation ở đây nữa, chỉ gọi khi thực sự tấn công trong AttackController hoặc SkillManager
+        movementController?.Stop(); // Dừng di chuyển khi tấn công
     }
 
     public override void Execute()
     {
         base.Execute();
+        
+        // Throttle state checking để tối ưu performance
+        if (Time.time < nextStateUpdate) return;
+        nextStateUpdate = Time.time + stateUpdateInterval;
+        
         var enemy = aiController.GetComponent<Enemy>();
         var attackController = aiController.GetComponent<EnemyAttackController>();
-        var skillManager = aiController.GetComponent<EnemySkillManager>(); // Lấy script quản lý kỹ năng
+        var skillManager = aiController.GetComponent<EnemySkillManager>();
 
-        // Lấy phạm vi truy đuổi và tấn công từ Enemy và EnemyAttackController
+        // Lấy phạm vi từ components với fallback values
         float chaseRange = enemy != null ? enemy.chaseRange : 20f;
-        float attackRange = attackController != null ? attackController.AttackRange : 2f; // Sử dụng AttackRange property
+        float attackRange = attackController != null ? attackController.AttackRange : 2f;
 
         if (aiController.playerTarget == null)
         {
@@ -36,15 +44,15 @@ public class AttackState : State
 
         float distanceToPlayer = Vector3.Distance(aiController.transform.position, aiController.playerTarget.position);
 
-        // Nếu player ra khỏi vùng chaseRange → Patrol/Idle
+        // Nếu player ra khỏi vùng chaseRange → về Idle, để Enemy.cs xử lý patrol
         if (distanceToPlayer > chaseRange)
         {
-            stateMachine.ChangeState(aiController.patrolState);
+            stateMachine.ChangeState(aiController.idleState);
             return;
         }
 
         // Nếu player ra khỏi vùng attack nhưng vẫn trong vùng chaseRange → Chase
-        if (attackController != null && distanceToPlayer > attackRange)
+        if (distanceToPlayer > attackRange)
         {
             stateMachine.ChangeState(aiController.chaseState);
             return;
@@ -56,12 +64,10 @@ public class AttackState : State
             // Ưu tiên dùng kỹ năng nếu có EnemySkillManager
             if (skillManager != null && skillManager.CanUseSkill())
             {
-                // Gọi kỹ năng module (có thể random hoặc theo thứ tự)
                 skillManager.UseSkill();
             }
             else if (attackController != null)
             {
-                // Nếu không có kỹ năng module, dùng tấn công cơ bản
                 attackController.Attack(aiController.playerTarget);
             }
         }
@@ -70,7 +76,6 @@ public class AttackState : State
     public override void Exit()
     {
         base.Exit();
-        Debug.Log($"[{aiController.enemyType}] Exit AttackState");
         aiController.animatorController?.PlayIdleAnimation();
     }
 }

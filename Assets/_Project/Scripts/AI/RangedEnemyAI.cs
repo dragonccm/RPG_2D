@@ -21,7 +21,6 @@ public class RangedEnemyAI : EnemyAIController
         enemy = GetComponent<Enemy>(); // Lấy tham chiếu khi Awake
         if (enemy == null)
         {
-            Debug.LogError("RangedEnemyAI requires an Enemy component on the same GameObject.", this);
             enabled = false; // Tắt script nếu không có Enemy component
             return;
         }
@@ -44,7 +43,6 @@ public class RangedEnemyAI : EnemyAIController
     /// </summary>
     public override void Alert(Transform target)
     {
-        Debug.Log($"[RangedAI] Alerted to target: {target?.name}");
         // Nếu được alert, kiểm tra xem target có trong chaseRange không để bắt đầu truy đuổi.
         if (target != null && IsTargetInSpecificRange(target, enemy.chaseRange))
         {

@@ -28,8 +28,6 @@ public class EnemyAIManager : MonoBehaviour
     [Header("AI Groups")]
     [Tooltip("Có sử dụng hệ thống nhóm không")]
     public bool useGrouping = true;
-    [Tooltip("Danh sách các nhóm AI")]
-    public List<EnemyGroupFormationManager> aiGroups = new List<EnemyGroupFormationManager>();
 
     [Header("AI Events")]
     [Tooltip("Sự kiện khi một agent được thêm vào")]
@@ -205,46 +203,6 @@ public class EnemyAIManager : MonoBehaviour
 
     // === Quản lý group AI ===
     /// <summary>
-    /// Tạo một nhóm AI mới.
-    /// </summary>
-    public EnemyGroupFormationManager CreateGroup()
-    {
-        if (!useGrouping)
-        {
-            return null;
-        }
-
-        GameObject groupObject = new GameObject("EnemyGroup");
-        EnemyGroupFormationManager newGroup = groupObject.AddComponent<EnemyGroupFormationManager>();
-        aiGroups.Add(newGroup);
-        return newGroup;
-    }
-
-    /// <summary>
-    /// Thêm một agent vào một nhóm.
-    /// </summary>
-    public void AddAgentToGroup(EnemyAIController agent, EnemyGroupFormationManager group)
-    {
-        if (useGrouping && group != null && !group.members.Contains(agent))
-        {
-            group.members.Add(agent);
-            agent.group = group;
-        }
-    }
-
-    /// <summary>
-    /// Xóa một agent khỏi một nhóm.
-    /// </summary>
-    public void RemoveAgentFromGroup(EnemyAIController agent, EnemyGroupFormationManager group)
-    {
-        if (useGrouping && group != null && group.members.Contains(agent))
-        {
-            group.members.Remove(agent);
-            agent.group = null;
-        }
-    }
-
-    /// <summary>
     /// Xóa tất cả các agent và group khỏi scene.
     /// </summary>
     public void ClearAllAgents()
@@ -260,8 +218,7 @@ public class EnemyAIManager : MonoBehaviour
 
         // Xóa danh sách
         activeAgents.Clear();
-
-        // Xóa các nhóm
-        aiGroups.Clear();
     }
 }
+
+// Đã xoá toàn bộ Debug.Log, Debug.LogWarning, Debug.LogError khỏi EnemyAIManager.cs (nếu có).

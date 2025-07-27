@@ -20,7 +20,6 @@ public class SupportEnemyAI : EnemyAIController
         enemy = GetComponent<Enemy>(); // Lấy tham chiếu khi Awake
         if (enemy == null)
         {
-            Debug.LogError("SupportEnemyAI requires an Enemy component on the same GameObject.", this);
             enabled = false; // Tắt script nếu không có Enemy component
             return;
         }
@@ -55,7 +54,6 @@ public class SupportEnemyAI : EnemyAIController
     /// </summary>
     public override void Alert(Transform target)
     {
-        Debug.Log($"[SupportAI] Alerted to target: {target?.name}");
         // Chỉ nhận target là đồng minh hoặc player trong vùng support
         if (target != null && (target.CompareTag("Enemy") || target.CompareTag("Player")))
         {
@@ -126,14 +124,11 @@ public class SupportEnemyAI : EnemyAIController
             {
                 if (IsTargetInSupportRange(playerTarget))
                 {
-                    // Nếu mục tiêu (đồng minh/player) đã trong tầm hỗ trợ, dừng lại hoặc di chuyển ít
                     moveCtrl.Stop();
                     // TODO: Thực hiện hành động hỗ trợ (hồi máu, tạo lá chắn, buff, v.v.)
-                    Debug.Log($"[SupportAI] Supporting {playerTarget.name}");
                 }
                 else
                 {
-                    // Di chuyển đến gần mục tiêu hỗ trợ
                     moveCtrl.MoveTo(playerTarget.position);
                 }
             }

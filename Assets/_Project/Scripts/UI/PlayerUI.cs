@@ -13,7 +13,7 @@ public class PlayerUI : MonoBehaviour
 
     void Start()
     {
-        // T�m player character
+        // Tìm player character
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player != null)
         {
@@ -22,14 +22,6 @@ public class PlayerUI : MonoBehaviour
             {
                 InitializeUI();
             }
-            else
-            {
-                Debug.LogError("Player kh�ng c� Character component!");
-            }
-        }
-        else
-        {
-            Debug.LogError("Kh�ng t�m th?y GameObject v?i tag 'Player'!");
         }
     }
 
@@ -40,7 +32,6 @@ public class PlayerUI : MonoBehaviour
         playerCharacter.mana.OnValueChanged += UpdateManaUI;
         playerCharacter.OnDamageTaken += OnTakeDamage;
 
-
         // Initial update
         UpdateHealthUI(playerCharacter.health.currentValue, playerCharacter.health.maxValue);
         UpdateManaUI(playerCharacter.mana.currentValue, playerCharacter.mana.maxValue);
@@ -49,7 +40,6 @@ public class PlayerUI : MonoBehaviour
     public void OnTakeDamage(float damage)
     {
         // This method can be used to trigger visual effects like screen shake, flashing, etc.
-        Debug.Log($"Player has taken {damage} damage!");
     }
 
     private void UpdateHealthUI(float currentValue, float maxValue)

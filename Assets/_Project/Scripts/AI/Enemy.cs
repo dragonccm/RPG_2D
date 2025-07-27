@@ -13,17 +13,31 @@ using Random = UnityEngine.Random;
 /// </summary>
 public class Enemy : MonoBehaviour
 {
-    [Header("Auto Targeting")]
-    [Tooltip("Phạm vi phát hiện ban đầu của kẻ địch. Kẻ địch sẽ tìm kiếm mục tiêu mới trong phạm vi này.")]
+    public enum PatrolMode { Once, Loop, RandomAroundAnchor, PingPong }
+
+    [Header("Cài đặt vùng phát hiện")]
+    [Tooltip("Khoảng cách để địch phát hiện người chơi")]
     public float detectionRange = 10f;
-    [Tooltip("Phạm vi truy đuổi của kẻ địch. Kẻ địch sẽ tiếp tục đuổi theo mục tiêu trong phạm vi này ngay cả khi mục tiêu đã ra khỏi detectionRange.")]
+    [Tooltip("Khoảng cách tối đa để tiếp tục đuổi người chơi")]
     public float chaseRange = 20f;
+    [Header("Cài đặt tuần tra (chỉ thiết lập qua EnemyGroupManager)")]
+    [HideInInspector]
+    public PatrolMode patrolMode = PatrolMode.Loop;
+    [HideInInspector]
+    public List<Transform> patrolPoints = new List<Transform>();
+    [HideInInspector]
+    public Transform anchor;
+    [HideInInspector]
+    public float randomPatrolRadius = 5f;
+    [Tooltip("Ngưỡng khoảng cách để coi là đã đến điểm đích (anchor hoặc patrol point)")]
+    public float arriveThreshold = 1.2f;
+    [Header("Cài đặt khác")]
     [Tooltip("Sát thương cơ bản của kẻ địch.")]
     public float baseDamage = 10f;
     [Tooltip("Layer của Player để kẻ địch có thể phát hiện.")]
     public LayerMask playerLayerMask = 1 << 7; // Layer của Player
 
-    [SerializeField] protected Transform target; // Mục tiêu hiện tại của kẻ địch
+    protected Transform target; // Mục tiêu hiện tại của kẻ địch (không SerializeField)
     [SerializeField] protected NavMeshAgent agent; // NavMeshAgent để điều khiển di chuyển
 
     // Cache để tối ưu performance
@@ -32,10 +46,22 @@ public class Enemy : MonoBehaviour
     private float nextTargetUpdateTime = 0f;
     private const float TARGET_UPDATE_INTERVAL = 0.2f; // Cập nhật mục tiêu mỗi 0.2s
 
+    // Thêm throttling cho patrol/anchor logic
+    private float nextPatrolUpdateTime = 0f;
+    private const float PATROL_UPDATE_INTERVAL = 0.3f; // Cập nhật patrol mỗi 0.3s
+    
+    // Cache distance calculations
+    private float cachedAnchorDistance = 0f;
+    private float lastAnchorDistanceTime = 0f;
+    private const float ANCHOR_DISTANCE_CACHE_DURATION = 0.2f;
+
     // Cache player reference để tối ưu hiệu suất
     private static Transform[] cachedPlayers;
     private static float lastPlayerCacheTime = 0f;
     private const float PLAYER_CACHE_DURATION = 1f; // Cache player trong 1 giây
+
+    // Movement controller reference
+    protected EnemyMovementController movementController;
 
     // --- Event & Property cho hệ thống combat, buff, elite, v.v. ---
     public event Action<float, float> OnHealthChanged;
@@ -79,13 +105,22 @@ public class Enemy : MonoBehaviour
     public float GetHealthPercent() { return _maxHealth > 0 ? _currentHealth / _maxHealth : 0f; }
     public void Heal(float amount) { _currentHealth = Mathf.Min(_currentHealth + amount, _maxHealth); OnHealthChanged?.Invoke(_currentHealth, _maxHealth); }
 
+    private int currentPatrolIndex = 0;
+    private bool patrolForward = true;
+    private Vector3 randomPatrolTarget;
+    private bool hasRandomTarget = false;
+
+    private enum PatrolState { None, ReturningToAnchor, Patrolling }
+    private PatrolState patrolState = PatrolState.None;
+
     /// <summary>
     /// Khởi tạo agent, đăng ký với AIManager, chuẩn bị NavMeshAgent.
     /// </summary>
     protected virtual void Start()
     {
-        Debug.Log("--------------------------------------------------------------------------------------");
         agent = GetComponent<NavMeshAgent>();
+        movementController = GetComponent<EnemyMovementController>();
+        
         if (agent != null)
         {
             agent.updateRotation = false; // Tắt cập nhật xoay tự động
@@ -103,25 +138,314 @@ public class Enemy : MonoBehaviour
         }
 
         EnsureMeleeEnemyAIActive();
-        Debug.Log($"[{gameObject.name}] Enemy Start. Initial target: {target?.name ?? "None"}");
-
-        // Debug thông tin layer và mask
-        Debug.Log($"[{gameObject.name}] Player Layer Mask: {playerLayerMask.value} (binary: {System.Convert.ToString(playerLayerMask.value, 2)})");
     }
 
     /// <summary>
-    /// Update: Cập nhật target định kỳ và xử lý di chuyển.
+    /// Update: Cập nhật target định kỳ và xử lý di chuyển với throttling.
     /// </summary>
     protected virtual void Update()
     {
-        // Chỉ cập nhật mục tiêu theo khoảng thời gian để tối ưu hiệu suất
+        // Cập nhật mục tiêu player theo khoảng thời gian
         if (Time.time >= nextTargetUpdateTime)
         {
             UpdateTarget();
             nextTargetUpdateTime = Time.time + TARGET_UPDATE_INTERVAL;
         }
 
+        // Cập nhật patrol logic theo khoảng thời gian để tối ưu performance
+        if (Time.time >= nextPatrolUpdateTime)
+        {
+            UpdatePatrolLogic();
+            nextPatrolUpdateTime = Time.time + PATROL_UPDATE_INTERVAL;
+        }
+
+        // Xử lý movement cuối cùng
         HandleMovement();
+    }
+
+    /// <summary>
+    /// Cập nhật logic patrol với throttling và optimization.
+    /// </summary>
+    private void UpdatePatrolLogic()
+    {
+        // Nếu không có anchor, không làm gì
+        if (anchor == null) 
+        {
+
+            return;
+        }
+
+        // Kiểm tra player có trong chase range không
+        bool hasValidPlayerTarget = HasValidPlayerInChaseRange();
+
+        // Cache anchor distance để tránh tính toán lặp lại
+        float distToAnchor = GetCachedAnchorDistance();
+
+
+
+        // Logic state transitions
+        if (hasValidPlayerTarget)
+        {
+            // Có player trong chase range → pause patrol, để AI states xử lý chase
+
+            patrolState = PatrolState.None;
+            return;
+        }
+        else
+        {
+            // Không có player hoặc player ra khỏi chase range → xử lý patrol logic
+            switch (patrolState)
+            {
+                case PatrolState.None:
+                    HandlePatrolStateNone(distToAnchor);
+                    break;
+                case PatrolState.ReturningToAnchor:
+                    HandlePatrolStateReturning(distToAnchor);
+                    break;
+                case PatrolState.Patrolling:
+                    HandlePatrolStatePatrolling();
+                    break;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Kiểm tra có player hợp lệ trong chase range không.
+    /// </summary>
+    private bool HasValidPlayerInChaseRange()
+    {
+        if (target == null) return false;
+        
+        if (!IsValidTarget(target)) return false;
+        
+        if (!target.CompareTag("Player")) return false;
+        
+        float distanceToTarget = Vector3.Distance(transform.position, target.position);
+        return distanceToTarget <= chaseRange;
+    }
+
+    /// <summary>
+    /// Lấy khoảng cách đến anchor với caching để tối ưu performance.
+    /// </summary>
+    private float GetCachedAnchorDistance()
+    {
+        if (Time.time - lastAnchorDistanceTime > ANCHOR_DISTANCE_CACHE_DURATION)
+        {
+            cachedAnchorDistance = Vector3.Distance(transform.position, anchor.position);
+            lastAnchorDistanceTime = Time.time;
+        }
+        return cachedAnchorDistance;
+    }
+
+    /// <summary>
+    /// Xử lý khi không có trạng thái patrol.
+    /// Player đã ra khỏi chase range hoặc chưa có target, cần về anchor trước khi patrol.
+    /// </summary>
+    private void HandlePatrolStateNone(float distToAnchor)
+    {
+        // Luôn về anchor trước khi bắt đầu patrol
+        if (distToAnchor > arriveThreshold)
+        {
+            target = anchor;
+            hasRandomTarget = false;
+            patrolState = PatrolState.ReturningToAnchor;
+        }
+        else
+        {
+            // Đã gần anchor, bắt đầu patrol cycle
+            StartPatrolling();
+        }
+    }
+
+    /// <summary>
+    /// Xử lý khi đang trở về anchor.
+    /// </summary>
+    private void HandlePatrolStateReturning(float distToAnchor)
+    {
+        if (distToAnchor <= arriveThreshold)
+        {
+            StartPatrolling();
+        }
+        else
+        {
+            target = anchor;
+            hasRandomTarget = false;
+        }
+    }
+
+    /// <summary>
+    /// Bắt đầu patrol dựa trên patrol mode.
+    /// </summary>
+    private void StartPatrolling()
+    {
+        Debug.Log($"[Enemy] {gameObject.name} StartPatrolling - mode: {patrolMode}, waypoints: {(patrolPoints?.Count ?? 0)}");
+        
+        if (patrolMode != PatrolMode.RandomAroundAnchor && patrolPoints != null && patrolPoints.Count > 0)
+        {
+            // Waypoint patrol - bắt đầu từ waypoint đầu tiên
+            currentPatrolIndex = 0;
+            patrolForward = true;
+            target = patrolPoints[currentPatrolIndex]; // Set target ban đầu
+            hasRandomTarget = false;
+            patrolState = PatrolState.Patrolling;
+            Debug.Log($"[Enemy] {gameObject.name} bắt đầu WAYPOINT patrol, target đầu tiên: {target.position}");
+        }
+        else if (patrolMode == PatrolMode.RandomAroundAnchor)
+        {
+            // Random patrol - sẽ generate random target trong HandleRandomPatrol()
+            if (randomPatrolRadius <= 0f)
+            {
+                Debug.LogWarning($"[Enemy] {gameObject.name} randomPatrolRadius <= 0 ({randomPatrolRadius}), set to default 5f");
+                randomPatrolRadius = 5f;
+            }
+            
+            patrolState = PatrolState.Patrolling;
+            target = null; // Clear target vì sẽ dùng randomPatrolTarget
+            hasRandomTarget = false; // Reset để force generate new target
+            Debug.Log($"[Enemy] {gameObject.name} bắt đầu RANDOM patrol quanh {anchor.position} với radius {randomPatrolRadius}");
+        }
+        else
+        {
+            Debug.LogWarning($"[Enemy] {gameObject.name} không thể start patrol - không có waypoints hoặc setup sai");
+        }
+    }
+
+    /// <summary>
+    /// Xử lý logic patrol khi đang trong trạng thái Patrolling.
+    /// </summary>
+    private void HandlePatrolStatePatrolling()
+    {
+        if (patrolMode == PatrolMode.RandomAroundAnchor)
+        {
+            HandleRandomPatrol();
+        }
+        else if (patrolPoints != null && patrolPoints.Count > 0)
+        {
+            HandleWaypointPatrol();
+        }
+        else
+        {
+            // Không có waypoints hợp lệ, chuyển về idle  
+            Debug.LogWarning($"[Enemy] {gameObject.name} ở Patrolling state nhưng không có waypoints! PatrolPoints: {(patrolPoints == null ? "null" : patrolPoints.Count.ToString())}");
+            patrolState = PatrolState.None;
+            target = null;
+        }
+    }
+
+    /// <summary>
+    /// Xử lý patrol ngẫu nhiên quanh anchor.
+    /// </summary>
+    private void HandleRandomPatrol()
+    {
+
+        
+        if (!hasRandomTarget || Vector3.Distance(transform.position, randomPatrolTarget) <= arriveThreshold)
+        {
+            Vector2 randCircle = Random.insideUnitCircle * randomPatrolRadius;
+            randomPatrolTarget = anchor.position + new Vector3(randCircle.x, 0, randCircle.y);
+            hasRandomTarget = true;
+            Debug.Log($"[Enemy] {gameObject.name} tạo random target mới: {randomPatrolTarget} (radius: {randomPatrolRadius})");
+        }
+
+    }
+
+    /// <summary>
+    /// Xử lý patrol theo waypoints.
+    /// </summary>
+    private void HandleWaypointPatrol()
+    {
+        // Validate patrol index
+        if (currentPatrolIndex < 0 || currentPatrolIndex >= patrolPoints.Count)
+        {
+            currentPatrolIndex = 0;
+            patrolForward = true;
+        }
+
+        // Check if reached current waypoint
+        if (Vector3.Distance(transform.position, patrolPoints[currentPatrolIndex].position) <= arriveThreshold)
+        {
+            AdvancePatrolIndex();
+        }
+
+        target = patrolPoints[currentPatrolIndex];
+        hasRandomTarget = false;
+    }
+
+    /// <summary>
+    /// Tiến tới waypoint tiếp theo dựa trên patrol mode.
+    /// </summary>
+    private void AdvancePatrolIndex()
+    {
+        switch (patrolMode)
+        {
+            case PatrolMode.Once:
+                // Đi tuần qua một lần rồi dừng lại
+                if (currentPatrolIndex < patrolPoints.Count - 1)
+                {
+                    currentPatrolIndex++;
+                }
+                // Khi đến waypoint cuối cùng, dừng lại (không reset về 0)
+                break;
+                
+            case PatrolMode.PingPong:
+                // Đi tuần qua rồi quay lại (ping-pong)
+                if (patrolForward)
+                {
+                    if (currentPatrolIndex < patrolPoints.Count - 1)
+                        currentPatrolIndex++;
+                    else
+                        patrolForward = false; // Đảo chiều khi đến cuối
+                }
+                else
+                {
+                    if (currentPatrolIndex > 0)
+                        currentPatrolIndex--;
+                    else
+                        patrolForward = true; // Đảo chiều khi về đầu
+                }
+                break;
+                
+            case PatrolMode.Loop:
+            default:
+                // Đi tuần thành một vòng (loop)
+                currentPatrolIndex = (currentPatrolIndex + 1) % patrolPoints.Count;
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Xử lý movement cuối cùng thông qua MovementController.
+    /// </summary>
+    private void HandleMovement()
+    {
+        if (movementController == null) return;
+
+
+
+        // Xử lý movement dựa trên patrol state và mode
+        if (patrolState == PatrolState.Patrolling)
+        {
+            if (patrolMode == PatrolMode.RandomAroundAnchor && hasRandomTarget)
+            {
+                // Random patrol quanh anchor
+                movementController.MoveTo(randomPatrolTarget);
+            }
+            else if (patrolMode != PatrolMode.RandomAroundAnchor && target != null)
+            {
+                // Waypoint patrol - di chuyển đến waypoint hiện tại
+                movementController.MoveTo(target.position);
+            }
+            else
+            {
+                // Fallback: không có target hợp lệ trong patrol state
+                patrolState = PatrolState.None;
+            }
+        }
+        // Xử lý các trường hợp khác (return to anchor, chase player, etc.)
+        else if (target != null)
+        {
+            movementController.MoveTo(target.position);
+        }
     }
 
     /// <summary>
@@ -144,7 +468,6 @@ public class Enemy : MonoBehaviour
             if (player != null && !tempPlayerObjects.Contains(player))
             {
                 tempPlayerObjects.Add(player);
-                Debug.Log($"[{gameObject.name}] Found player by tag: {player.name}, Layer: {player.layer} ({LayerMask.LayerToName(player.layer)})");
             }
         }
 
@@ -161,7 +484,6 @@ public class Enemy : MonoBehaviour
                         if (obj != null && obj != gameObject && !tempPlayerObjects.Contains(obj))
                         {
                             tempPlayerObjects.Add(obj);
-                            Debug.Log($"[{gameObject.name}] Found player by layer: {obj.name}, Layer: {layer} ({LayerMask.LayerToName(layer)})");
                         }
                     }
                 }
@@ -181,7 +503,6 @@ public class Enemy : MonoBehaviour
                 if (player != null && !tempPlayerObjects.Contains(player))
                 {
                     tempPlayerObjects.Add(player);
-                    Debug.Log($"[{gameObject.name}] Found player by component: {player.name}");
                 }
             }
         }
@@ -189,8 +510,6 @@ public class Enemy : MonoBehaviour
         // Convert to Transform array và cache
         cachedPlayers = tempPlayerObjects.Where(p => p != null).Select(p => p.transform).ToArray();
         lastPlayerCacheTime = Time.time;
-
-        Debug.Log($"[{gameObject.name}] Total players found: {cachedPlayers.Length}");
 
         return cachedPlayers;
     }
@@ -200,8 +519,6 @@ public class Enemy : MonoBehaviour
     /// </summary>
     protected virtual void UpdateTarget()
     {
-        Debug.Log("--------------------------------------UpdateTarget------------------------------------------------");
-
         Transform currentBestTarget = null;
         float currentBestDistance = float.MaxValue;
 
@@ -213,32 +530,22 @@ public class Enemy : MonoBehaviour
             {
                 currentBestTarget = target;
                 currentBestDistance = distanceToCurrentTarget;
-                Debug.Log($"[{gameObject.name}] Current target {target.name} still valid at {distanceToCurrentTarget:F2}m");
             }
         }
 
         // BƯỚC 2: Tìm players bằng multiple methods
         tempPlayerList.Clear();
-
-        // Method A: Physics.OverlapSphere
         var colliders = Physics.OverlapSphere(transform.position, detectionRange, playerLayerMask);
-        Debug.Log($"[{gameObject.name}] Physics.OverlapSphere found {colliders.Length} colliders");
-
         foreach (var col in colliders)
         {
             if (col != null && IsValidTarget(col.transform))
             {
                 tempPlayerList.Add(col.transform);
-                Debug.Log($"[{gameObject.name}] Valid target from OverlapSphere: {col.name}");
             }
         }
-
-        // Method B: Fallback - tìm tất cả players trong scene và filter theo distance
         if (tempPlayerList.Count == 0)
         {
-            Debug.Log($"[{gameObject.name}] No targets found via OverlapSphere, using fallback method");
             var allPlayers = FindAllPlayers();
-
             foreach (var player in allPlayers)
             {
                 if (player != null && IsValidTarget(player))
@@ -247,69 +554,45 @@ public class Enemy : MonoBehaviour
                     if (distance <= detectionRange)
                     {
                         tempPlayerList.Add(player);
-                        Debug.Log($"[{gameObject.name}] Valid target from fallback: {player.name} at {distance:F2}m");
                     }
                 }
             }
         }
 
-        Debug.Log($"[{gameObject.name}] Found {tempPlayerList.Count} potential targets in detection range");
-
-        // BƯỚC 3: Đánh giá ứng cử viên player tốt nhất
         Transform bestPlayerCandidate = EvaluatePlayerTargetCandidates(tempPlayerList);
         if (bestPlayerCandidate != null)
         {
             float distToBestCandidate = Vector3.Distance(transform.position, bestPlayerCandidate.position);
-
-            // So sánh với mục tiêu hiện tại
             if (currentBestTarget == null || distToBestCandidate < currentBestDistance)
             {
                 currentBestTarget = bestPlayerCandidate;
                 currentBestDistance = distToBestCandidate;
-                Debug.Log($"[{gameObject.name}] New best target: {currentBestTarget.name} at {currentBestDistance:F2}m");
             }
         }
 
-        // BƯỚC 4: Xử lý group target
-        var aiController = GetComponent<EnemyAIController>();
-        if (aiController?.group?.groupTarget != null)
-        {
-            float distToGroupTarget = Vector3.Distance(transform.position, aiController.group.groupTarget.position);
-            if (distToGroupTarget <= detectionRange && IsValidTarget(aiController.group.groupTarget))
-            {
-                if (currentBestTarget == null || distToGroupTarget < currentBestDistance)
-                {
-                    currentBestTarget = aiController.group.groupTarget;
-                    currentBestDistance = distToGroupTarget;
-                    Debug.Log($"[{gameObject.name}] Prioritizing group target: {currentBestTarget.name}");
-                }
-            }
+        // BƯỚC 4: (Bỏ qua group target, không còn group)
+        // BƯỚC 5: Gán target cuối cùng (chỉ là player)
+        if (currentBestTarget != null && Vector3.Distance(transform.position, currentBestTarget.position) <= chaseRange)
+        {            
+            target = currentBestTarget;
+            Debug.Log($"[Enemy] {gameObject.name} đặt PLAYER target: {target.name}");
         }
-
-        // BƯỚC 5: Gán target cuối cùng
-        bool targetChanged = (target != currentBestTarget);
-        target = currentBestTarget;
-
-        if (targetChanged)
+        else if (target != null && IsValidTarget(target) && target.CompareTag("Player"))
         {
-            Debug.Log($"[{gameObject.name}] Target changed to: {target?.name ?? "None"}");
-        }
-
-        // BƯỚC 6: Kiểm tra chase range
-        if (target != null && Vector3.Distance(transform.position, target.position) > chaseRange)
-        {
-            Debug.Log($"[{gameObject.name}] Target {target.name} out of chase range, setting to null");
+            // Chỉ reset target nếu target hiện tại là player (không phải waypoint/anchor)
+            Debug.Log($"[Enemy] {gameObject.name} reset PLAYER target (player ra khỏi range)");
             target = null;
         }
 
-        // BƯỚC 7: Cập nhật AI Controller
+        // BƯỚC 6: Cập nhật AI Controller
+        var aiController = GetComponent<EnemyAIController>();
         UpdateAIController(aiController);
     }
 
     /// <summary>
     /// Kiểm tra một transform có phải là target hợp lệ không (tag, layer, active, máu...)
     /// </summary>
-    private bool IsValidTarget(Transform t)
+    protected bool IsValidTarget(Transform t)
     {
         if (t == null || t == transform) return false;
 
@@ -319,7 +602,6 @@ public class Enemy : MonoBehaviour
         // Kiểm tra layer (nếu được chỉ định)
         if (playerLayerMask != 0 && (playerLayerMask & (1 << t.gameObject.layer)) == 0)
         {
-            Debug.Log($"[{gameObject.name}] Target {t.name} has wrong layer {t.gameObject.layer}");
             return false;
         }
 
@@ -334,34 +616,43 @@ public class Enemy : MonoBehaviour
     }
 
     /// <summary>
-    /// Cập nhật trạng thái AI Controller dựa trên target hiện tại.
+    /// Cập nhật trạng thái AI Controller dựa trên player target.
     /// </summary>
     private void UpdateAIController(EnemyAIController aiController)
     {
         if (aiController == null) return;
 
-        aiController.playerTarget = target;
-
-        if (target != null)
+        // Chỉ set playerTarget nếu target hiện tại là player
+        if (target != null && IsValidTarget(target) && target.CompareTag("Player"))
         {
+            aiController.playerTarget = target;
+            
             var attackController = GetComponent<EnemyAttackController>();
             float currentDistance = Vector3.Distance(transform.position, target.position);
 
             if (attackController != null && currentDistance <= attackController.AttackRange)
             {
-                Debug.Log($"[{gameObject.name}] Switching to AttackState");
+                Debug.Log($"[Enemy] {gameObject.name} UpdateAIController: chuyển sang AttackState");
                 aiController.ChangeState(aiController.attackState);
             }
             else if (currentDistance <= chaseRange)
             {
-                Debug.Log($"[{gameObject.name}] Switching to ChaseState");
+                Debug.Log($"[Enemy] {gameObject.name} UpdateAIController: chuyển sang ChaseState");
                 aiController.ChangeState(aiController.chaseState);
             }
         }
         else
         {
-            Debug.Log($"[{gameObject.name}] No target, switching to IdleState");
-            aiController.ChangeState(aiController.idleState);
+            // Không có player target, CHỈ chuyển về idle nếu đang ở chase/attack state
+            aiController.playerTarget = null;
+            
+            if (aiController.stateMachine.currentState == aiController.chaseState || 
+                aiController.stateMachine.currentState == aiController.attackState)
+            {
+                Debug.Log($"[Enemy] {gameObject.name} UpdateAIController: không có player, chuyển về IdleState");
+                aiController.ChangeState(aiController.idleState);
+            }
+            // Nếu đang ở IdleState hoặc PatrolState, không làm gì để tránh override
         }
     }
 
@@ -410,34 +701,7 @@ public class Enemy : MonoBehaviour
         return distanceScore + healthScore;
     }
 
-    /// <summary>
-    /// Xử lý di chuyển của kẻ địch (theo target hoặc dừng lại).
-    /// </summary>
-    protected virtual void HandleMovement()
-    {
-        if (agent == null) return;
 
-        if (target != null)
-        {
-            if (agent.isOnNavMesh && agent.enabled)
-            {
-                agent.isStopped = false;
-                agent.SetDestination(target.position);
-            }
-            else
-            {
-                Debug.LogWarning($"[{gameObject.name}] NavMeshAgent not ready for pathfinding");
-            }
-        }
-        else
-        {
-            if (agent.hasPath)
-            {
-                agent.ResetPath();
-            }
-            agent.isStopped = true;
-        }
-    }
 
     /// <summary>
     /// Vẽ Gizmos debug phạm vi detection, chase, attack, line tới target.
@@ -536,23 +800,70 @@ public class Enemy : MonoBehaviour
     }
 
     /// <summary>
+    /// Setup waypoint patrol cho enemy (có thể gọi từ code).
+    /// </summary>
+    public void SetupWaypointPatrol(Transform anchorPoint, List<Transform> waypoints, PatrolMode mode = PatrolMode.Loop)
+    {
+        anchor = anchorPoint;
+        patrolPoints = new List<Transform>(waypoints);
+        patrolMode = mode;
+        randomPatrolRadius = 0f;
+        
+        Debug.Log($"[Enemy] {gameObject.name} được setup waypoint patrol với {waypoints.Count} waypoints, mode: {mode}");
+    }
+
+    /// <summary>
+    /// Setup random patrol cho enemy (có thể gọi từ code).
+    /// </summary>
+    public void SetupRandomPatrol(Transform anchorPoint, float radius = 5f)
+    {
+        anchor = anchorPoint;
+        patrolPoints = new List<Transform>();
+        patrolMode = PatrolMode.RandomAroundAnchor;
+        randomPatrolRadius = radius;
+        
+        Debug.Log($"[Enemy] {gameObject.name} được setup random patrol quanh {anchorPoint.name} với radius {radius}");
+    }
+
+    /// <summary>
+    /// Test method để force start patrol (gọi từ inspector hoặc code để test).
+    /// </summary>
+    [ContextMenu("Force Start Patrol")]
+    public void ForceStartPatrol()
+    {
+        Debug.Log($"[Enemy] {gameObject.name} ForceStartPatrol - anchor: {anchor?.name}, mode: {patrolMode}, waypoints: {patrolPoints?.Count}");
+        
+        if (anchor == null)
+        {
+            Debug.LogError($"[Enemy] {gameObject.name} không có anchor để patrol!");
+            return;
+        }
+
+        // Reset states
+        patrolState = PatrolState.None;
+        target = null;
+        hasRandomTarget = false;
+        
+        // Force vào PatrolState
+        var aiController = GetComponent<EnemyAIController>();
+        if (aiController != null)
+        {
+            aiController.ChangeState(aiController.patrolState);
+        }
+        
+        Debug.Log($"[Enemy] {gameObject.name} đã force start patrol!");
+    }
+
+    /// <summary>
     /// Debug method để kiểm tra setup
     /// </summary>
     [ContextMenu("Debug Player Detection")]
     public void DebugPlayerDetection()
     {
-        Debug.Log($"=== Debug Player Detection for {gameObject.name} ===");
-        Debug.Log($"Detection Range: {detectionRange}");
-        Debug.Log($"Chase Range: {chaseRange}");
-        Debug.Log($"Player Layer Mask: {playerLayerMask.value}");
-
         var allPlayers = FindAllPlayers();
-        Debug.Log($"Found {allPlayers.Length} players in scene");
-
         foreach (var player in allPlayers)
         {
             float distance = Vector3.Distance(transform.position, player.position);
-            Debug.Log($"Player: {player.name}, Distance: {distance:F2}, Valid: {IsValidTarget(player)}");
         }
     }
 }

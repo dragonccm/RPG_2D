@@ -1,66 +1,55 @@
 using UnityEngine;
 
+/// <summary>
+/// Trạng thái tuần tra của kẻ địch.
+/// </summary>
 public class PatrolState : State
 {
-    private Vector3[] patrolPoints;
-    private int currentPatrolIndex;
+    private float stateUpdateInterval = 0.5f;
+    private float nextStateUpdate;
+    private EnemyMovementController movementController;
 
-    public PatrolState(EnemyAIController aiController, StateMachine stateMachine, Vector3[] patrolPoints) : base(aiController, stateMachine)
+    public PatrolState(EnemyAIController aiController, StateMachine stateMachine) : base(aiController, stateMachine)
     {
-        this.patrolPoints = patrolPoints;
+        movementController = aiController.GetComponent<EnemyMovementController>();
     }
 
     public override void Enter()
     {
         base.Enter();
-        Debug.Log($"[{aiController.enemyType}] Enter PatrolState");
-        currentPatrolIndex = 0;
-        MoveToNextPatrolPoint();
-        aiController.animatorController?.PlayMoveAnimation(aiController.GetComponent<EnemyMovementController>()?.Agent.speed ?? 0f);
+        Debug.Log($"[PatrolState] {aiController.name} vào PatrolState");
+        aiController.animatorController?.PlayIdleAnimation();
     }
 
     public override void Execute()
     {
         base.Execute();
+        
+        // Throttle state checking để tối ưu performance
+        if (Time.time < nextStateUpdate) return;
+        nextStateUpdate = Time.time + stateUpdateInterval;
+
         var enemy = aiController.GetComponent<Enemy>();
-        // Sử dụng detectionRange để phát hiện mục tiêu mới khi ở trạng thái Patrol
         float detectionRange = enemy != null ? enemy.detectionRange : 10f;
 
-        // Ưu tiên đuổi theo người chơi nếu phát hiện
+        // Chỉ kiểm tra player detection, Enemy.cs sẽ xử lý toàn bộ patrol logic
         if (aiController.playerTarget != null)
         {
             float distanceToPlayer = Vector3.Distance(aiController.transform.position, aiController.playerTarget.position);
             if (distanceToPlayer < detectionRange)
             {
-                Debug.Log($"[{aiController.enemyType}] Player detected, switching to ChaseState");
                 stateMachine.ChangeState(aiController.chaseState);
                 return;
             }
         }
 
-        // Nếu AI là một phần của một nhóm, không thực hiện logic tuần tra độc lập
-        if (aiController.group != null) return;
-
-        // Logic đi tuần tra
-        if (patrolPoints == null || patrolPoints.Length == 0) return;
-
-        if (Vector3.Distance(aiController.transform.position, patrolPoints[currentPatrolIndex]) < 1f)
-        {
-            MoveToNextPatrolPoint();
-        }
-    }
-
-    private void MoveToNextPatrolPoint()
-    {
-        if (patrolPoints == null || patrolPoints.Length == 0) return;
-        currentPatrolIndex = (currentPatrolIndex + 1) % patrolPoints.Length;
-        aiController.GetComponent<EnemyMovementController>()?.MoveTo(patrolPoints[currentPatrolIndex]);
+        // Tất cả patrol logic (return to anchor, waypoint navigation, random patrol) 
+        // được xử lý hoàn toàn bởi Enemy.cs trong UpdatePatrolLogic()
+        // PatrolState chỉ đảm nhiệm việc phát hiện player
     }
 
     public override void Exit()
     {
         base.Exit();
-        Debug.Log($"[{aiController.enemyType}] Exit PatrolState");
-        aiController.animatorController?.PlayIdleAnimation();
     }
 }

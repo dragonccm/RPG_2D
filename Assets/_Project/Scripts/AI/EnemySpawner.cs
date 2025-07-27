@@ -36,7 +36,7 @@ public class EnemySpawner : MonoBehaviour
                 playerTransform = playerObj.transform;
             else
             {
-                Debug.LogWarning("EnemySpawner: Could not find Player. Ensure Player has 'Player' tag or PlayerController component.");
+                // Log removed
             }
         }
         StartCoroutine(SpawnEnemiesRoutine());
@@ -53,7 +53,7 @@ public class EnemySpawner : MonoBehaviour
             {
                 if (spawnPoints == null || spawnPoints.Length == 0)
                 {
-                    Debug.LogWarning("EnemySpawner: No spawn points assigned. Cannot spawn enemies.");
+                    // Log removed
                     continue;
                 }
 
@@ -72,7 +72,7 @@ public class EnemySpawner : MonoBehaviour
                 }
                 else
                 {
-                    Debug.LogWarning($"Spawned enemy '{enemy.name}' does not have an Enemy component. AI/Movement/Attack may not function correctly.", enemy);
+                    // Log removed
                 }
             }
         }

@@ -35,26 +35,21 @@ public class EnemySkillManager : MonoBehaviour
     /// </summary>
     public void UseSkill()
     {
-        Debug.Log($"[EnemySkillManager] Bắt đầu xử lý UseSkill trên {gameObject.name}");
         if (skillExecutors.Count == 0)
         {
-            Debug.LogWarning($"[EnemySkillManager] Không có kỹ năng nào để dùng cho {gameObject.name}");
             return;
         }
         if (enemy == null)
         {
-            Debug.LogError($"[EnemySkillManager] Thiếu component Enemy trên {gameObject.name}");
             return;
         }
         var aiController = enemy.GetComponent<EnemyAIController>();
         if (aiController == null)
         {
-            Debug.LogError($"[EnemySkillManager] Thiếu EnemyAIController trên {gameObject.name}");
             return;
         }
         if (aiController.playerTarget == null)
         {
-            Debug.LogWarning($"[EnemySkillManager] Không có playerTarget cho {gameObject.name}");
             return;
         }
         Transform target = aiController.playerTarget;
@@ -62,29 +57,21 @@ public class EnemySkillManager : MonoBehaviour
         if (useRandomSkill)
         {
             skillIndex = Random.Range(0, skillExecutors.Count);
-            Debug.Log($"[EnemySkillManager] Chọn kỹ năng ngẫu nhiên: index={skillIndex}, tên={skillModules[skillIndex]?.skillName}");
         }
         else
         {
             skillIndex = (lastSkillIndex + 1) % skillExecutors.Count;
             lastSkillIndex = skillIndex;
-            Debug.Log($"[EnemySkillManager] Chọn kỹ năng tuần tự: index={skillIndex}, tên={skillModules[skillIndex]?.skillName}");
         }
         var executor = skillExecutors[skillIndex];
         var character = enemy.GetComponent<Character>();
         if (character == null)
         {
-            Debug.LogError($"[EnemySkillManager] Thiếu component Character trên {gameObject.name}");
             return;
         }
         if (executor.CanExecute(character))
         {
-            Debug.Log($"[EnemySkillManager] Đang thực thi kỹ năng '{skillModules[skillIndex]?.skillName}' lên mục tiêu {target.name} tại vị trí {target.position}");
             executor.Execute(character, target.position);
-        }
-        else
-        {
-            Debug.LogWarning($"[EnemySkillManager] Kỹ năng '{skillModules[skillIndex]?.skillName}' không thể thực thi bởi {gameObject.name}");
         }
     }
 

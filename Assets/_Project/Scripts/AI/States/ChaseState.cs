@@ -1,72 +1,96 @@
 using UnityEngine;
 
 /// <summary>
-/// Trạng thái truy đuổi mục tiêu của kẻ địch.
+/// Trạng thái truy đuổi người chơi khi phát hiện trong tầm.
 /// </summary>
 public class ChaseState : State
 {
+    [Header("Cài đặt truy đuổi")]
+    [Tooltip("Khoảng thời gian giữa các lần cập nhật trạng thái (giây)")]
+    private float stateUpdateInterval = 0.3f;
+    
+    [Tooltip("Khoảng cách tối đa để tiếp tục đuổi người chơi")]
+    private float chaseRange;
+    
+    [Tooltip("Khoảng cách để bắt đầu tấn công người chơi")]
+    private float attackRange;
+    
+    private float nextStateUpdate;
+    private EnemyMovementController movementController;
+    
     public ChaseState(EnemyAIController aiController, StateMachine stateMachine) : base(aiController, stateMachine)
     {
+        movementController = aiController.GetComponent<EnemyMovementController>();
     }
 
     public override void Enter()
     {
         base.Enter();
-        Debug.Log($"[{aiController.enemyType}] Enter ChaseState: target={aiController.playerTarget?.name}");
-        var moveCtrl = aiController.GetComponent<EnemyMovementController>();
-        if (moveCtrl != null)
+        
+        if (movementController != null && aiController.playerTarget != null)
         {
-            // EnemyMovementController sẽ tự động di chuyển đến playerTarget
-            moveCtrl.playerTarget = aiController.playerTarget;
-            Debug.Log($"[{aiController.enemyType}] ChaseState: Set MovementController target to {moveCtrl.playerTarget?.name}");
-            aiController.animatorController?.PlayMoveAnimation(moveCtrl.Agent.speed);
+            // EnemyMovementController sẽ tự động tối ưu destination updates
+            movementController.MoveTo(aiController.playerTarget.position);
+            aiController.animatorController?.PlayMoveAnimation(movementController.Agent?.speed ?? 3f);
         }
     }
 
     public override void Execute()
     {
         base.Execute();
+        
+        // Throttle state checking để tối ưu performance
+        if (Time.time < nextStateUpdate) return;
+        nextStateUpdate = Time.time + stateUpdateInterval;
+        
         var enemy = aiController.GetComponent<Enemy>();
         var attackController = aiController.GetComponent<EnemyAttackController>();
 
-        // Lấy phạm vi truy đuổi và tấn công từ Enemy và EnemyAttackController
-        float chaseRange = enemy != null ? enemy.chaseRange : 20f;
-        float attackRange = attackController != null ? attackController.AttackRange : 2f; // Sử dụng AttackRange property
+        // Lấy phạm vi từ components
+        chaseRange = enemy != null ? enemy.chaseRange : 20f;
+        attackRange = attackController != null ? attackController.AttackRange : 2f;
 
         if (aiController.playerTarget == null)
         {
-            stateMachine.ChangeState(aiController.patrolState); // Hoặc idleState nếu không có tuần tra
+            // Không có player target → về Idle, để Enemy.cs xử lý patrol logic
+            stateMachine.ChangeState(aiController.idleState);
             return;
         }
 
         float distanceToPlayer = Vector3.Distance(aiController.transform.position, aiController.playerTarget.position);
 
+        // Kiểm tra vượt quá chase range
         if (distanceToPlayer > chaseRange)
         {
-            stateMachine.ChangeState(aiController.patrolState);
+            // Player ra khỏi chase range → về Idle, để Enemy.cs xử lý return to anchor + patrol
+            stateMachine.ChangeState(aiController.idleState);
             return;
         }
 
+        // Kiểm tra reposition cho ranged enemies
         if (aiController is RangedEnemyAI rangedAI && distanceToPlayer < rangedAI.safeDistance)
         {
             stateMachine.ChangeState(rangedAI.repositionState);
+            return;
         }
-        else if (distanceToPlayer <= attackRange)
+        
+        // Kiểm tra attack range
+        if (distanceToPlayer <= attackRange)
         {
             stateMachine.ChangeState(aiController.attackState);
+            return;
+        }
+        
+        // Tiếp tục chase - update destination
+        if (movementController != null && aiController.playerTarget != null)
+        {
+            movementController.MoveTo(aiController.playerTarget.position);
         }
     }
 
     public override void Exit()
     {
         base.Exit();
-        Debug.Log($"[{aiController.enemyType}] Exit ChaseState");
-        var moveCtrl = aiController.GetComponent<EnemyMovementController>();
-        if (moveCtrl != null)
-        {
-            moveCtrl.playerTarget = null; // Dừng di chuyển theo player khi thoát trạng thái Chase
-            Debug.Log($"[{aiController.enemyType}] ChaseState: Cleared MovementController target.");
-        }
         aiController.animatorController?.PlayIdleAnimation();
     }
 }

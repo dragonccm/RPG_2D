@@ -108,16 +108,8 @@ public class NearbyHealthDisplay : MonoBehaviour
                 healthBar.Initialize(enemy.GetComponent<Character>());
                 healthBar.SetupForEnemy();
             }
-            else
-            {
-                Debug.LogWarning($"HealthBar component không tìm th?y trong prefab {enemyHealthBarPrefabPath}");
-            }
             
             UpdateHealthBarPosition(healthBarInstance, enemy);
-        }
-        else
-        {
-            Debug.LogError($"Không tìm th?y prefab {enemyHealthBarPrefabPath} trong Resources folder!");
         }
     }
 

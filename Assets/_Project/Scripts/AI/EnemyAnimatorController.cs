@@ -9,11 +9,7 @@ public class EnemyAnimatorController : MonoBehaviour
 
     private void Awake()
     {
-        animator = GetComponent<Animator>();
-        if (animator == null)
-        {
-            Debug.LogWarning($"[{gameObject.name}] Animator component not found on this GameObject. Animation control will be limited.", this);
-        }
+        animator = GetComponent<Animator>();        
     }
 
     /// <summary>

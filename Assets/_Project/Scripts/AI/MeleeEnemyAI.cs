@@ -23,11 +23,9 @@ public class MeleeEnemyAI : EnemyAIController
         enemy = GetComponent<Enemy>(); // Lấy tham chiếu đến Enemy component
         if (enemy == null)
         {
-            Debug.LogError("MeleeEnemyAI requires an Enemy component on the same GameObject.", this);
             enabled = false; // Tắt script nếu không tìm thấy Enemy component để tránh lỗi
             return;
         }
-        Debug.Log($"[{gameObject.name}] MeleeEnemyAI Awake. Enemy component found.");
     }
     /// <summary>
     /// Kiểm tra mục tiêu có trong phạm vi chỉ định không (dùng cho alert, chase, attack).
@@ -47,14 +45,12 @@ public class MeleeEnemyAI : EnemyAIController
     /// <param name="target">Mục tiêu được báo động.</param>
     public override void Alert(Transform target)
     {
-        Debug.Log($"[MeleeAI] Alerted to target: {target?.name}");
         // Nếu được alert, kiểm tra xem target có trong chaseRange không để bắt đầu truy đuổi.
         // Alert thường dùng để thông báo về một mục tiêu mới, không nhất thiết phải trong detectionRange.
         if (target != null && enemy != null && IsTargetInSpecificRange(target, enemy.chaseRange))
         {
             playerTarget = target; // Gán mục tiêu người chơi cho AI này
             ChangeState(chaseState); // Chuyển sang trạng thái truy đuổi
-            Debug.Log($"[MeleeAI] Alerted and changing to ChaseState with target: {playerTarget.name}");
         }
     }
 
