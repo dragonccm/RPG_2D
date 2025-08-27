@@ -14,9 +14,7 @@ public class CombatEffectsManager : MonoBehaviour
     [SerializeField] private float damageNumberLifetime = 1f;
     [SerializeField] private float damageNumberSpeed = 2f;
     
-    [Header("Screen Shake Settings")]
-    [SerializeField] private float screenShakeIntensity = 0.1f;
-    [SerializeField] private float screenShakeDuration = 0.2f;
+
     
     [Header("Hit Stop Settings")]
     [SerializeField] private float hitStopDuration = 0.1f;
@@ -40,8 +38,7 @@ public class CombatEffectsManager : MonoBehaviour
     }
 
     private Camera mainCamera;
-    private Vector3 originalCameraPosition;
-    private bool isShaking = false;
+
 
     private void Awake()
     {
@@ -59,7 +56,7 @@ public class CombatEffectsManager : MonoBehaviour
         mainCamera = Camera.main;
         if (mainCamera != null)
         {
-            originalCameraPosition = mainCamera.transform.position;
+
         }
     }
 
@@ -142,41 +139,7 @@ public class CombatEffectsManager : MonoBehaviour
         Destroy(damageNumberObj);
     }
 
-    public void ScreenShake(float intensity = -1f, float duration = -1f)
-    {
-        if (mainCamera == null) return;
-        
-        float shakeIntensity = intensity > 0 ? intensity : screenShakeIntensity;
-        float shakeDuration = duration > 0 ? duration : screenShakeDuration;
-        
-        if (!isShaking)
-        {
-            StartCoroutine(ScreenShakeCoroutine(shakeIntensity, shakeDuration));
-        }
-    }
 
-    private IEnumerator ScreenShakeCoroutine(float intensity, float duration)
-    {
-        isShaking = true;
-        originalCameraPosition = mainCamera.transform.position;
-        
-        float elapsedTime = 0f;
-        
-        while (elapsedTime < duration)
-        {
-            elapsedTime += Time.deltaTime;
-            
-            float offsetX = Random.Range(-intensity, intensity);
-            float offsetY = Random.Range(-intensity, intensity);
-            
-            mainCamera.transform.position = originalCameraPosition + new Vector3(offsetX, offsetY, 0);
-            
-            yield return null;
-        }
-        
-        mainCamera.transform.position = originalCameraPosition;
-        isShaking = false;
-    }
 
     public void HitStop(float duration = -1f)
     {

@@ -1,0 +1,58 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3801336f91abb87468f0d8079c0aef75, type: 3}
+  m_Name: newMelee
+  m_EditorClassIdentifier: 
+  skillName: shape
+  description: Melee attack dealing 10 damage in 2 range.
+  skillIcon: {fileID: 8793915729297761979, guid: bfe9ac200ee464d47bd6fed0971b37ec,
+    type: 3}
+  requiredLevel: 1
+  damage: 10
+  range: 2
+  speed: 5
+  cooldown: 1
+  manaCost: 1
+  stunDuration: 0
+  knockbackForce: 5
+  healAmount: 0
+  areaRadius: 0
+  chargeTime: 0
+  skillColor: {r: 1, g: 0, b: 0.915617, a: 1}
+  castSound: {fileID: 0}
+  impactSound: {fileID: 0}
+  effectPrefab: {fileID: 0}
+  projectilePrefab: {fileID: 0}
+  customEffectLifetime: 0
+  effectPositionOffset: {x: 0, y: 0, z: 0}
+  enableEnhancedEffects: 1
+  animationTrigger: Attack
+  animationLength: 1
+  skillType: 0
+  damageZonePrefab: {fileID: 0}
+  use4DirectionalAttack: 1
+  damageAreaShape: 1
+  directionalAttackSize: {x: 2, y: 1}
+  attackWidth: 1
+  attackAngle: 90
+  attackLungeForce: 1.5
+  damageDelay: 0.2
+  allowCombatMovement: 0
+  combatMovementSpeed: 0.3
+  criticalChance: 0.1
+  criticalMultiplier: 2
+  upgrades: []
+  maxLevel: 5
+  currentLevel: 1
+  showDamageArea: 1
+  damageAreaColor: {r: 1, g: 0, b: 0, a: 0.3}
+  damageAreaDisplayTime: 1

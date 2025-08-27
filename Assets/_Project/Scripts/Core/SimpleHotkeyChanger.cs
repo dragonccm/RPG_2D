@@ -20,15 +20,6 @@ public class SimpleHotkeyChanger : MonoBehaviour
     {
         // Find the skill manager
         skillManager = FindFirstObjectByType<ModularSkillManager>();
-        
-        if (skillManager != null)
-        {
-            Debug.Log("?? SimpleHotkeyChanger found ModularSkillManager - ready to change hotkeys!");
-        }
-        else
-        {
-            Debug.LogError("? No ModularSkillManager found! SimpleHotkeyChanger will not work.");
-        }
     }
     
     /// <summary>
@@ -39,25 +30,17 @@ public class SimpleHotkeyChanger : MonoBehaviour
     {
         if (!enableSimpleSystem)
         {
-            Debug.LogWarning("Simple hotkey system is disabled!");
             return false;
         }
         
         if (skillManager == null)
         {
-            Debug.LogError("No ModularSkillManager available!");
             return false;
         }
         
         if (skill == null)
         {
-            Debug.LogError("Cannot change hotkey for null skill!");
             return false;
-        }
-        
-        if (showDebugLogs)
-        {
-            Debug.Log($"?? SIMPLE CHANGE: {skill.skillName} ? {newKey}");
         }
         
         // Step 1: Find current slot with this skill
@@ -159,7 +142,6 @@ public class SimpleHotkeyChanger : MonoBehaviour
             }
             else
             {
-                Debug.LogWarning($"?? No available slots to assign {skill.skillName} to {newKey}");
                 return false;
             }
         }
@@ -300,14 +282,13 @@ public class SimpleHotkeyChanger : MonoBehaviour
     {
         if (skillManager == null || skillManager.GetAvailableSkills().Count == 0)
         {
-            Debug.LogWarning("No skills available for testing!");
             return;
         }
         
         var testSkill = skillManager.GetAvailableSkills()[0];
         bool success = ChangeSkillHotkey(testSkill, KeyCode.E);
         
-        Debug.Log($"?? Test result: {(success ? "SUCCESS" : "FAILED")} - {testSkill.skillName} ? E");
+        // Test completed
     }
     
     /// <summary>

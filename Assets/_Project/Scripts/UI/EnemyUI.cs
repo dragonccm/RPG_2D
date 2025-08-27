@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// EnemyUI - Qu?n lý health bar cho enemy v?i error handling t?t h?n
+/// EnemyUI - Qu?n lï¿½ health bar cho enemy v?i error handling t?t h?n
 /// </summary>
 public class EnemyUI : MonoBehaviour
 {
@@ -19,7 +19,7 @@ public class EnemyUI : MonoBehaviour
 
     void Update()
     {
-        // Th? kh?i t?o l?i n?u ch?a thành công
+        // Th? kh?i t?o l?i n?u ch?a thï¿½nh cï¿½ng
         if (!isInitialized)
         {
             InitializeEnemyUI();
@@ -28,14 +28,14 @@ public class EnemyUI : MonoBehaviour
 
     private void InitializeEnemyUI()
     {
-        // Tìm Character component trong nhi?u cách khác nhau
+        // Tï¿½m Character component trong nhi?u cï¿½ch khï¿½c nhau
         enemyCharacter = GetComponentInParent<Character>();
         if (enemyCharacter == null)
             enemyCharacter = GetComponent<Character>();
         if (enemyCharacter == null)
             enemyCharacter = GetComponentInChildren<Character>();
 
-        // N?u v?n không tìm th?y, th? tìm trong parent objects
+        // N?u v?n khï¿½ng tï¿½m th?y, th? tï¿½m trong parent objects
         if (enemyCharacter == null)
         {
             Transform parent = transform.parent;
@@ -46,10 +46,9 @@ public class EnemyUI : MonoBehaviour
             }
         }
 
-        // N?u v?n không có Character, t?o m?t component Character c? b?n
+        // N?u v?n khï¿½ng cï¿½ Character, t?o m?t component Character c? b?n
         if (enemyCharacter == null)
         {
-            Debug.LogWarning($"Enemy {gameObject.name} không có Character component! T?o component m?i...");
             enemyCharacter = gameObject.AddComponent<Character>();
             
             // Setup basic health cho enemy
@@ -71,7 +70,7 @@ public class EnemyUI : MonoBehaviour
 
     private void SetupUI()
     {
-        // T? ??ng tìm health slider n?u ch?a có
+        // T? ??ng tï¿½m health slider n?u ch?a cï¿½
         if (healthSlider == null)
         {
             healthSlider = GetComponentInChildren<Slider>();
@@ -115,7 +114,7 @@ public class EnemyUI : MonoBehaviour
         Image bgImage = background.AddComponent<Image>();
         bgImage.color = new Color(0.2f, 0.2f, 0.2f, 0.8f);
         
-        // T?o fill area và fill
+        // T?o fill area vï¿½ fill
         GameObject fillArea = new GameObject("Fill Area");
         fillArea.transform.SetParent(sliderObj.transform, false);
         fillArea.AddComponent<RectTransform>();
@@ -173,40 +172,10 @@ public class EnemyUI : MonoBehaviour
     public Character GetCharacter() => enemyCharacter;
     public bool IsInitialized() => isInitialized;
 
-    /// <summary>
-    /// Context menu ?? test và debug
-    /// </summary>
-    [ContextMenu("?? Test EnemyUI")]
-    public void TestEnemyUI()
-    {
-        Debug.Log("=== TESTING ENEMYUI ===");
-        Debug.Log($"GameObject: {gameObject.name}");
-        Debug.Log($"Character: {(enemyCharacter != null ? "?" : "?")}");
-        Debug.Log($"HealthSlider: {(healthSlider != null ? "?" : "?")}");
-        Debug.Log($"Initialized: {(isInitialized ? "?" : "?")}");
-        
-        if (enemyCharacter != null)
-        {
-            Debug.Log($"Health: {enemyCharacter.health.currentValue}/{enemyCharacter.health.maxValue}");
-        }
-        
-        Debug.Log("=== TEST COMPLETE ===");
-    }
-
     [ContextMenu("?? Force Initialize")]
     public void ForceInitialize()
     {
         isInitialized = false;
         InitializeEnemyUI();
-    }
-
-    [ContextMenu("?? Test Damage")]
-    public void TestDamage()
-    {
-        if (enemyCharacter != null)
-        {
-            enemyCharacter.TakeDamage(10f);
-            Debug.Log($"Applied 10 damage to {gameObject.name}");
-        }
     }
 }

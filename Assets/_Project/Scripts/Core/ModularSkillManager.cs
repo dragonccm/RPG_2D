@@ -779,7 +779,7 @@ public class ModularSkillManager : MonoBehaviour
         var skill = slot.equippedSkill;
         if (skill == null || !skill.showDamageArea) return;
 
-        // Hi?n th? vùng sát th??ng preview
+        // Hi?n th? vï¿½ng sï¿½t th??ng preview
         ShowSkillPreview(skill);
 
         isSkillActive = true;
@@ -796,7 +796,7 @@ public class ModularSkillManager : MonoBehaviour
         var skill = slot.equippedSkill;
         if (skill == null || !skill.showDamageArea) return;
 
-        // C?p nh?t vùng sát th??ng preview n?u c?n
+        // C?p nh?t vï¿½ng sï¿½t th??ng preview n?u c?n
         UpdateSkillPreview(skill);
 
         isSkillHeld = true;
@@ -806,7 +806,7 @@ public class ModularSkillManager : MonoBehaviour
     {
         if (!isSkillActive || slotIndex != activeSkillSlot) return;
 
-        // ?n vùng sát th??ng preview
+        // ?n vï¿½ng sï¿½t th??ng preview
         HideSkillPreview();
 
         isSkillActive = false;
@@ -818,7 +818,7 @@ public class ModularSkillManager : MonoBehaviour
     {
         Vector2 playerPosition = transform.position;
         
-        // C?p nh?t v? trí và kích th??c d?a trên lo?i k? n?ng
+        // C?p nh?t v? trï¿½ vï¿½ kï¿½ch th??c d?a trï¿½n lo?i k? n?ng
         switch (skill.skillType)
         {
             case SkillType.Melee:
@@ -831,11 +831,11 @@ public class ModularSkillManager : MonoBehaviour
                 ShowProjectilePreview(skill, playerPosition);
                 break;
             case SkillType.Instant:
-                // Instant skills không c?n preview - s? execute ngay l?p t?c
+                // Instant skills khï¿½ng c?n preview - s? execute ngay l?p t?c
                 HideAllPreviews();
                 return;
             default:
-                // Support không hi?n th? preview
+                // Support khï¿½ng hi?n th? preview
                 HideAllPreviews();
                 return;
         }
@@ -843,42 +843,9 @@ public class ModularSkillManager : MonoBehaviour
 
     private void ShowMeleePreview(SkillModule skill, Vector2 playerPosition)
     {
-        // ?u tiên s? d?ng damageZonePrefab t? SkillModule
-        if (skill.damageZonePrefab != null)
-        {
-            // S? d?ng custom prefab cho Melee
-            if (currentPreviewDamageArea == null)
-            {
-                currentPreviewDamageArea = Object.Instantiate(skill.damageZonePrefab);
-                currentPreviewDamageArea.name = "MeleePreviewArea_Custom";
-            }
-            
-            currentPreviewDamageArea.transform.position = new Vector3(playerPosition.x, playerPosition.y, 0);
-            currentPreviewDamageArea.transform.localScale = Vector3.one * skill.range * 2;
-        }
-        else
-        {
-            // Fallback: T?o vùng sát th??ng preview m?c ??nh cho Melee
-            if (currentPreviewDamageArea == null)
-            {
-                currentPreviewDamageArea = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                currentPreviewDamageArea.name = "MeleePreviewArea";
-                
-                // Remove collider
-                var collider = currentPreviewDamageArea.GetComponent<Collider>();
-                if (collider != null)
-                {
-                    Destroy(collider);
-                }
-            }
-
-            currentPreviewDamageArea.transform.position = new Vector3(playerPosition.x, playerPosition.y, 0);
-            currentPreviewDamageArea.transform.localScale = Vector3.one * skill.range * 2;
-            
-            SetPreviewMaterial(currentPreviewDamageArea, skill.damageAreaColor);
-        }
-
-        currentPreviewDamageArea.SetActive(true);
+        // Disabled old melee preview - using new enhanced system in SkillExecutors
+        // The new system handles shaped damage areas automatically
+        return;
     }
 
     private void ShowAreaPreview(SkillModule skill, Vector2 playerPosition)
@@ -886,7 +853,7 @@ public class ModularSkillManager : MonoBehaviour
         Vector2 mousePos = GetMouseWorldPosition();
         Vector2 validPos = GetValidTargetPosition(mousePos, playerPosition, skill);
         
-        // ?u tiên s? d?ng damageZonePrefab t? SkillModule
+        // ?u tiï¿½n s? d?ng damageZonePrefab t? SkillModule
         if (skill.damageZonePrefab != null)
         {
             // S? d?ng custom prefab cho Area
@@ -901,7 +868,7 @@ public class ModularSkillManager : MonoBehaviour
         }
         else
         {
-            // Fallback: T?o vùng sát th??ng preview m?c ??nh cho Area
+            // Fallback: T?o vï¿½ng sï¿½t th??ng preview m?c ??nh cho Area
             if (currentPreviewDamageArea == null)
             {
                 currentPreviewDamageArea = GameObject.CreatePrimitive(PrimitiveType.Sphere);
@@ -929,7 +896,7 @@ public class ModularSkillManager : MonoBehaviour
         Vector2 mousePos = GetMouseWorldPosition();
         Vector2 direction = (mousePos - playerPosition).normalized;
         
-        // ?u tiên s? d?ng damageZonePrefab thay vì LineRenderer cho Projectile
+        // ?u tiï¿½n s? d?ng damageZonePrefab thay vï¿½ LineRenderer cho Projectile
         if (skill.damageZonePrefab != null)
         {
             // S? d?ng custom prefab cho Projectile direction indicator
@@ -939,7 +906,7 @@ public class ModularSkillManager : MonoBehaviour
                 currentProjectileDirectionLine.name = "ProjectileDirectionPrefab";
             }
             
-            // ??t v? trí và h??ng cho custom prefab
+            // ??t v? trï¿½ vï¿½ h??ng cho custom prefab
             Vector3 startPos = new Vector3(playerPosition.x, playerPosition.y, 0);
             Vector3 endPos = startPos + (Vector3)(direction * skill.range);
             Vector3 midPos = (startPos + endPos) / 2f;
@@ -987,7 +954,7 @@ public class ModularSkillManager : MonoBehaviour
 
         currentProjectileDirectionLine.SetActive(true);
         
-        // ?n damage area cho Projectile vì chúng ta ch? hi?n th? ???ng bay
+        // ?n damage area cho Projectile vï¿½ chï¿½ng ta ch? hi?n th? ???ng bay
         if (currentPreviewDamageArea != null)
         {
             currentPreviewDamageArea.SetActive(false);
@@ -1042,7 +1009,7 @@ public class ModularSkillManager : MonoBehaviour
         switch (skill.skillType)
         {
             case SkillType.Area:
-                // C?p nh?t v? trí Area preview khi chu?t di chuy?n
+                // C?p nh?t v? trï¿½ Area preview khi chu?t di chuy?n
                 if (currentPreviewDamageArea != null)
                 {
                     Vector2 mousePos = GetMouseWorldPosition();

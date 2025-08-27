@@ -124,15 +124,6 @@ The system is ready for production use!";
     
     private void Start()
     {
-        if (enableTestMode && testSkill != null)
-        {
-            Debug.Log("?? Skill System Test Mode Enabled");
-            Debug.Log($"?? System Status: {systemStatus}");
-            
-            // Test skill creation
-            var executor = testSkill.CreateExecutor();
-            Debug.Log($"? Successfully created executor for '{testSkill.skillName}'");
-            Debug.Log($"?? Skill Info: {testSkill.GetSkillInfo()}");
-        }
+        // Test mode removed for production
     }
 }

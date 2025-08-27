@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 5276969497930216652}
   - component: {fileID: 8771591203943472295}
   - component: {fileID: 8407493434379318582}
-  m_Layer: 5
+  m_Layer: 3
   m_Name: healthBar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -135,7 +135,7 @@ GameObject:
   - component: {fileID: 5913998196164744968}
   - component: {fileID: 3671280278922626003}
   - component: {fileID: 2824288415568423840}
-  m_Layer: 5
+  m_Layer: 3
   m_Name: Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -212,16 +212,17 @@ GameObject:
   - component: {fileID: 2037092294052192285}
   - component: {fileID: 879823754305377918}
   - component: {fileID: 3532918150246532643}
+  - component: {fileID: 192421407724151076}
   - component: {fileID: 5185380452483445738}
   - component: {fileID: 6744402739741696896}
-  - component: {fileID: 187294452420414485}
   - component: {fileID: 8222978190277163896}
-  - component: {fileID: 192421407724151076}
   - component: {fileID: 3137885024273327423}
   - component: {fileID: 3986741045161960724}
-  m_Layer: 6
+  - component: {fileID: 3772084157937045997}
+  - component: {fileID: 8964467103381393915}
+  m_Layer: 3
   m_Name: Lancer
-  m_TagString: Player
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -372,7 +373,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDamping: 0
   m_AngularDamping: 0.05
-  m_GravityScale: 1
+  m_GravityScale: 0
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -384,6 +385,28 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
+--- !u!195 &192421407724151076
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3729075743242336014}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.355
+  m_Speed: 1.5
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 1.5229686
+  m_BaseOffset: 0.7614843
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
 --- !u!114 &5185380452483445738
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -418,24 +441,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   detectionRange: 10
   chaseRange: 20
+  patrolMode: 1
+  patrolPoints: []
+  anchor: {fileID: 0}
+  randomPatrolRadius: 5
+  arriveThreshold: 1.2
   baseDamage: 10
   playerLayerMask:
     serializedVersion: 2
     m_Bits: 0
-  target: {fileID: 0}
   agent: {fileID: 0}
---- !u!114 &187294452420414485
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3729075743242336014}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 13d754e97c6bdbc43b7ffeb949924e44, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &8222978190277163896
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -450,28 +465,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   attackRange: 2
   attackCooldown: 1
---- !u!195 &192421407724151076
-NavMeshAgent:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3729075743242336014}
-  m_Enabled: 1
-  m_AgentTypeID: 0
-  m_Radius: 0.355
-  m_Speed: 1.5
-  m_Acceleration: 8
-  avoidancePriority: 50
-  m_AngularSpeed: 120
-  m_StoppingDistance: 0
-  m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 1
-  m_AutoRepath: 1
-  m_Height: 1.5229686
-  m_BaseOffset: 0.7614843
-  m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 4
 --- !u!114 &3137885024273327423
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -484,8 +477,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e80e63492ec1d1945bede9d4f647652e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerTarget: {fileID: 0}
   moveSpeed: 3
+  rotationSpeed: 10
 --- !u!114 &3986741045161960724
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -498,12 +491,39 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 802abc091b19e9047b8e0576c50b8df6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyType: 0
+  animatorController: {fileID: 0}
+  movementController: {fileID: 0}
   playerTarget: {fileID: 0}
-  group:
-    members: []
-    groupTarget: {fileID: 0}
   patrolPoints: []
+  enemyType: 0
+--- !u!114 &3772084157937045997
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3729075743242336014}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0302681940747bb4e864ceef9b5b057b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animator: {fileID: 0}
+--- !u!114 &8964467103381393915
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3729075743242336014}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e34b7e077b5548148ac2bd04d2a3c9ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  skillModules:
+  - {fileID: 11400000, guid: 707e9487b31b78b4a98bea65ee1b6a43, type: 2}
+  useRandomSkill: 0
 --- !u!1 &7390354048877065881
 GameObject:
   m_ObjectHideFlags: 0
@@ -515,7 +535,7 @@ GameObject:
   - component: {fileID: 9129970494556006401}
   - component: {fileID: 5847677815490879614}
   - component: {fileID: 8534784084247954632}
-  m_Layer: 5
+  m_Layer: 3
   m_Name: border
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -591,7 +611,7 @@ GameObject:
   - component: {fileID: 1085587380637803918}
   - component: {fileID: 1979114256650063418}
   - component: {fileID: 3760472105003589162}
-  m_Layer: 5
+  m_Layer: 3
   m_Name: EnemyHealthBar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -693,7 +713,7 @@ GameObject:
   - component: {fileID: 7593637350058110704}
   - component: {fileID: 1098369610256106726}
   - component: {fileID: 3087911446336889116}
-  m_Layer: 5
+  m_Layer: 3
   m_Name: fill
   m_TagString: Untagged
   m_Icon: {fileID: 0}

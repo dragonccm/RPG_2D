@@ -212,13 +212,16 @@ GameObject:
   - component: {fileID: 6520242526386466453}
   - component: {fileID: 9188435097105379354}
   - component: {fileID: 7638219635353337369}
+  - component: {fileID: 2896813933843854985}
   - component: {fileID: 8164215291241186014}
   - component: {fileID: 6419105750083409254}
-  - component: {fileID: 6972510869517878213}
   - component: {fileID: 5924856176869390025}
-  - component: {fileID: 5584607950331926217}
-  - component: {fileID: 4139028607073030927}
-  - component: {fileID: 2896813933843854985}
+  - component: {fileID: 5442186086577326791}
+  - component: {fileID: 3683580823296304486}
+  - component: {fileID: 5410417738793770423}
+  - component: {fileID: 2909400027528569250}
+  - component: {fileID: 5981342221518902621}
+  - component: {fileID: 8471360417664754981}
   m_Layer: 3
   m_Name: Archer
   m_TagString: Enemy
@@ -328,7 +331,7 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3300779137972288831}
-  m_BodyType: 0
+  m_BodyType: 1
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
@@ -384,6 +387,28 @@ CapsuleCollider2D:
   m_Offset: {x: 0.014425278, y: -0.07475099}
   m_Size: {x: 0.43410873, y: 0.750498}
   m_Direction: 0
+--- !u!195 &2896813933843854985
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3300779137972288831}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.225
+  m_Speed: 1.5
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 0.4
+  m_BaseOffset: 0.2
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
 --- !u!114 &8164215291241186014
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -416,26 +441,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5916ce48c3f51954ca24d5b97ecf1e34, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  detectionRange: 10
+  detectionRange: 5
   chaseRange: 20
+  patrolMode: 1
+  patrolPoints: []
+  anchor: {fileID: 0}
+  randomPatrolRadius: 5
+  arriveThreshold: 1.2
   baseDamage: 10
   playerLayerMask:
     serializedVersion: 2
     m_Bits: 64
-  target: {fileID: 0}
   agent: {fileID: 0}
---- !u!114 &6972510869517878213
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3300779137972288831}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 13d754e97c6bdbc43b7ffeb949924e44, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &5924856176869390025
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -450,7 +467,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   attackRange: 5
   attackCooldown: 1
---- !u!114 &5584607950331926217
+--- !u!114 &5442186086577326791
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -459,18 +476,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 3300779137972288831}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 21976ba5b3cfa7a4283646606c0bd93d, type: 3}
+  m_Script: {fileID: 11500000, guid: 0d3b6ef77f608174a990a5f55903fd95, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  detectionRange: 6
-  chaseRange: 20
-  baseDamage: 10
-  playerLayerMask:
-    serializedVersion: 2
-    m_Bits: 64
-  target: {fileID: 0}
-  agent: {fileID: 0}
---- !u!114 &4139028607073030927
+--- !u!114 &3683580823296304486
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -479,39 +488,77 @@ MonoBehaviour:
   m_GameObject: {fileID: 3300779137972288831}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 21976ba5b3cfa7a4283646606c0bd93d, type: 3}
+  m_Script: {fileID: 11500000, guid: 7fab5d5a0fac6e84985b224a03d08c21, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  detectionRange: 10
-  chaseRange: 20
-  baseDamage: 10
-  playerLayerMask:
-    serializedVersion: 2
-    m_Bits: 72
-  target: {fileID: 0}
-  agent: {fileID: 0}
---- !u!195 &2896813933843854985
-NavMeshAgent:
+  animatorController: {fileID: 0}
+  movementController: {fileID: 0}
+  playerTarget: {fileID: 0}
+  patrolPoints: []
+  enemyType: 1
+  safeDistance: 5
+--- !u!114 &5410417738793770423
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3300779137972288831}
   m_Enabled: 1
-  m_AgentTypeID: 0
-  m_Radius: 0.225
-  m_Speed: 1.5
-  m_Acceleration: 8
-  avoidancePriority: 50
-  m_AngularSpeed: 120
-  m_StoppingDistance: 0
-  m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 1
-  m_AutoRepath: 1
-  m_Height: 0.4
-  m_BaseOffset: 0.2
-  m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 4
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4353e0a636264549920ab2779050849, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  health: {fileID: 0}
+  mana: {fileID: 0}
+  knockbackResistance: 1
+  damageFlashDuration: 0.2
+  damageFlashColor: {r: 1, g: 0, b: 0, a: 1}
+  showDamageNumbers: 1
+  enableScreenShake: 1
+  enableHitStop: 1
+--- !u!114 &2909400027528569250
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3300779137972288831}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e80e63492ec1d1945bede9d4f647652e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveSpeed: 1.5
+  rotationSpeed: 10
+--- !u!114 &5981342221518902621
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3300779137972288831}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e34b7e077b5548148ac2bd04d2a3c9ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  skillModules:
+  - {fileID: 11400000, guid: eca2b7514aae5ba41bb939c5632bdd49, type: 2}
+  useRandomSkill: 0
+--- !u!114 &8471360417664754981
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3300779137972288831}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0302681940747bb4e864ceef9b5b057b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animator: {fileID: 0}
 --- !u!1 &3926712535967707481
 GameObject:
   m_ObjectHideFlags: 0

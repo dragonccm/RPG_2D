@@ -40,9 +40,13 @@ public class DamageAreaIndicator : MonoBehaviour
         areaRenderer.sortingOrder = -1;
     }
     
+    [Header("🎯 System Control")]
+    [Tooltip("Disable all damage area indicators (for cleaner gameplay)")]
+    public bool disableAllIndicators = true;
+    
     public void ShowSkillArea(SkillModule skill, Vector3 position)
     {
-        if (skill == null) return;
+        if (skill == null || disableAllIndicators) return;
         
         transform.position = position;
         gameObject.SetActive(true);

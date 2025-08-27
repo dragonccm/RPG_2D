@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 649bbf46d651c0a429673af8c2ef4bb4, type: 3}
+  m_Name: EliteEnemyTemplate
+  m_EditorClassIdentifier: 
+  templateName: "K\u1EBB \u0110\u1ECBch Cao C\u1EA5p"
+  description: "Template cho elite enemy v\u1EDBi animations m\u01B0\u1EE3t m\xE0
+    h\u01A1n v\xE0 transition nhanh h\u01A1n. Ph\xF9 h\u1EE3p cho enemy c\xF3 nhi\u1EC1u
+    k\u1EF9 n\u0103ng \u0111\u1EB7c bi\u1EC7t."
+  idleClip: {fileID: 0}
+  walkClip: {fileID: 0}
+  attackClip: {fileID: 0}
+  hurtClip: {fileID: 0}
+  deathClip: {fileID: 0}
+  skill1Clip: {fileID: 0}
+  skill2Clip: {fileID: 0}
+  skill3Clip: {fileID: 0}
+  ultimateClip: {fileID: 0}
+  teleportClip: {fileID: 0}
+  berserkClip: {fileID: 0}
+  animatorType: 1
+  autoSetupTransitions: 1
+  createSubStateMachines: 0
+  defaultTransitionDuration: 0.08
+  autoAddAnimationEvents: 1
+  attackHitFrame: 0.7
+  footstepFrame: 0.5

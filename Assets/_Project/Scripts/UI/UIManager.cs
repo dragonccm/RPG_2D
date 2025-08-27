@@ -1,9 +1,10 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Core;
 
 /// <summary>
-/// UI Manager - Qu?n lý toàn b? h? th?ng UI v?i Legacy Skill UI
+/// UI Manager - Qu?n lï¿½ toï¿½n b? h? th?ng UI v?i Legacy Skill UI
 /// </summary>
 public class UIManager : MonoBehaviour
 {
@@ -21,6 +22,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private PlayerUI playerUI;
     [SerializeField] private NearbyHealthDisplay nearbyHealthDisplay;
     [SerializeField] private TargetingSystem targetingSystem;
+    [SerializeField] private PauseMenu pauseMenu;
 
     [Header("UI Settings")]
     [SerializeField] private bool showPlayerUI = true;
@@ -70,17 +72,17 @@ public class UIManager : MonoBehaviour
 
     void Update()
     {
-        // Tab toggle ?ã ???c x? lý trong PlayerController
+        // Tab toggle ?ï¿½ ???c x? lï¿½ trong PlayerController
     }
 
     /// <summary>
-    /// T? ??ng tìm các UI components theo hierarchy structure
+    /// T? ??ng tï¿½m cï¿½c UI components theo hierarchy structure
     /// </summary>
     private void AutoFindUIComponents()
     {
         Debug.Log("?? Auto-finding UI components for UIManager...");
 
-        // Tìm Canvas
+        // Tï¿½m Canvas
         Canvas canvas = FindFirstObjectByType<Canvas>();
         if (canvas == null)
         {
@@ -120,6 +122,9 @@ public class UIManager : MonoBehaviour
         if (targetingSystem == null)
             targetingSystem = FindFirstObjectByType<TargetingSystem>();
 
+        if (pauseMenu == null)
+            pauseMenu = FindFirstObjectByType<PauseMenu>();
+
         Debug.Log("? Auto-find complete for UIManager");
     }
 
@@ -128,7 +133,7 @@ public class UIManager : MonoBehaviour
     /// </summary>
     private void InitializeUI()
     {
-        // T? ??ng tìm các component khác n?u ch?a ???c assign
+        // T? ??ng tï¿½m cï¿½c component khï¿½c n?u ch?a ???c assign
         if (playerUI == null)
             playerUI = FindFirstObjectByType<PlayerUI>();
 
@@ -174,6 +179,7 @@ public class UIManager : MonoBehaviour
         Debug.Log($"PlayerUI: {(playerUI != null ? "?" : "?")}");
         Debug.Log($"NearbyHealthDisplay: {(nearbyHealthDisplay != null ? "?" : "?")}");
         Debug.Log($"TargetingSystem: {(targetingSystem != null ? "?" : "?")}");
+        Debug.Log($"PauseMenu: {(pauseMenu != null ? "?" : "?")}");
 
         // Warnings for missing components
         if (!healthUIValid)
@@ -223,6 +229,22 @@ public class UIManager : MonoBehaviour
         else
         {
             Debug.LogWarning("? SkillPanelUI not found! Cannot toggle skill panel.");
+        }
+    }
+
+    /// <summary>
+    /// Toggle pause menu v?i Escape key
+    /// </summary>
+    public void TogglePauseMenu()
+    {
+        if (pauseMenu != null)
+        {
+            pauseMenu.TogglePause();
+            Debug.Log($"?? PauseMenu toggled - Now: {(pauseMenu.IsPaused ? "PAUSED" : "RESUMED")}");
+        }
+        else
+        {
+            Debug.LogWarning("? PauseMenu not found! Cannot toggle pause menu.");
         }
     }
 
@@ -312,24 +334,6 @@ public class UIManager : MonoBehaviour
     public bool IsSkillPanelVisible()
     {
         return skillPanelUI != null && skillPanelUI.IsVisible();
-    }
-
-    /// <summary>
-    /// Context menu ?? test component
-    /// </summary>
-    [ContextMenu("?? Test All UI Components")]
-    public void TestAllUIComponents()
-    {
-        Debug.Log("?? === TESTING ALL UI COMPONENTS ===");
-        ValidateUIComponents();
-        
-        if (skillPanelUI != null)
-            skillPanelUI.TestComponent();
-            
-        if (skillDetailUI != null)
-            skillDetailUI.TestComponent();
-            
-        Debug.Log("?? === UI TEST COMPLETE ===");
     }
 
     [ContextMenu("?? Refresh Auto-Find")]

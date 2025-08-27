@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 649bbf46d651c0a429673af8c2ef4bb4, type: 3}
+  m_Name: AdvancedBossTemplate
+  m_EditorClassIdentifier: 
+  templateName: "Boss Cao C\u1EA5p"
+  description: "Template cho raid boss v\u1EDBi h\u1EC7 th\u1ED1ng ph\u1EE9c t\u1EA1p
+    v\xE0 nhi\u1EC1u phases. T\u1ED1i \u01B0u cho boss c\xF3 nhi\u1EC1u k\u1EF9 n\u0103ng
+    v\xE0 tr\u1EA1ng th\xE1i \u0111\u1EB7c bi\u1EC7t."
+  idleClip: {fileID: 0}
+  walkClip: {fileID: 0}
+  attackClip: {fileID: 0}
+  hurtClip: {fileID: 0}
+  deathClip: {fileID: 0}
+  skill1Clip: {fileID: 0}
+  skill2Clip: {fileID: 0}
+  skill3Clip: {fileID: 0}
+  ultimateClip: {fileID: 0}
+  teleportClip: {fileID: 0}
+  berserkClip: {fileID: 0}
+  animatorType: 3
+  autoSetupTransitions: 1
+  createSubStateMachines: 1
+  defaultTransitionDuration: 0.2
+  autoAddAnimationEvents: 1
+  attackHitFrame: 0.7
+  footstepFrame: 0.25

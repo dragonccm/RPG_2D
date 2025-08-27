@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using RPGGame.AI;
 
 /// <summary>
 /// AI cho kẻ địch hỗ trợ. Kế thừa EnemyAIController, chỉ cần gắn script này lên prefab là đủ cho AI support.

@@ -398,20 +398,6 @@ public class ResourcesPrefabPopulator : MonoBehaviour
         return isInitialized;
     }
     
-    [ContextMenu("?? Test Population")]
-    public void TestPopulation()
-    {
-        if (currentSkill != null && parentPanel != null)
-        {
-            PopulateWithSkillData(currentSkill, parentPanel);
-            Debug.Log($"?? Test population complete for {currentSkill.skillName}");
-        }
-        else
-        {
-            Debug.LogWarning("?? Cannot test - missing skill or parent panel!");
-        }
-    }
-    
     [ContextMenu("?? Test Visual Refresh")]
     public void TestVisualRefresh()
     {

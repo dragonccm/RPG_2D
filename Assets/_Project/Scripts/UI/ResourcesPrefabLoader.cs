@@ -11,7 +11,7 @@ public class ResourcesPrefabLoader : MonoBehaviour
     [Header("Resources Settings")]
     [SerializeField] private string prefabName = "SkillItem";
     [SerializeField] private string resourcesPath = ""; // Empty = root Resources folder
-    [SerializeField] private bool debugMode = true;
+    [SerializeField] private bool debugMode = false;
     
     [Header("Auto-Population Settings")]
     [SerializeField] private bool autoAnalyzeStructure = true;
@@ -46,25 +46,17 @@ public class ResourcesPrefabLoader : MonoBehaviour
     {
         if (loadedPrefab != null)
         {
-            if (debugMode) Debug.Log($"? Using cached prefab: {loadedPrefab.name}");
             return loadedPrefab;
         }
         
         string fullPath = string.IsNullOrEmpty(resourcesPath) ? prefabName : $"{resourcesPath}/{prefabName}";
         
-        if (debugMode) Debug.Log($"?? Loading prefab from Resources: {fullPath}");
-        
         loadedPrefab = Resources.Load<GameObject>(fullPath);
         
         if (loadedPrefab == null)
         {
-            Debug.LogError($"? Failed to load prefab '{fullPath}' from Resources!");
-            Debug.LogError($"   ? Ensure prefab is in Resources/{resourcesPath} folder");
-            Debug.LogError($"   ? Check prefab name spelling: '{prefabName}'");
             return null;
         }
-        
-        if (debugMode) Debug.Log($"? Successfully loaded prefab: {loadedPrefab.name}");
         
         if (autoAnalyzeStructure)
         {
@@ -275,20 +267,6 @@ public class ResourcesPrefabLoader : MonoBehaviour
     public bool HasValidPrefab()
     {
         return loadedPrefab != null && structureAnalysis.hasValidStructure;
-    }
-    
-    [ContextMenu("?? Test Load Prefab")]
-    public void TestLoadPrefab()
-    {
-        GameObject prefab = LoadSkillItemPrefab();
-        if (prefab != null)
-        {
-            Debug.Log($"? Test successful: Loaded {prefab.name}");
-        }
-        else
-        {
-            Debug.LogError("? Test failed: Could not load prefab");
-        }
     }
     
     [ContextMenu("?? Force Reload Prefab")]

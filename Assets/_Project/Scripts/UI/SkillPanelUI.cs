@@ -4,8 +4,8 @@ using TMPro;
 using System.Collections.Generic;
 
 /// <summary>
-/// SkillPanelUI Component - Qu?n lý UI panel chính theo c?u trúc hierarchy
-/// ???c thi?t k? ?? g?n vào SkillPanelUI GameObject trong Canvas
+/// SkillPanelUI Component - Qu?n lï¿½ UI panel chï¿½nh theo c?u trï¿½c hierarchy
+/// ???c thi?t k? ?? g?n vï¿½o SkillPanelUI GameObject trong Canvas
 /// </summary>
 public class SkillPanelUI : MonoBehaviour
 {
@@ -57,7 +57,7 @@ public class SkillPanelUI : MonoBehaviour
             InitializeResourcesLoader();
         }
 
-        // Tìm SkillDetailUI n?u ch?a ???c gán
+        // Tï¿½m SkillDetailUI n?u ch?a ???c gï¿½n
         if (skillDetailUI == null)
         {
             skillDetailUI = FindFirstObjectByType<SkillDetailUI>();
@@ -74,7 +74,7 @@ public class SkillPanelUI : MonoBehaviour
 
     void Update()
     {
-        // ?óng b?ng Escape (Tab ?ã ???c handle trong PlayerController)
+        // ?ï¿½ng b?ng Escape (Tab ?ï¿½ ???c handle trong PlayerController)
         if (gameObject.activeInHierarchy && Input.GetKeyDown(KeyCode.Escape))
         {
             ClosePanel();
@@ -88,7 +88,7 @@ public class SkillPanelUI : MonoBehaviour
     }
 
     /// <summary>
-    /// T? ??ng tìm và gán các UI components theo hierarchy structure
+    /// T? ??ng tï¿½m vï¿½ gï¿½n cï¿½c UI components theo hierarchy structure
     /// </summary>
     private void AutoFindUIComponents()
     {
@@ -173,7 +173,7 @@ public class SkillPanelUI : MonoBehaviour
     }
 
     /// <summary>
-    /// Setup các UI elements ban ??u
+    /// Setup cï¿½c UI elements ban ??u
     /// </summary>
     private void SetupUIElements()
     {
@@ -284,7 +284,7 @@ public class SkillPanelUI : MonoBehaviour
     }
 
     /// <summary>
-    /// T?o basic skill item n?u không có prefab
+    /// T?o basic skill item n?u khï¿½ng cï¿½ prefab
     /// </summary>
     private GameObject CreateBasicSkillItem(SkillModule skill)
     {
@@ -316,7 +316,7 @@ public class SkillPanelUI : MonoBehaviour
         // Add Button for interaction - IMPORTANT: This must be clickable
         Button button = itemObj.AddComponent<Button>();
         
-        // ??M B?O button có th? click ???c
+        // ??M B?O button cï¿½ th? click ???c
         button.interactable = true;
         button.targetGraphic = background; // Set target graphic ?? button ho?t ??ng
         
@@ -349,7 +349,7 @@ public class SkillPanelUI : MonoBehaviour
         // Create description text
         CreateDescriptionText(skill, itemObj.transform);
 
-        Debug.Log($"?ã Created properly sized skill item for {skill.skillName} - Size: {rect.sizeDelta}");
+        Debug.Log($"?ï¿½ Created properly sized skill item for {skill.skillName} - Size: {rect.sizeDelta}");
         return itemObj;
     }
 
@@ -405,7 +405,7 @@ public class SkillPanelUI : MonoBehaviour
         nameText.color = Color.white;
         nameText.fontStyle = FontStyles.Bold;
         nameText.alignment = TextAlignmentOptions.Left;
-        nameText.raycastTarget = false; // Tránh ch?n click events
+        nameText.raycastTarget = false; // Trï¿½nh ch?n click events
         nameText.overflowMode = TextOverflowModes.Ellipsis;
     }
 
@@ -428,7 +428,7 @@ public class SkillPanelUI : MonoBehaviour
         levelText.fontSize = 14;
         levelText.color = Color.yellow;
         levelText.alignment = TextAlignmentOptions.Center;
-        levelText.raycastTarget = false; // Tránh ch?n click events
+        levelText.raycastTarget = false; // Trï¿½nh ch?n click events
     }
 
     /// <summary>
@@ -449,7 +449,7 @@ public class SkillPanelUI : MonoBehaviour
         descText.fontSize = 12;
         descText.color = new Color(0.8f, 0.8f, 0.8f);
         descText.alignment = TextAlignmentOptions.Left;
-        descText.raycastTarget = false; // Tránh ch?n click events
+        descText.raycastTarget = false; // Trï¿½nh ch?n click events
         descText.overflowMode = TextOverflowModes.Ellipsis;
         
         // Hide description if too long or in compact mode
@@ -508,15 +508,15 @@ public class SkillPanelUI : MonoBehaviour
     }
 
     /// <summary>
-    /// X? lý khi skill item ???c click
+    /// X? lï¿½ khi skill item ???c click
     /// </summary>
     public void OnSkillItemClicked(SkillModule skill)
     {
-        Debug.Log($"?ã OnSkillItemClicked called for: {(skill != null ? skill.skillName : "NULL")}");
+        Debug.Log($"?ï¿½ OnSkillItemClicked called for: {(skill != null ? skill.skillName : "NULL")}");
         
         if (skill == null)
         {
-            Debug.LogWarning("Không th? show detail cho null skill");
+            Debug.LogWarning("Khï¿½ng th? show detail cho null skill");
             return;
         }
 
@@ -524,7 +524,7 @@ public class SkillPanelUI : MonoBehaviour
         if (skillDetailUI == null)
         {
             skillDetailUI = FindFirstObjectByType<SkillDetailUI>();
-            Debug.Log($"?ã Auto-found SkillDetailUI: {skillDetailUI != null}");
+            Debug.Log($"?ï¿½ Auto-found SkillDetailUI: {skillDetailUI != null}");
         }
 
         if (skillDetailUI != null)
@@ -592,13 +592,13 @@ public class SkillPanelUI : MonoBehaviour
     }
 
     /// <summary>
-    /// ?óng panel
+    /// ?ï¿½ng panel
     /// </summary>
     public void ClosePanel()
     {
         gameObject.SetActive(false);
         
-        // ?óng detail panel n?u ?ang m?
+        // ?ï¿½ng detail panel n?u ?ang m?
         if (skillDetailUI != null && skillDetailUI.IsVisible())
         {
             skillDetailUI.ClosePanel();
@@ -622,24 +622,6 @@ public class SkillPanelUI : MonoBehaviour
     public bool IsVisible() => gameObject.activeInHierarchy;
     public ModularSkillManager GetSkillManager() => skillManager;
 
-    /// <summary>
-    /// Context menu ?? test component
-    /// </summary>
-    [ContextMenu("Test Component")]
-    public void TestComponent()
-    {
-        Debug.Log("=== TESTING SKILLPANELUI COMPONENT ===");
-        Debug.Log($"Header: {(header != null ? "Có" : "Không")}");
-        Debug.Log($"InstructionText: {(instructionText != null ? "Có" : "Không")}");
-        Debug.Log($"SkillScrollView: {(skillScrollView != null ? "Có" : "Không")}");
-        Debug.Log($"SkillListContent: {(skillListContent != null ? "Có" : "Không")}");
-        Debug.Log($"CloseButton: {(closeButton != null ? "Có" : "Không")}");
-        Debug.Log($"SkillDetailUI: {(skillDetailUI != null ? "Có" : "Không")}");
-        Debug.Log($"SkillManager: {(skillManager != null ? "Có" : "Không")}");
-        Debug.Log($"Skill Items Count: {skillItems.Count}");
-        Debug.Log("=== TEST COMPLETE ===");
-    }
-
     [ContextMenu("Refresh Auto-Find")]
     public void RefreshAutoFind()
     {
@@ -652,53 +634,6 @@ public class SkillPanelUI : MonoBehaviour
     {
         CreateSkillItems();
         Debug.Log("Skill items recreated");
-    }
-
-    [ContextMenu("?ã Test Prefab Population")]
-    public void TestPrefabPopulation()
-    {
-        Debug.Log("=== TESTING PREFAB POPULATION ===");
-        
-        if (skillItemPrefab == null)
-        {
-            Debug.LogWarning("?ã No skill item prefab assigned!");
-            return;
-        }
-        
-        if (skillManager == null)
-        {
-            Debug.LogWarning("?ã No ModularSkillManager found!");
-            return;
-        }
-        
-        var availableSkills = skillManager.GetAvailableSkills();
-        Debug.Log($"?ã Available skills: {availableSkills.Count}");
-        
-        if (availableSkills.Count > 0)
-        {
-            var testSkill = availableSkills[0];
-            Debug.Log($"?ã Testing with skill: {testSkill.skillName}");
-            
-            // Create test item
-            GameObject testItem = Instantiate(skillItemPrefab, skillListContent);
-            
-            // Add handler
-            SkillItemPrefabHandler handler = testItem.GetComponent<SkillItemPrefabHandler>();
-            if (handler == null)
-            {
-                handler = testItem.AddComponent<SkillItemPrefabHandler>();
-            }
-            
-            // Initialize
-            handler.Initialize(testSkill, this);
-            
-            Debug.Log("?ã Test item created and populated!");
-            
-            // Clean up after 5 seconds
-            Destroy(testItem, 5f);
-        }
-        
-        Debug.Log("=== TEST COMPLETE ===");
     }
 
     /// <summary>
@@ -744,57 +679,6 @@ public class SkillPanelUI : MonoBehaviour
         }
     }
 
-    [ContextMenu("?? Test Resources Loader")]
-    public void TestResourcesLoader()
-    {
-        Debug.Log("=== TESTING RESOURCES LOADER ===");
-        
-        if (!useResourcesLoader)
-        {
-            Debug.LogWarning("?? Resources loader is disabled!");
-            Debug.LogWarning("   ? Enable 'useResourcesLoader' in SkillPanelUI");
-            return;
-        }
-        
-        InitializeResourcesLoader();
-        
-        if (resourcesLoader != null)
-        {
-            resourcesLoader.TestLoadPrefab();
-            
-            if (resourcesLoader.HasValidPrefab())
-            {
-                Debug.Log("? Resources loader test: SUCCESS");
-                
-                // Test creating a skill item if skills available
-                if (skillManager != null)
-                {
-                    var skills = skillManager.GetAvailableSkills();
-                    if (skills.Count > 0)
-                    {
-                        var testSkill = skills[0];
-                        Debug.Log($"?? Testing skill item creation with: {testSkill.skillName}");
-                        
-                        GameObject testItem = resourcesLoader.CreatePopulatedSkillItem(testSkill, skillListContent, this);
-                        if (testItem != null)
-                        {
-                            Debug.Log("? Test skill item created successfully!");
-                            
-                            // Clean up after 5 seconds
-                            Destroy(testItem, 5f);
-                        }
-                    }
-                }
-            }
-            else
-            {
-                Debug.LogError("? Resources loader test: FAILED");
-            }
-        }
-        
-        Debug.Log("=== TEST COMPLETE ===");
-    }
-    
     [ContextMenu("?? Force Resources Reload")]
     public void ForceResourcesReload()
     {
@@ -807,26 +691,6 @@ public class SkillPanelUI : MonoBehaviour
         {
             Debug.LogWarning("?? No resources loader available");
         }
-    }
-    
-    [ContextMenu("?? Debug Resources System")]
-    public void DebugResourcesSystem()
-    {
-        Debug.Log("=== RESOURCES SYSTEM DEBUG ===");
-        Debug.Log($"Use Resources Loader: {useResourcesLoader}");
-        Debug.Log($"Resources Prefab Name: {resourcesPrefabName}");
-        Debug.Log($"Resources Loader Component: {(resourcesLoader != null ? "?" : "?")}");
-        Debug.Log($"Manual Prefab Assignment: {(skillItemPrefab != null ? "?" : "?")}");
-        
-        if (resourcesLoader != null)
-        {
-            Debug.Log($"Has Valid Prefab: {resourcesLoader.HasValidPrefab()}");
-            var analysis = resourcesLoader.GetStructureAnalysis();
-            Debug.Log($"Structure Analysis Valid: {analysis.hasValidStructure}");
-        }
-        
-        Debug.Log($"Total Skill Items: {skillItems.Count}");
-        Debug.Log("=== END DEBUG ===");
     }
 }
 

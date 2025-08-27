@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 649bbf46d651c0a429673af8c2ef4bb4, type: 3}
+  m_Name: BossTemplate
+  m_EditorClassIdentifier: 
+  templateName: Boss
+  description: "Template cho boss v\u1EDBi skills \u0111\u1EB7c bi\u1EC7t v\xE0 nhi\u1EC1u
+    phases. Bao g\u1ED3m sub-state machines \u0111\u1EC3 t\u1ED5 ch\u1EE9c c\xE1c
+    animation states ph\u1EE9c t\u1EA1p."
+  idleClip: {fileID: 0}
+  walkClip: {fileID: 0}
+  attackClip: {fileID: 0}
+  hurtClip: {fileID: 0}
+  deathClip: {fileID: 0}
+  skill1Clip: {fileID: 0}
+  skill2Clip: {fileID: 0}
+  skill3Clip: {fileID: 0}
+  ultimateClip: {fileID: 0}
+  teleportClip: {fileID: 0}
+  berserkClip: {fileID: 0}
+  animatorType: 2
+  autoSetupTransitions: 1
+  createSubStateMachines: 1
+  defaultTransitionDuration: 0.15
+  autoAddAnimationEvents: 1
+  attackHitFrame: 0.65
+  footstepFrame: 0.3

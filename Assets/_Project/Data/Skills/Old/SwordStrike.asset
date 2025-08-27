@@ -22,7 +22,7 @@ MonoBehaviour:
   cooldown: 0.1
   manaCost: 10
   stunDuration: 0
-  knockbackForce: 8
+  knockbackForce: 1
   healAmount: 0
   areaRadius: 0
   chargeTime: 0
@@ -31,10 +31,22 @@ MonoBehaviour:
   impactSound: {fileID: 0}
   effectPrefab: {fileID: 0}
   projectilePrefab: {fileID: 0}
+  customEffectLifetime: 0
+  effectPositionOffset: {x: 0, y: 0, z: 0}
+  enableEnhancedEffects: 1
   animationTrigger: Attack
   animationLength: 1
   skillType: 0
   damageZonePrefab: {fileID: 0}
+  use4DirectionalAttack: 0
+  damageAreaShape: 1
+  directionalAttackSize: {x: 2, y: 1}
+  attackWidth: 1
+  attackAngle: 30
+  attackLungeForce: 0
+  damageDelay: 0.2
+  allowCombatMovement: 0
+  combatMovementSpeed: 0.3
   criticalChance: 0.15
   criticalMultiplier: 2
   upgrades: []

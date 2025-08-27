@@ -104,6 +104,17 @@ public class EnemyMovementController : MonoBehaviour
     }
 
     /// <summary>
+    /// Resume di chuyển sau khi pause.
+    /// </summary>
+    public void Resume()
+    {
+        if (agent != null && agent.isOnNavMesh)
+        {
+            agent.isStopped = false;
+        }
+    }
+
+    /// <summary>
     /// Đặt tốc độ di chuyển mới.
     /// </summary>
     public void SetSpeed(float newSpeed)

@@ -2,8 +2,8 @@ using UnityEngine;
 using System.Collections;
 
 /// <summary>
-/// Enhanced Effect Manager - Qu?n lý vi?c t?o, ??nh v? và h?y effect prefabs
-/// ??m b?o effect xu?t hi?n ?úng v? trí va ch?m và ???c h?y sau khi animation hoàn t?t
+/// Enhanced Effect Manager - Qu?n lï¿½ vi?c t?o, ??nh v? vï¿½ h?y effect prefabs
+/// ??m b?o effect xu?t hi?n ?ï¿½ng v? trï¿½ va ch?m vï¿½ ???c h?y sau khi animation hoï¿½n t?t
 /// </summary>
 public class EnhancedEffectManager : MonoBehaviour
 {
@@ -17,7 +17,7 @@ public class EnhancedEffectManager : MonoBehaviour
     [SerializeField] private bool adjustForCollisionPoint = true;
     
     /// <summary>
-    /// T?o effect t?i v? trí va ch?m chính xác v?i auto-destroy
+    /// T?o effect t?i v? trï¿½ va ch?m chï¿½nh xï¿½c v?i auto-destroy
     /// </summary>
     public static GameObject CreateEffectAtPosition(GameObject effectPrefab, Vector3 position, 
         Quaternion rotation = default, Transform parent = null, float? customLifetime = null)
@@ -28,7 +28,7 @@ public class EnhancedEffectManager : MonoBehaviour
             return null;
         }
         
-        // Instantiate effect t?i v? trí chính xác
+        // Instantiate effect t?i v? trï¿½ chï¿½nh xï¿½c
         GameObject effectInstance = Instantiate(effectPrefab, position, rotation, parent);
         effectInstance.name = $"{effectPrefab.name}_Effect_{Time.time:F2}";
         
@@ -45,7 +45,7 @@ public class EnhancedEffectManager : MonoBehaviour
     }
     
     /// <summary>
-    /// T?o effect t?i v? trí va ch?m v?i m?c tiêu c? th?
+    /// T?o effect t?i v? trï¿½ va ch?m v?i m?c tiï¿½u c? th?
     /// </summary>
     public static GameObject CreateImpactEffect(GameObject effectPrefab, Vector3 impactPosition, 
         Vector3 impactDirection, GameObject target = null, float? customLifetime = null)
@@ -154,7 +154,7 @@ public class EnhancedEffectManager : MonoBehaviour
 }
 
 /// <summary>
-/// Component t? ??ng h?y effect sau khi animation hoàn t?t
+/// Component t? ??ng h?y effect sau khi animation hoï¿½n t?t
 /// </summary>
 public class EffectAutoDestroy : MonoBehaviour
 {
@@ -263,20 +263,20 @@ public class ImpactEffectEnhancer : MonoBehaviour
             }
         }
         
-        // Apply screen shake for strong impacts
+        // Apply hit stop for strong impacts
         if (impactDirection.magnitude > 0.8f)
         {
             var effectsManager = FindFirstObjectByType<CombatEffectsManager>();
             if (effectsManager != null)
             {
-                effectsManager.ScreenShake(0.1f, 0.2f);
+                effectsManager.HitStop(0.1f);
             }
         }
     }
 }
 
 /// <summary>
-/// Component làm effect follow target (cho continuous effects)
+/// Component lï¿½m effect follow target (cho continuous effects)
 /// </summary>
 public class EffectFollowTarget : MonoBehaviour
 {
