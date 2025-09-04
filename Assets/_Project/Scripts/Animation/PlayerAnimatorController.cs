@@ -26,6 +26,9 @@ namespace RPG.Animation
         {
             base.Awake();
             playerController = GetComponent<PlayerController>();
+
+            // Validate animator parameters on startup
+            ValidateAnimatorParameters();
         }
 
         void Update()
@@ -95,7 +98,18 @@ namespace RPG.Animation
         /// </summary>
         public void TriggerAttack(AttackDirection direction)
         {
-            if (!ValidateAnimator()) return;
+            if (!ValidateAnimator())
+            {
+                Debug.LogError($"[{gameObject.name}] Cannot trigger attack - animator not valid");
+                return;
+            }
+
+            // Validate required parameters exist
+            if (!HasParameter(attackUpHash) || !HasParameter(attackDownHash) || !HasParameter(attackLeftHash))
+            {
+                Debug.LogError($"[{gameObject.name}] Missing attack animation parameters in Animator Controller");
+                return;
+            }
 
             // 3-Animation System: Up, Down, Horizontal (Left/Right shared with flip)
             int triggerHash = direction switch
@@ -106,14 +120,47 @@ namespace RPG.Animation
                 AttackDirection.Right => attackLeftHash, // Use Left animation + flip
                 _ => attackDownHash
             };
-            
+
             // Handle sprite flipping for Left/Right attacks
             HandleSpriteFlipping(direction);
-            
+
             SetTriggerOptimized(triggerHash);
-            
+
             if (enableDebugLogging)
                 Debug.Log($"🎯 Attack triggered: {direction} (Animation: {GetAnimationName(direction)})");
+        }
+        
+        /// <summary>
+        /// Validate that all required animator parameters exist
+        /// </summary>
+        private void ValidateAnimatorParameters()
+        {
+            if (animator == null || animator.runtimeAnimatorController == null)
+            {
+                Debug.LogError($"[{gameObject.name}] Animator or AnimatorController is null!");
+                return;
+            }
+
+            string[] requiredParameters = { "IsMoving", "Speed", "FacingDirection", "AttackUp", "AttackDown", "AttackLeft", "Hurt", "Die" };
+            bool allParametersValid = true;
+
+            foreach (string paramName in requiredParameters)
+            {
+                if (!HasParameter(paramName))
+                {
+                    Debug.LogError($"[{gameObject.name}] Missing animator parameter: {paramName}");
+                    allParametersValid = false;
+                }
+            }
+
+            if (allParametersValid)
+            {
+                Debug.Log($"[{gameObject.name}] All animator parameters validated successfully");
+            }
+            else
+            {
+                Debug.LogError($"[{gameObject.name}] Some animator parameters are missing! Please check your Animator Controller.");
+            }
         }
         
         /// <summary>
@@ -135,7 +182,7 @@ namespace RPG.Animation
                     case AttackDirection.Right:
                         spriteRenderer.flipX = false;
                         break;
-                    // Up/Down không flip
+                    // Up/Down don't flip
                 }
             }
         }
@@ -192,19 +239,33 @@ namespace RPG.Animation
         }
 
         /// <summary>
-        /// Animation Event receiver for when an action (like an attack) is complete.
-        /// This is used to make the player available for new actions.
+        /// Test method to verify animation system is working
+        /// Call this from PlayerController for debugging
         /// </summary>
-        public void OnActionComplete()
+        public void TestAnimationSystem()
         {
-            if (playerController != null)
+            Debug.Log($"[{gameObject.name}] Testing animation system...");
+
+            if (!ValidateAnimator())
             {
-                playerController.EndAction(); // EndAction is already available in PlayerController
+                Debug.LogError($"[{gameObject.name}] Animator validation failed!");
+                return;
             }
-            if (enableDebugLogging)
-            {
-                Debug.Log("OnActionComplete event triggered.");
-            }
+
+            // Test basic parameters
+            SetBoolOptimized(isMovingHash, true);
+            SetFloatOptimized(speedHash, 1f);
+            SetFloatOptimized(facingDirectionHash, 0f);
+
+            Debug.Log($"[{gameObject.name}] Basic parameters set successfully");
+
+            // Test attack triggers
+            SetTriggerOptimized(attackDownHash);
+            Debug.Log($"[{gameObject.name}] Attack trigger test completed");
+
+            // Reset parameters
+            SetBoolOptimized(isMovingHash, false);
+            SetFloatOptimized(speedHash, 0f);
         }
     }
 }

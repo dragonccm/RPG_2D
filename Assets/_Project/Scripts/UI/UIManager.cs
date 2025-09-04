@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using TMPro;
+using UI;
 using Core;
 
 /// <summary>
@@ -22,7 +24,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private PlayerUI playerUI;
     [SerializeField] private NearbyHealthDisplay nearbyHealthDisplay;
     [SerializeField] private TargetingSystem targetingSystem;
-    [SerializeField] private PauseMenu pauseMenu;
+    [SerializeField] private UI.PauseMenu pauseMenu;
 
     [Header("UI Settings")]
     [SerializeField] private bool showPlayerUI = true;
@@ -123,7 +125,7 @@ public class UIManager : MonoBehaviour
             targetingSystem = FindFirstObjectByType<TargetingSystem>();
 
         if (pauseMenu == null)
-            pauseMenu = FindFirstObjectByType<PauseMenu>();
+            pauseMenu = FindFirstObjectByType<UI.PauseMenu>();
 
         Debug.Log("? Auto-find complete for UIManager");
     }

@@ -2,6 +2,8 @@ using System;
 using UnityEngine;
 using RPG.Animation;
 using RPG.Effects;
+using Core;
+using UI;
 
 /// <summary>
 /// Enum for 4-way attack direction.
@@ -97,18 +99,18 @@ public class PlayerController : MonoBehaviour
 
     private void TriggerDirectionalAttackAnimation(AttackDirection direction)
     {
-        if (playerAnimatorController == null) 
+        if (playerAnimatorController == null)
         {
-            Debug.LogError($"❌ [{gameObject.name}] PlayerAnimatorController is null! Attack animation cannot be triggered.");
+            PerformanceUtils.LogError(PerformanceUtils.FormatString("❌ [{0}] PlayerAnimatorController is null! Attack animation cannot be triggered.", gameObject.name));
             return;
         }
-        
-        Debug.Log($"🎯 [{gameObject.name}] Triggering directional attack: {direction}");
+
+        PerformanceUtils.Log(PerformanceUtils.FormatString("🎯 [{0}] Triggering directional attack: {1}", gameObject.name, direction));
         playerAnimatorController.TriggerAttack(direction);
-        
+
         if (showAttackDirectionDebug)
         {
-            Debug.Log($"🎯 Attack Direction: {direction}");
+            PerformanceUtils.Log(PerformanceUtils.FormatString("🎯 Attack Direction: {0}", direction));
         }
     }
 
@@ -133,26 +135,26 @@ public class PlayerController : MonoBehaviour
             
             if (shouldUse4Directional)
             {
-                Debug.Log($"🎯 [{gameObject.name}] Using 4-directional attack system, direction: {currentFacingDirection}");
+                PerformanceUtils.Log(PerformanceUtils.FormatString("🎯 [{0}] Using 4-directional attack system, direction: {1}", gameObject.name, currentFacingDirection));
                 TriggerDirectionalAttackAnimation(currentFacingDirection);
             }
             else
             {
                 string trigger = !string.IsNullOrEmpty(animationTrigger) ? animationTrigger : "Attack";
-                Debug.Log($"🗡️ [{gameObject.name}] Using basic attack system, trigger: {trigger}");
+                PerformanceUtils.Log(PerformanceUtils.FormatString("🗡️ [{0}] Using basic attack system, trigger: {1}", gameObject.name, trigger));
                 animator.SetTrigger(trigger);
             }
-            
+
             string logMessage = string.IsNullOrEmpty(skillName) ?
-                $"🗡️ Triggered animation for skill" :
-                $"🗡️ Triggered animation for {skillName}";
-                
+                "🗡️ Triggered animation for skill" :
+                PerformanceUtils.FormatString("🗡️ Triggered animation for {0}", skillName);
+
             if (shouldUse4Directional)
             {
-                logMessage += $" (Direction: {currentFacingDirection})";
+                logMessage += PerformanceUtils.FormatString(" (Direction: {0})", currentFacingDirection);
             }
-            
-            Debug.Log(logMessage);
+
+            PerformanceUtils.Log(logMessage);
 
             // FALLBACK: Auto-reset busy state if OnActionComplete event doesn't fire
             StartCoroutine(ResetBusyAfterDelay(1.5f));
@@ -172,15 +174,15 @@ public class PlayerController : MonoBehaviour
         {
             AttackDirection attackDir = GetDirectionFromVector(targetDirection);
             TriggerDirectionalAttackAnimation(attackDir);
-            
-            Debug.Log($"🗡️ Skill {skill.skillName} triggered with direction: {attackDir}");
+
+            PerformanceUtils.Log(PerformanceUtils.FormatString("🗡️ Skill {0} triggered with direction: {1}", skill.skillName, attackDir));
         }
         else
         {
             string trigger = !string.IsNullOrEmpty(skill?.animationTrigger) ? skill.animationTrigger : "Attack";
             animator.SetTrigger(trigger);
-            
-            Debug.Log($"🗡️ Skill {skill?.skillName} triggered with animation: {trigger}");
+
+            PerformanceUtils.Log(PerformanceUtils.FormatString("🗡️ Skill {0} triggered with animation: {1}", skill?.skillName ?? "Unknown", trigger));
         }
         
         // StartCoroutine(ResetBusyAfterDelay(1f)); // This is now handled by OnActionComplete event
@@ -211,26 +213,27 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     private void TriggerAttackAnimation()
     {
-        if (animator != null)
-        {
-            isBusy = true;
-            ForceStopMovement(); // Stop movement immediately when attacking
-            
-            if (use4DirectionalAttacks)
-            {
-                TriggerDirectionalAttackAnimation(currentFacingDirection);
-            }
-            else
-            {
-                animator.SetTrigger(AnimationParameters.Attack);
-            }
-            
-            string directionText = use4DirectionalAttacks ? $" ({currentFacingDirection})" : "";
-            Debug.Log($"🗡️ Triggered Attack animation{directionText}");
+        if (animator == null || isBusy) return;
 
-            // FALLBACK: Auto-reset busy state if OnActionComplete event doesn't fire
-            StartCoroutine(ResetBusyAfterDelay(1.2f));
+        isBusy = true;
+        ForceStopMovement(); // Stop movement immediately when attacking
+
+        // Use 4-directional attack system if enabled
+        if (use4DirectionalAttacks && playerAnimatorController != null)
+        {
+            TriggerDirectionalAttackAnimation(currentFacingDirection);
         }
+        else
+        {
+            // Use basic attack animation
+            animator.SetTrigger(AnimationParameters.Attack);
+        }
+
+        string directionText = use4DirectionalAttacks ? PerformanceUtils.FormatString(" ({0})", currentFacingDirection) : "";
+        PerformanceUtils.Log(PerformanceUtils.FormatString("🗡️ Triggered Attack animation{0}", directionText));
+
+        // More reliable busy state reset with shorter delay
+        StartCoroutine(ResetBusyAfterDelay(0.8f));
     }
 
     /// <summary>
@@ -244,11 +247,11 @@ public class PlayerController : MonoBehaviour
         if (isBusy)
         {
             isBusy = false;
-            Debug.Log("⚠️ Fallback: Player is no longer busy (animation event didn't fire)");
+            PerformanceUtils.Log("⚠️ Fallback: Player is no longer busy (animation event didn't fire)");
         }
         else
         {
-            Debug.Log("ℹ️ Animation event already reset busy state - fallback not needed");
+            PerformanceUtils.Log("ℹ️ Animation event already reset busy state - fallback not needed");
         }
     }
 
@@ -278,56 +281,45 @@ public class PlayerController : MonoBehaviour
         // Handle Tab key for Skill Panel
         if (Input.GetKeyDown(KeyCode.Tab))
         {
-            var uiManager = FindFirstObjectByType<UIManager>();
+            var uiManager = ServiceLocator.Get<UIManager>();
             if (uiManager != null)
             {
                 uiManager.ToggleSkillPanel();
-                
-                // Pause game when opening skill panel
                 HandlePauseOnMenuOpen();
                 return;
             }
 
-            var skillPanelUI = FindFirstObjectByType<SkillPanelUI>();
+            var skillPanelUI = ServiceLocator.Get<SkillPanelUI>();
             if (skillPanelUI != null)
             {
                 skillPanelUI.TogglePanel();
-                
-                // Pause game when opening skill panel
                 HandlePauseOnMenuOpen();
                 return;
             }
 
-            Debug.LogWarning("❌ No UI system found!");
+            PerformanceUtils.LogWarning("❌ No UI system found!");
         }
         
         // Handle Escape key for Pause Menu
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            var uiManager = FindFirstObjectByType<UIManager>();
+            Debug.Log("🎮 Escape key detected in PlayerController");
+            var uiManager = ServiceLocator.Get<UIManager>();
             if (uiManager != null)
             {
                 uiManager.TogglePauseMenu();
                 return;
             }
-            
+
             // Fallback: Look for PauseMenu directly
-            var pauseMenu = FindFirstObjectByType<PauseMenu>();
-            if (pauseMenu != null)
-            {
-                pauseMenu.TogglePause();
-                return;
-            }
-            
-            // Try UI.PauseMenu namespace
-            var pauseMenuUI = FindFirstObjectByType<UI.PauseMenu>();
+            var pauseMenuUI = ServiceLocator.Get<UI.PauseMenu>();
             if (pauseMenuUI != null)
             {
                 pauseMenuUI.TogglePause();
                 return;
             }
-            
-            Debug.LogWarning("❌ No Pause Menu found!");
+
+            PerformanceUtils.LogWarning("❌ No Pause Menu found!");
         }
     }
     
@@ -339,47 +331,38 @@ public class PlayerController : MonoBehaviour
         // Check if any menu is currently open
         bool isAnyMenuOpen = false;
         
-        var uiManager = FindFirstObjectByType<UIManager>();
+        var uiManager = ServiceLocator.Get<UIManager>();
         if (uiManager != null)
         {
-            var skillPanel = FindFirstObjectByType<SkillPanelUI>();
+            var skillPanel = ServiceLocator.Get<SkillPanelUI>();
             if (skillPanel != null && skillPanel.IsVisible())
             {
                 isAnyMenuOpen = true;
             }
         }
         
-        // Get pause menu reference
-        var pauseMenu = FindFirstObjectByType<PauseMenu>();
+        var pauseMenu = ServiceLocator.Get<UI.PauseMenu>();
         if (pauseMenu == null)
         {
-            var uiPauseMenu = FindFirstObjectByType<UI.PauseMenu>();
-            if (uiPauseMenu != null)
-            {
-                // Handle different PauseMenu types
-            var pauseMenuComponent = uiPauseMenu.GetComponent<PauseMenu>();
-            if (pauseMenuComponent != null)
-            {
-                pauseMenu = pauseMenuComponent;
-            }
-            }
+            // Try to find UI.PauseMenu directly in scene
+            pauseMenu = FindFirstObjectByType<UI.PauseMenu>();
         }
-        
+
         if (pauseMenu != null)
         {
             if (isAnyMenuOpen && !isPausedByMenu)
             {
                 // Pause game when menu opens
-                pauseMenu.Pause();
+                pauseMenu.PauseGame();
                 isPausedByMenu = true;
-                Debug.Log("🎮 Game paused due to menu opening");
+                PerformanceUtils.Log("🎮 Game paused due to menu opening");
             }
             else if (!isAnyMenuOpen && isPausedByMenu)
             {
                 // Resume game when menu closes (only if it was paused by menu)
-                pauseMenu.Resume();
+                pauseMenu.ResumeGame();
                 isPausedByMenu = false;
-                Debug.Log("🎮 Game resumed - menu closed");
+                PerformanceUtils.Log("🎮 Game resumed - menu closed");
             }
         }
     }
@@ -391,12 +374,13 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.V))
         {
+            var skillManager = ServiceLocator.Get<ModularSkillManager>();
             if (skillManager != null)
             {
                 int currentLevel = skillManager.GetPlayerLevel();
                 int newLevel = currentLevel + 10;
                 skillManager.SetPlayerLevel(newLevel);
-                Debug.Log($"🎉 Level Up! {currentLevel} → {newLevel}");
+                PerformanceUtils.Log(PerformanceUtils.FormatString("🎉 Level Up! {0} → {1}", currentLevel, newLevel));
             }
         }
     }
@@ -466,24 +450,10 @@ public class PlayerController : MonoBehaviour
         isPausedByMenu = false;
         
         // Ensure game is not paused on start
-        var pauseMenu = FindFirstObjectByType<PauseMenu>();
-        if (pauseMenu == null)
-        {
-            var uiPauseMenu = FindFirstObjectByType<UI.PauseMenu>();
-            if (uiPauseMenu != null)
-            {
-                // Handle different PauseMenu types
-                var pauseMenuComponent = uiPauseMenu.GetComponent<PauseMenu>();
-                if (pauseMenuComponent != null)
-                {
-                    pauseMenu = pauseMenuComponent;
-                }
-            }
-        }
-        
+        var pauseMenu = FindFirstObjectByType<UI.PauseMenu>();
         if (pauseMenu != null && pauseMenu.IsPaused)
         {
-            pauseMenu.Resume();
+            pauseMenu.ResumeGame();
             Debug.Log("🎮 Game resumed on start");
         }
     }
@@ -787,11 +757,12 @@ public class PlayerController : MonoBehaviour
         float horizontal = Input.GetAxis("Horizontal");
         float vertical = Input.GetAxis("Vertical");
         Vector2 inputMovement = new Vector2(horizontal, vertical);
-        
-        // Prevent movement during attacks
+
+        // Smooth transition when stopping movement during attacks
         if (isBusy)
         {
-            movement = Vector2.zero;
+            // Gradually reduce movement instead of sudden stop
+            movement = Vector2.Lerp(movement, Vector2.zero, Time.deltaTime * 10f);
         }
         else
         {
@@ -803,7 +774,7 @@ public class PlayerController : MonoBehaviour
         {
             TriggerAttackAnimation();
         }
-        
+
         // Handle direct attack test (K key)
         if (Input.GetKeyDown(KeyCode.K) && !isBusy)
         {
@@ -829,31 +800,71 @@ public class PlayerController : MonoBehaviour
         if (isMoving != wasMovingLastFrame)
         {
             wasMovingLastFrame = isMoving;
-            if (isMoving)
-            {
-                Debug.Log("🚶 Player started moving");
-            }
-            else
-            {
-                Debug.Log("⏸️ Player stopped moving");
-            }
+            // Removed debug logs for performance - can be re-enabled if needed for debugging
         }
     }
 
     /// <summary>
-    /// Apply movement to Rigidbody2D - Responsive and snappy movement
+    /// Apply movement to Rigidbody2D - Smooth and responsive movement
     /// </summary>
     private void ApplyMovement()
     {
         if (rb == null) return;
 
-        // Calculate target velocity - immediate response for snappy movement
+        // Calculate target velocity
         Vector2 targetVelocity = movement * moveSpeed;
-        
-        // Apply immediate movement without smoothing for responsiveness
-        rb.linearVelocity = targetVelocity;
-        
+
+        // Smooth velocity transition to prevent jerky movements
+        rb.linearVelocity = Vector2.Lerp(rb.linearVelocity, targetVelocity, Time.fixedDeltaTime * 15f);
+
         // Update current velocity for other systems
-        currentVelocity = targetVelocity;
+        currentVelocity = rb.linearVelocity;
+    }
+
+    /// <summary>
+    /// Debug method to test animation system
+    /// Call this from Unity Editor or add a key binding
+    /// </summary>
+    [ContextMenu("Test Animation System")]
+    private void TestAnimationSystem()
+    {
+        if (playerAnimatorController != null)
+        {
+            playerAnimatorController.TestAnimationSystem();
+        }
+        else
+        {
+            Debug.LogError("PlayerAnimatorController is null!");
+        }
+    }
+
+    /// <summary>
+    /// Debug method to test all attack directions
+    /// </summary>
+    [ContextMenu("Test All Attack Directions")]
+    private void TestAllAttackDirections()
+    {
+        if (playerAnimatorController == null)
+        {
+            Debug.LogError("PlayerAnimatorController is null!");
+            return;
+        }
+
+        Debug.Log("Testing all attack directions...");
+        StartCoroutine(TestAttacksCoroutine());
+    }
+
+    private System.Collections.IEnumerator TestAttacksCoroutine()
+    {
+        AttackDirection[] directions = { AttackDirection.Up, AttackDirection.Down, AttackDirection.Left, AttackDirection.Right };
+
+        foreach (AttackDirection dir in directions)
+        {
+            Debug.Log($"Testing attack direction: {dir}");
+            playerAnimatorController.TriggerAttack(dir);
+            yield return new WaitForSeconds(1f);
+        }
+
+        Debug.Log("Attack direction test completed!");
     }
 }

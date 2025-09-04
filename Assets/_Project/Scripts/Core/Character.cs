@@ -92,6 +92,49 @@ public class Character : MonoBehaviour, IDamageable
 
     public bool IsDead => health.currentValue <= 0;
 
+    /// <summary>
+    /// Transform of this damageable object
+    /// </summary>
+    public UnityEngine.Transform Transform => transform;
+
+    /// <summary>
+    /// Player level
+    /// </summary>
+    public int Level
+    {
+        get
+        {
+            var skillManager = ServiceLocator.GetService<ModularSkillManager>();
+            return skillManager != null ? skillManager.GetPlayerLevel() : 1;
+        }
+        set
+        {
+            var skillManager = ServiceLocator.GetService<ModularSkillManager>();
+            if (skillManager != null)
+            {
+                skillManager.SetPlayerLevel(value);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Player experience
+    /// </summary>
+    public float Experience
+    {
+        get
+        {
+            // For now, return 0 as experience is managed by skill system
+            // This can be expanded to integrate with the experience system
+            return 0f;
+        }
+        set
+        {
+            // For now, ignore experience setting as it's managed by skill system
+            // This can be expanded to integrate with the experience system
+        }
+    }
+
     // Enhanced properties
     public float ShieldHealth => shieldHealth;
     public float MaxShieldHealth => maxShieldHealth;

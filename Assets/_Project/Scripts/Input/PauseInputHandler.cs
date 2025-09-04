@@ -1,4 +1,5 @@
 using UnityEngine;
+using UI;
 
 /// <summary>
 /// Xử lý input cho pause menu

@@ -105,6 +105,11 @@ public class CoreEnemy : MonoBehaviour, IDamageable
     public float ChaseRange => chaseRange;
     public bool IsDead => isDead;
     public bool IsStunned => isStunned;
+
+    /// <summary>
+    /// Transform of this damageable object
+    /// </summary>
+    public UnityEngine.Transform Transform => transform;
     public Transform CurrentTarget => currentTarget;
     public NavMeshAgent NavAgent => navAgent;
     public Animator EnemyAnimator => animator;

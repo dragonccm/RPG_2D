@@ -22,6 +22,11 @@ public interface IDamageable
     bool IsDead { get; }
     
     /// <summary>
+    /// Transform of the damageable object (for positioning damage numbers, etc.)
+    /// </summary>
+    UnityEngine.Transform Transform { get; }
+    
+    /// <summary>
     /// Apply damage to this object
     /// </summary>
     /// <param name="damage">Amount of damage to apply</param>

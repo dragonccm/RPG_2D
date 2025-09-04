@@ -9,11 +9,11 @@ namespace UI
     public class PauseMenu : MonoBehaviour
     {
         [Header("Pause Menu Settings")]
-        [SerializeField] private GameObject pauseMenuPanel;
-        [SerializeField] private Button resumeButton;
-        [SerializeField] private Button restartButton;
-        [SerializeField] private Button mainMenuButton;
-        [SerializeField] private Button settingsButton;
+        [SerializeField] public GameObject pauseMenuPanel;
+        [SerializeField] public Button resumeButton;
+        [SerializeField] public Button restartButton;
+        [SerializeField] public Button mainMenuButton;
+        [SerializeField] public Button settingsButton;
         [SerializeField] private KeyCode pauseKey = KeyCode.Escape;
         
         [Header("Audio Settings")]
@@ -57,6 +57,7 @@ namespace UI
         {
             if (Input.GetKeyDown(pauseKey))
             {
+                Debug.Log($"🎮 Pause key ({pauseKey}) detected in UI.PauseMenu");
                 TogglePause();
             }
         }
