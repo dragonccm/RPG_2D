@@ -29,107 +29,95 @@ public class NearbyHealthDisplay : MonoBehaviour
         }
     }
 
+    private const float ScanInterval = 0.2f;
+    private float nextScanTime;
+    private readonly List<Character> nearby = new List<Character>(8);   // mục tiêu đang hiển thị
+    private readonly List<HealthBar> barComponents = new List<HealthBar>(8);
+    private GameObject healthBarPrefab;
+    private Camera cam;
+
     void Update()
     {
-        if (showWorldSpaceHealthBars && uiCanvas != null)
+        if (!showWorldSpaceHealthBars || uiCanvas == null) return;
+
+        // Chọn lại tập kẻ địch gần theo nhịp; vị trí thanh máu vẫn cập nhật mỗi frame
+        if (Time.time >= nextScanTime)
         {
-            UpdateNearbyHealthBars();
+            nextScanTime = Time.time + ScanInterval;
+            SelectNearbyEnemies();
+        }
+        UpdateNearbyHealthBars();
+    }
+
+    /// <summary>Lấy tối đa maxDisplayCount kẻ địch gần nhất — chèn có thứ tự, không cấp phát.</summary>
+    void SelectNearbyEnemies()
+    {
+        nearby.Clear();
+        float rangeSqr = displayRange * displayRange;
+        Vector2 self = transform.position;
+        var all = Character.Active;
+        for (int i = 0; i < all.Count; i++)
+        {
+            var c = all[i];
+            if (!c.CompareTag("Enemy") || !c.IsAlive) continue;
+            float d = ((Vector2)c.transform.position - self).sqrMagnitude;
+            if (d > rangeSqr) continue;
+
+            int at = nearby.Count;
+            while (at > 0 && ((Vector2)nearby[at - 1].transform.position - self).sqrMagnitude > d) at--;
+            if (at >= maxDisplayCount) continue;
+            nearby.Insert(at, c);
+            if (nearby.Count > maxDisplayCount) nearby.RemoveAt(nearby.Count - 1);
         }
     }
 
     void UpdateNearbyHealthBars()
     {
-        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
-        List<GameObject> enemiesInRange = new List<GameObject>();
-
-        foreach (GameObject enemy in enemies)
+        int shown = 0;
+        for (int i = 0; i < nearby.Count; i++)
         {
-            Character enemyChar = enemy.GetComponent<Character>();
-            if (enemyChar == null || enemyChar.health.currentValue <= 0) continue;
+            var enemy = nearby[i];
+            if (enemy == null || !enemy.IsAlive) continue;
 
-            float distance = Vector2.Distance(transform.position, enemy.transform.position);
-            if (distance <= displayRange)
+            if (shown >= healthBars.Count && !CreateNewHealthBar()) break;
+            var bar = healthBars[shown];
+            var hb = barComponents[shown];
+            if (bar == null) { shown++; continue; }
+
+            if (hb != null && hb.target != enemy)
             {
-                enemiesInRange.Add(enemy);
+                hb.Initialize(enemy);
+                hb.SetupForEnemy();
             }
+            UpdateHealthBarPosition(bar, enemy.transform);
+            shown++;
         }
 
-        enemiesInRange.Sort((a, b) => Vector2.Distance(transform.position, a.transform.position)
-            .CompareTo(Vector2.Distance(transform.position, b.transform.position)));
-
-        if (enemiesInRange.Count > maxDisplayCount)
+        for (int i = shown; i < healthBars.Count; i++)
         {
-            enemiesInRange = enemiesInRange.GetRange(0, maxDisplayCount);
-        }
-
-        for (int i = 0; i < enemiesInRange.Count; i++)
-        {
-            GameObject enemy = enemiesInRange[i];
-            if (i < healthBars.Count)
-            {
-                if (healthBars[i] != null)
-                {
-                    healthBars[i].SetActive(true);
-                    UpdateHealthBarPosition(healthBars[i], enemy);
-                    HealthBar healthBar = healthBars[i].GetComponent<HealthBar>();
-                    if (healthBar != null && (healthBar.target == null || healthBar.target.gameObject != enemy))
-                    {
-                        healthBar.Initialize(enemy.GetComponent<Character>());
-                        healthBar.SetupForEnemy();
-                    }
-                }
-            }
-            else
-            {
-                CreateNewHealthBar(enemy);
-            }
-        }
-
-        for (int i = enemiesInRange.Count; i < healthBars.Count; i++)
-        {
-            if (healthBars[i] != null)
-            {
-                healthBars[i].SetActive(false);
-            }
+            if (healthBars[i] != null && healthBars[i].activeSelf) healthBars[i].SetActive(false);
         }
     }
 
-    void CreateNewHealthBar(GameObject enemy)
+    bool CreateNewHealthBar()
     {
-        GameObject healthBarPrefab = Resources.Load<GameObject>(enemyHealthBarPrefabPath);
-        if (healthBarPrefab != null)
-        {
-            GameObject healthBarInstance = Instantiate(healthBarPrefab, uiCanvas.transform);
-            healthBars.Add(healthBarInstance);
-            
-            HealthBar healthBar = healthBarInstance.GetComponent<HealthBar>();
-            if (healthBar != null)
-            {
-                healthBar.Initialize(enemy.GetComponent<Character>());
-                healthBar.SetupForEnemy();
-            }
-            
-            UpdateHealthBarPosition(healthBarInstance, enemy);
-        }
+        if (healthBarPrefab == null) healthBarPrefab = Resources.Load<GameObject>(enemyHealthBarPrefabPath);
+        if (healthBarPrefab == null) return false;
+        GameObject instance = Instantiate(healthBarPrefab, uiCanvas.transform);
+        healthBars.Add(instance);
+        barComponents.Add(instance.GetComponent<HealthBar>());
+        return true;
     }
 
-    void UpdateHealthBarPosition(GameObject healthBar, GameObject target)
+    void UpdateHealthBarPosition(GameObject healthBar, Transform target)
     {
-        if (healthBar != null && target != null && Camera.main != null)
-        {
-            Vector3 worldPos = target.transform.position + Vector3.up * 1.5f;
-            Vector3 screenPos = Camera.main.WorldToScreenPoint(worldPos);
-            
-            if (screenPos.z > 0)
-            {
-                healthBar.transform.position = screenPos;
-                healthBar.SetActive(true);
-            }
-            else
-            {
-                healthBar.SetActive(false);
-            }
-        }
+        if (cam == null) cam = Camera.main;
+        if (cam == null) return;
+
+        Vector3 screenPos = cam.WorldToScreenPoint(target.position + Vector3.up * 1.5f);
+        bool visible = screenPos.z > 0;
+        if (visible) healthBar.transform.position = screenPos;
+        if (healthBar.activeSelf != visible) healthBar.SetActive(visible);
     }
 
     void OnDestroy()

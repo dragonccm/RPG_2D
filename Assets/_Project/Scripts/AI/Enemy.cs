@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.AI;
 using System.Collections.Generic;
-using System.Linq;
 using System;
 using RPGGame.AI;
 
@@ -58,6 +57,7 @@ public class Enemy : MonoBehaviour
 
     // Cache player reference để tối ưu hiệu suất
     private static Transform[] cachedPlayers;
+    private static readonly Collider2D[] detectionBuffer = new Collider2D[16]; // dùng lại, không cấp phát mỗi lần quét
     private static float lastPlayerCacheTime = 0f;
     private const float PLAYER_CACHE_DURATION = 1f; // Cache player trong 1 giây
 
@@ -454,7 +454,7 @@ public class Enemy : MonoBehaviour
     /// </summary>
     private Transform[] FindAllPlayers()
     {
-        // Sử dụng cache để tối ưu hiệu suất
+        // Cache 1s chung cho mọi Enemy
         if (Time.time - lastPlayerCacheTime < PLAYER_CACHE_DURATION && cachedPlayers != null)
         {
             return cachedPlayers;
@@ -462,54 +462,22 @@ public class Enemy : MonoBehaviour
 
         tempPlayerObjects.Clear();
 
-        // Phương pháp 1: Tìm bằng tag "Player"
-        var playersByTag = GameObject.FindGameObjectsWithTag("Player");
-        foreach (var player in playersByTag)
+        // Lấy từ danh sách Character đang active (không quét toàn scene)
+        var all = Character.Active;
+        for (int i = 0; i < all.Count; i++)
         {
-            if (player != null && !tempPlayerObjects.Contains(player))
-            {
-                tempPlayerObjects.Add(player);
-            }
+            if (all[i].CompareTag("Player")) tempPlayerObjects.Add(all[i].gameObject);
         }
 
-        // Phương pháp 2: Tìm bằng layer mask (chỉ khi không tìm thấy bằng tag)
+        // Dự phòng: player chưa có Character (scene test) — tìm theo tag, không quét mọi object
         if (tempPlayerObjects.Count == 0)
         {
-            for (int layer = 0; layer < 32; layer++)
-            {
-                if ((playerLayerMask & (1 << layer)) != 0)
-                {
-                    var objectsInLayer = FindObjectsOfType<GameObject>().Where(obj => obj.layer == layer);
-                    foreach (var obj in objectsInLayer)
-                    {
-                        if (obj != null && obj != gameObject && !tempPlayerObjects.Contains(obj))
-                        {
-                            tempPlayerObjects.Add(obj);
-                        }
-                    }
-                }
-            }
+            tempPlayerObjects.AddRange(GameObject.FindGameObjectsWithTag("Player"));
         }
 
-        // Phương pháp 3: Tìm bằng component specific (ví dụ: PlayerController, CharacterController)
-        if (tempPlayerObjects.Count == 0)
-        {
-            var playerControllers = FindObjectsOfType<MonoBehaviour>()
-                .Where(mb => mb.GetType().Name.ToLower().Contains("player"))
-                .Select(mb => mb.gameObject)
-                .Distinct();
-
-            foreach (var player in playerControllers)
-            {
-                if (player != null && !tempPlayerObjects.Contains(player))
-                {
-                    tempPlayerObjects.Add(player);
-                }
-            }
-        }
-
-        // Convert to Transform array và cache
-        cachedPlayers = tempPlayerObjects.Where(p => p != null).Select(p => p.transform).ToArray();
+        if (cachedPlayers == null || cachedPlayers.Length != tempPlayerObjects.Count)
+            cachedPlayers = new Transform[tempPlayerObjects.Count];
+        for (int i = 0; i < tempPlayerObjects.Count; i++) cachedPlayers[i] = tempPlayerObjects[i].transform;
         lastPlayerCacheTime = Time.time;
 
         return cachedPlayers;
@@ -536,9 +504,11 @@ public class Enemy : MonoBehaviour
 
         // BƯỚC 2: Tìm players bằng Physics2D (game 2D top-down)
         tempPlayerList.Clear();
-        var colliders = Physics2D.OverlapCircleAll(transform.position, detectionRange, playerLayerMask);
-        foreach (var col in colliders)
+        var filter = new ContactFilter2D { useLayerMask = true, layerMask = playerLayerMask, useTriggers = Physics2D.queriesHitTriggers };
+        int hitCount = Physics2D.OverlapCircle(transform.position, detectionRange, filter, detectionBuffer);
+        for (int i = 0; i < hitCount; i++)
         {
+            var col = detectionBuffer[i];
             if (col != null && IsValidTarget(col.transform))
             {
                 tempPlayerList.Add(col.transform);

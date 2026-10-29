@@ -41,7 +41,7 @@ Mọi đòn đánh của Player và Enemy phải tuân thủ nghiêm ngặt 3 ph
 - **Lệnh cấm:** Cấm dùng `LineRenderer` vẽ đường tròn toán học 64 đỉnh, cấm dùng `Texture2D` runtime vẽ gradient mềm làm vòng kỹ năng (như trong `DamageAreaIndicator.cs` cũ).
 - **Quy chuẩn mới:**
   - 100% VFX phải là **Pixel Art VFX** (vẽ tay từng frame) hoặc **Particle System dạng pixelated** (Pixel Art Particles).
-  - Kích thước pixel (Pixel Density / PPU) của VFX phải đồng bộ với nhân vật (PPU = 16 hoặc 32).
+  - Kích thước pixel (Pixel Density / PPU) của VFX phải đồng bộ với nhân vật: **PPU = 64** (art Tiny Swords: 1 tile = 64 px = 1 đơn vị). Không scale sprite pixel theo số lẻ — sinh/vẽ đúng cỡ.
   - Hiệu ứng chém: Lưỡi chém hình lưỡi liềm pixel (Slash Arc) khớp với góc vung kiếm.
   - Hiệu ứng va chạm (Sparks/Blood): 3-5 hạt pixel văng theo hướng vung đòn và rơi xuống sàn trong 0.2s.
 

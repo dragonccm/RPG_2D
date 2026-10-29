@@ -73,20 +73,20 @@ public static class VfxService
                 case HitMaterial.Flesh:
                     h.Spawn(PixelSprites.Pixel, position, d * speed, 0.18f + Random.value * 0.1f,
                         Random.value < 0.5f ? new Color(0.6f, 0.05f, 0.08f) : new Color(0.85f, 0.12f, 0.12f),
-                        Random.value < 0.4f ? 2f : 1f, 1f, drag: 6f, gravity: 6f, rotate: false);
+                        Random.value < 0.4f ? 4f : 3f, 1f, drag: 6f, gravity: 6f, rotate: false);
                     break;
                 case HitMaterial.Metal:
                     h.Spawn(PixelSprites.Spark, position, d * (speed + 1.5f), 0.12f + Random.value * 0.08f,
                         Random.value < 0.5f ? new Color(1f, 0.95f, 0.7f) : Color.white,
-                        1f, 1f, drag: 5f, gravity: 0f, rotate: true);
+                        2f, 1f, drag: 5f, gravity: 0f, rotate: true);
                     break;
                 case HitMaterial.Stone:
                     h.Spawn(PixelSprites.Pixel, position, d * speed * 0.7f, 0.22f + Random.value * 0.1f,
-                        new Color(0.55f, 0.52f, 0.48f), 2f, 1f, drag: 7f, gravity: 5f, rotate: false);
+                        new Color(0.55f, 0.52f, 0.48f), 4f, 2f, drag: 7f, gravity: 5f, rotate: false);
                     break;
                 default:
                     h.Spawn(PixelSprites.Pixel, position, d * speed * 0.8f, 0.25f,
-                        new Color(0.7f, 0.4f, 1f), 2f, 1f, drag: 4f, gravity: 0f, rotate: false);
+                        new Color(0.7f, 0.4f, 1f), 3f, 1f, drag: 4f, gravity: 0f, rotate: false);
                     break;
             }
         }
@@ -99,31 +99,43 @@ public static class VfxService
         if (h == null) return;
         if (dir.sqrMagnitude < 0.0001f) dir = Vector2.right;
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-        h.SpawnStatic(PixelSprites.Arc, origin, Quaternion.Euler(0f, 0f, angle), 0.12f, tint,
-            0.85f * size, 1.05f * size, stepped: 3);
+        h.SpawnStatic(PixelSprites.Arc(1.5f * size), origin, Quaternion.Euler(0f, 0f, angle), 0.12f, tint,
+            1f, 1f, stepped: 3);
     }
 
     /// <summary>
-    /// Sự kiện chung (checkpoint, mở rương, công tắc, dash...): vòng pixel nở theo bậc + mảnh pixel tỏa ra.
-    /// scale ≈ bán kính vòng cuối (đơn vị thế giới × 0.6).
+    /// Sự kiện chung (checkpoint, mở rương, công tắc, dash...): vòng pixel nở 5 frame + mảnh pixel tỏa ra.
+    /// Vòng cuối có bán kính 0.9 × scale (đơn vị thế giới).
     /// </summary>
     public static void Impact(Vector3 position, Color tint, float scale = 1f)
     {
         var h = Host;
         if (h == null) return;
         scale = Mathf.Max(0.2f, scale);
-        int ringPx = 16; // sprite cố định, đổi cỡ bằng scale nguyên bước
-        h.SpawnStatic(PixelSprites.Ring(ringPx), position, Quaternion.identity, 0.3f, tint,
-            0.3f * scale, 0.9f * scale, stepped: 5);
+        h.SpawnFrames(RingFrames(scale), position, 0.3f, tint);
 
         int shards = Mathf.Clamp(Mathf.RoundToInt(4 + scale * 2f), 4, 10);
         for (int i = 0; i < shards; i++)
         {
             Vector2 d = Random.insideUnitCircle.normalized;
             h.Spawn(PixelSprites.Pixel, position, d * Random.Range(1.5f, 3.5f) * Mathf.Sqrt(scale),
-                0.22f + Random.value * 0.12f, tint, Random.value < 0.4f ? 2f : 1f, 1f,
+                0.22f + Random.value * 0.12f, tint, Random.value < 0.4f ? 4f : 3f, 1f,
                 drag: 5f, gravity: 3f, rotate: false);
         }
+    }
+
+    private static readonly Dictionary<int, Sprite[]> ringFrames = new Dictionary<int, Sprite[]>();
+
+    /// <summary>5 frame vòng nở, bán kính 0.3→0.9 × scale (đơn vị thế giới), cache theo scale.</summary>
+    private static Sprite[] RingFrames(float scale)
+    {
+        int key = Mathf.RoundToInt(scale * 10f);
+        if (ringFrames.TryGetValue(key, out var frames) && frames[0] != null) return frames;
+        frames = new Sprite[5];
+        for (int i = 0; i < 5; i++)
+            frames[i] = PixelSprites.Ring(Mathf.RoundToInt((0.3f + 0.15f * i) * scale * PixelSprites.PPU));
+        ringFrames[key] = frames;
+        return frames;
     }
 
     /// <summary>
@@ -257,6 +269,7 @@ public static class VfxService
         public int stepped;      // 0 = mượt theo pixel; >0 = số nấc
         public bool intScale;    // scale làm tròn nguyên (hạt)
         public bool faceVelocity;
+        public Sprite[] frames;  // != null: đổi sprite theo bậc thay vì scale
         public Color color;
     }
 
@@ -311,6 +324,7 @@ public static class VfxService
             it.stepped = 0;
             it.intScale = false;
             it.faceVelocity = false;
+            it.frames = null;
             it.tr.rotation = Quaternion.identity;
             return it;
         }
@@ -346,6 +360,19 @@ public static class VfxService
             it.s0 = startScale;
             it.s1 = endScale;
             it.stepped = stepped;
+            Apply(it, 0f);
+            active.Add(it);
+        }
+
+        public void SpawnFrames(Sprite[] frames, Vector3 pos, float life, Color color)
+        {
+            var it = Acquire();
+            it.frames = frames;
+            it.sr.sprite = frames[0];
+            it.tr.position = Snap(pos);
+            it.life = life;
+            it.color = color;
+            it.s0 = it.s1 = 1f;
             Apply(it, 0f);
             active.Add(it);
         }
@@ -474,6 +501,8 @@ public static class VfxService
 
         private static void Apply(Item it, float t)
         {
+            if (it.frames != null)
+                it.sr.sprite = it.frames[Mathf.Min(it.frames.Length - 1, (int)(t * it.frames.Length))];
             float st = it.stepped > 0 ? Mathf.Floor(t * it.stepped) / it.stepped : t;
             float s = Mathf.Lerp(it.s0, it.s1, st);
             if (it.intScale) s = Mathf.Max(1f, Mathf.Round(s));

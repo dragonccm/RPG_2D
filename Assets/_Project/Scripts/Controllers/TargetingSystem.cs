@@ -27,53 +27,55 @@ public class TargetingSystem : MonoBehaviour
         }
     }
 
+    private const float ScanInterval = 0.2f;
+    private float nextScanTime;
+    private Character targetCharacter; // cache — tránh GetComponent mỗi frame
+
     void Update()
     {
         if (currentTarget == null)
         {
-            AutoSelectTarget();
+            // Quét mục tiêu theo nhịp, không phải mỗi frame
+            if (Time.time >= nextScanTime)
+            {
+                nextScanTime = Time.time + ScanInterval;
+                AutoSelectTarget();
+            }
+            return;
         }
-        else
+
+        if (targetCharacter == null || targetCharacter.gameObject != currentTarget)
+            targetCharacter = currentTarget.GetComponent<Character>();
+
+        if (targetCharacter == null || !targetCharacter.IsAlive
+            || ((Vector2)(currentTarget.transform.position - transform.position)).sqrMagnitude > targetingRange * targetingRange)
         {
-            Character targetCharacter = currentTarget.GetComponent<Character>();
-            if (targetCharacter == null || targetCharacter.health.currentValue <= 0)
-            {
-                DestroyHealthBar();
-                currentTarget = null;
-                return;
-            }
-            
-            if (Vector2.Distance(transform.position, currentTarget.transform.position) > targetingRange)
-            {
-                DestroyHealthBar();
-                currentTarget = null;
-            }
+            ClearTarget();
         }
     }
 
     void AutoSelectTarget()
     {
-        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
-        float closestDistance = Mathf.Infinity;
-        GameObject closestEnemy = null;
+        float rangeSqr = targetingRange * targetingRange;
+        float closestSqr = float.MaxValue;
+        Character closest = null;
+        Vector2 self = transform.position;
 
-        foreach (GameObject enemy in enemies)
+        var all = Character.Active;
+        for (int i = 0; i < all.Count; i++)
         {
-            Character enemyChar = enemy.GetComponent<Character>();
-            if (enemyChar == null || enemyChar.health.currentValue <= 0) continue;
-
-            float distance = Vector2.Distance(transform.position, enemy.transform.position);
-            if (distance < closestDistance && distance <= targetingRange)
+            var c = all[i];
+            if (!c.CompareTag("Enemy") || !c.IsAlive) continue;
+            float d = ((Vector2)c.transform.position - self).sqrMagnitude;
+            if (d <= rangeSqr && d < closestSqr)
             {
-                closestDistance = distance;
-                closestEnemy = enemy;
+                closestSqr = d;
+                closest = c;
             }
         }
-        
-        if (closestEnemy != currentTarget)
-        {
-            currentTarget = closestEnemy;
-        }
+
+        targetCharacter = closest;
+        currentTarget = closest != null ? closest.gameObject : null;
     }
 
     void DestroyHealthBar()
@@ -103,6 +105,7 @@ public class TargetingSystem : MonoBehaviour
     {
         DestroyHealthBar();
         currentTarget = null;
+        targetCharacter = null;
     }
 
     public void SetTargetingRange(float range)

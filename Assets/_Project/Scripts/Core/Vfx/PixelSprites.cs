@@ -2,18 +2,19 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Sprite pixel-art sinh runtime cho VfxService: viền cứng, FilterMode.Point, PPU = 16
-/// (cùng mật độ pixel với nhân vật). Không có gradient mềm / alpha mịn — mọi pixel
-/// hoặc đặc hoặc trong suốt. Khi có art vẽ tay, thay trong VfxService, không đổi chỗ gọi.
+/// Sprite pixel-art sinh runtime cho VfxService: viền cứng, FilterMode.Point, PPU = 64
+/// (cùng mật độ pixel với art Tiny Swords: 1 tile = 64 px = 1 đơn vị). Không gradient, không
+/// alpha mịn. Đổi kích thước bằng cách sinh sprite đúng cỡ (cache theo cỡ), không scale lẻ —
+/// để 1 pixel effect luôn bằng 1 pixel art. Khi có art vẽ tay, thay trong VfxService.
 /// </summary>
 public static class PixelSprites
 {
-    public const float PPU = 16f;
+    public const float PPU = 64f;
     public const float PixelSize = 1f / PPU;
 
     private static Sprite pixel;
     private static Sprite spark;
-    private static Sprite arc;
+    private static readonly Dictionary<int, Sprite> arcs = new Dictionary<int, Sprite>();
     private static readonly Dictionary<int, Sprite> rings = new Dictionary<int, Sprite>();
     private static readonly Dictionary<int, Sprite> discs = new Dictionary<int, Sprite>();
 
@@ -24,56 +25,62 @@ public static class PixelSprites
     public static Sprite Spark => spark != null ? spark : (spark = Build(1, 3, (x, y) => true, 0.5f, 0.5f));
 
     /// <summary>
-    /// Lưỡi liềm chém hướng +X, pivot ở tâm cung (xoay quanh điểm vung). 32×32 px.
+    /// Lưỡi liềm chém hướng +X, pivot ở tâm cung (xoay quanh điểm vung).
+    /// lengthUnits = chiều dài cung theo đơn vị thế giới (1 = 1 tile).
     /// </summary>
-    public static Sprite Arc
+    public static Sprite Arc(float lengthUnits)
     {
-        get
+        int grid = Mathf.Clamp(Mathf.RoundToInt(lengthUnits * PPU / 8f) * 8, 32, 256);
+        if (arcs.TryGetValue(grid, out var s) && s != null) return s;
+        float k = grid / 32f; // tỉ lệ so với lưới gốc 32 px
+        float ocx = 12f * k, ir = 13f * k, or = 14f * k, icx = 7f * k, cy = 16f * k;
+        s = Build(grid, grid, (x, y) =>
         {
-            if (arc != null) return arc;
-            arc = Build(32, 32, (x, y) =>
-            {
-                float ox = x + 0.5f - 12f, oy = y + 0.5f - 16f;
-                float ix = x + 0.5f - 7f, iy = y + 0.5f - 16f;
-                bool inOuter = ox * ox + oy * oy <= 14f * 14f;
-                bool inInner = ix * ix + iy * iy <= 13f * 13f;
-                return inOuter && !inInner;
-            }, 12f / 32f, 0.5f);
-            return arc;
-        }
+            float ox = x + 0.5f - ocx, oy = y + 0.5f - cy;
+            float ix = x + 0.5f - icx, iy = y + 0.5f - cy;
+            return ox * ox + oy * oy <= or * or && ix * ix + iy * iy > ir * ir;
+        }, 12f / 32f, 0.5f);
+        arcs[grid] = s;
+        return s;
     }
 
-    /// <summary>Viền tròn dày 1px (răng cưa), bán kính tính bằng pixel.</summary>
+    /// <summary>Viền tròn dày 2px (răng cưa), bán kính tính bằng pixel art.</summary>
     public static Sprite Ring(int radiusPx)
     {
-        radiusPx = Mathf.Clamp(radiusPx, 3, 160);
+        radiusPx = Mathf.Clamp(radiusPx / 2 * 2, 4, 640);
         if (rings.TryGetValue(radiusPx, out var s) && s != null) return s;
         int size = radiusPx * 2 + 2;
         float c = size * 0.5f;
         s = Build(size, size, (x, y) =>
         {
-            float d = Mathf.Sqrt((x + 0.5f - c) * (x + 0.5f - c) + (y + 0.5f - c) * (y + 0.5f - c));
-            return d >= radiusPx - 0.5f && d < radiusPx + 0.5f;
+            float d = Dist(x, y, c);
+            return d >= radiusPx - 1f && d < radiusPx + 1f;
         }, 0.5f, 0.5f);
         rings[radiusPx] = s;
         return s;
     }
 
-    /// <summary>Đĩa dither (caro 1px) + viền đặc: vùng cảnh báo kiểu pixel-art.</summary>
+    /// <summary>Đĩa dither (caro 2px, khớp độ thô của art) + viền 2px: vùng cảnh báo pixel-art.</summary>
     public static Sprite DitherDisc(int radiusPx)
     {
-        radiusPx = Mathf.Clamp(radiusPx, 3, 160);
+        radiusPx = Mathf.Clamp(radiusPx / 8 * 8, 8, 640); // làm tròn để cache dùng lại
         if (discs.TryGetValue(radiusPx, out var s) && s != null) return s;
         int size = radiusPx * 2 + 2;
         float c = size * 0.5f;
         s = Build(size, size, (x, y) =>
         {
-            float d = Mathf.Sqrt((x + 0.5f - c) * (x + 0.5f - c) + (y + 0.5f - c) * (y + 0.5f - c));
-            if (d >= radiusPx - 0.5f && d < radiusPx + 0.5f) return true;
-            return d < radiusPx - 1f && ((x + y) & 1) == 0;
+            float d = Dist(x, y, c);
+            if (d >= radiusPx - 2f && d < radiusPx) return true;
+            return d < radiusPx - 3f && (((x >> 1) + (y >> 1)) & 1) == 0;
         }, 0.5f, 0.5f);
         discs[radiusPx] = s;
         return s;
+    }
+
+    private static float Dist(int x, int y, float c)
+    {
+        float dx = x + 0.5f - c, dy = y + 0.5f - c;
+        return Mathf.Sqrt(dx * dx + dy * dy);
     }
 
     private static Sprite Build(int w, int h, System.Func<int, int, bool> solid, float pivotX, float pivotY)

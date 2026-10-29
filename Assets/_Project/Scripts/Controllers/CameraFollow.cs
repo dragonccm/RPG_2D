@@ -20,7 +20,14 @@ public class CameraFollow : MonoBehaviour
             Vector3 desiredPosition = target.position + offset;
             basePosition = Vector3.Lerp(basePosition, desiredPosition, followSpeed * Time.deltaTime);
         }
-        transform.position = basePosition + (Vector3)VfxService.ShakeOffset;
+        transform.position = SnapToPixel(basePosition + (Vector3)VfxService.ShakeOffset);
+    }
+
+    // Camera đứng đúng lưới pixel art (1/64 đơn vị) → tile/sprite không "bơi" khi camera lerp
+    private static Vector3 SnapToPixel(Vector3 p)
+    {
+        const float u = PixelSprites.PixelSize;
+        return new Vector3(Mathf.Round(p.x / u) * u, Mathf.Round(p.y / u) * u, p.z);
     }
 
     /// <summary>S3 (ScenePortal): đặt camera ngay lập tức tới target — teleport không lerp.</summary>

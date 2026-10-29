@@ -57,6 +57,10 @@ public class special_move : MonoBehaviour
     private Animator animator;
     private Collider2D selfCollider;
 
+    // Truy vấn va chạm không cấp phát: buffer dùng lại cho dash/charge
+    private readonly Collider2D[] hitBuffer = new Collider2D[32];
+    private static ContactFilter2D AllHitFilter => new ContactFilter2D { useTriggers = Physics2D.queriesHitTriggers };
+
     private bool isDashing, isTeleporting, isCharging;
     private float chargeStartTime = -1f;
 
@@ -176,9 +180,10 @@ public class special_move : MonoBehaviour
 
             if (dashDamage)
             {
-                foreach (var hitCol in Physics2D.OverlapCircleAll(rb.position, 0.9f))
+                int n = Physics2D.OverlapCircle(rb.position, 0.9f, AllHitFilter, hitBuffer);
+                for (int h = 0; h < n; h++)
                 {
-                    var ch = hitCol.GetComponent<Character>();
+                    var ch = hitBuffer[h].GetComponent<Character>();
                     if (ch != null && ch != character && !alreadyHit.Contains(ch))
                     {
                         alreadyHit.Add(ch);
@@ -282,8 +287,10 @@ public class special_move : MonoBehaviour
         float dmg = character.AttackPower * chargeDamageMultiplier * factor;
         float radius = ChargeRadiusEff;
 
-        foreach (var hitCol in Physics2D.OverlapCircleAll(transform.position, radius))
+        int hitCount = Physics2D.OverlapCircle(transform.position, radius, AllHitFilter, hitBuffer);
+        for (int h = 0; h < hitCount; h++)
         {
+            var hitCol = hitBuffer[h];
             if (!hitCol.CompareTag("Enemy")) continue;
             var enemyChar = hitCol.GetComponent<Character>();
             if (enemyChar == null) continue;

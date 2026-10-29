@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Character : MonoBehaviour, IDamageable
@@ -117,6 +118,18 @@ public class Character : MonoBehaviour, IDamageable
         get => enableHitStop; 
         set => enableHitStop = value; 
     }
+
+    /// <summary>
+    /// Mọi Character đang active trong scene. Dùng thay FindGameObjectsWithTag trong vòng lặp
+    /// (lọc thêm bằng CompareTag khi cần) — không cấp phát, không quét scene.
+    /// </summary>
+    public static readonly List<Character> Active = new List<Character>(64);
+
+    protected virtual void OnEnable() { Active.Add(this); }
+    protected virtual void OnDisable() { Active.Remove(this); }
+
+    /// <summary>Còn sống: có health và HP > 0.</summary>
+    public bool IsAlive => health != null && health.currentValue > 0f;
 
     protected virtual void Awake()
     {
