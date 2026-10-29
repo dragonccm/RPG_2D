@@ -485,7 +485,7 @@ Quest flag lưu trong save JSON; UI quest chỉ 1 panel gọn (đã có `UIManag
 | Sprint | Tuần | Deliverable | Tiêu chí nghiệm thu |
 |---|---|---|---|
 | **S0 — Dọn nền** | 1 | P0-1…P0-7 (mục 2) | ✅ **XONG 29/10** — recompile 0/0, test 8/8, play smoke 0 exception |
-| **S1 — Cảm giác chơi** | 2 | P1-1…P1-7 (mục 3) | Test 8 hướng sai số ≤1%; bóng + y-sort đúng; hit feedback |
+| **S1 — Cảm giác chơi** | 2 | P1-1…P1-7 (mục 3) | ✅ **XONG 29/10** — test 8 hướng sai số 0% (8/8 xanh); shadow + y-sort live-verified (layer `Characters`, bóng `Shadows`); hit feedback/damage number đã có sẵn từ trước (đã verify wiring `Character.TakeDamage`); P1-5 input rebind chuyển sang S2 |
 | **S2 — Lõi combat** | 3–4 | State machine player + combo + crit + damage numbers + pooling | Play 10 phút 0 exception; 60 FPS 25 enemy |
 | **S3 — Map M1+M2** | 4–5 | 2 map + mini-boss 1 + checkpoint + save/load | Đi từ làng tới sau rừng 1 mạch không lỗi |
 | **S4 — Skill tree + dialogue** | 6 | 19 nút + DialogueSO + hộp thoại + quest Q1–Q2 | Mở đủ nhánh, dialogue 0 lỗi font VN |
