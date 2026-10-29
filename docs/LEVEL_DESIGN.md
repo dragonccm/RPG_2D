@@ -335,6 +335,7 @@ Tên tilemap hiện tại (`Collisin-low`, `Non-Collision-high`, `Boundiary`, `s
 | Đò Lão Câu | ✅ | Cổng 2 chiều M1↔M3, chỉ mở sau `clear:marsh_boss` |
 | Làng đổi theo cốt truyện | ✅ | `quest:q3:started` → trời đỏ dần + Ông Tễ rời đi; `boss:agis` → ánh sáng trắng (làng sau ending). `QuestManager` bật flag `quest:<id>:started/done` |
 | Kẻ địch mới | 🟡 | **Chuột Đầm**: prefab mới từ art Rat (32 px vẽ ở 64 PPU → ~0.5 tile, đúng mật độ pixel). **Kỵ Sĩ Bóng Đêm / Đá Gộp**: Lancer nhuộm màu + to hơn (biến thể). **Chưa:** Hobgoblin (16 px), NightBorne (80 px, nhân vật ~35 px) và Necromancer — mật độ pixel lệch Tiny Swords, cần vẽ lại hoặc chấp nhận lệch |
+| Cuộn kỹ năng chủ động | ✅ | Băng Tiễn (rương rune ở đầm), Hồi Phục (kho hang), Lôi Kích (rương rune ở tháp) — `SkillBook` |
 | Ánh sáng URP 2D | ✅ | Trước đây **không gán pipeline** (Built-in RP) nên Light2D vô tác dụng — đã sửa |
 
 **Kiểm tra tự động:** PlayMode `MapSmokeTests` 12/12 — nạp cả 5 map, chuyển map, cổng làng, encounter, khe vực, bầy chuột, bến đò theo flag, làng đổi ánh sáng khi q3 bắt đầu.

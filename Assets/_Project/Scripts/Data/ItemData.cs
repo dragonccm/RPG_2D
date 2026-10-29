@@ -34,4 +34,7 @@ public class ItemData : ScriptableObject
     [Header("Bí kíp võ công (Skill Scroll)")]
     [Tooltip("ID kỹ năng trong SkillTree sẽ được mở khóa khi dùng cuộn bí kíp này (ví dụ: gio_1, khong_1, lua_1)")]
     public string unlockSkillId;
+
+    [Tooltip("Kỹ năng (SkillModule) học được khi dùng cuộn này — SkillBook.Learn. Để trống nếu cuộn mở nút cây kỹ năng (unlockSkillId).")]
+    public SkillModule learnSkill;
 }

@@ -20,7 +20,7 @@ Game 2D top-down action RPG. Một lính canh làng rời Làng Phong Nguyệt t
 3. Build Settings: MainMenu → M1_Village → M2_Forest → M3_Marsh → M4_Tower → M5_Cave (`World.unity` là scene cũ, không build).
 
 **Điều khiển:** WASD di chuyển · chuột trái hoặc J đánh (combo 3 nhịp, hướng theo chuột) · Shift Lướt Gió · Q Hư Không · giữ/thả E Hỏa Kích · F tương tác · Tab cây kỹ năng · I túi đồ.
-Kỹ năng đặc biệt **chỉ học từ cuộn bí kíp**; cây kỹ năng chỉ cường hoá.
+Mọi kỹ năng **chỉ học từ cuộn bí kíp** (hoặc quest/boss); nhân vật khởi đầu chỉ có combo chém. Cây kỹ năng chỉ cường hoá.
 
 ## Dựng lại map
 
@@ -50,7 +50,7 @@ RPG_SNAP_DIR=/tmp/play unity test --mode PlayMode
 
 | Thư mục | Nội dung chính |
 |---|---|
-| `Core/` | Character, PlayerCombat, SkillTree, QuestSystem, InventorySystem, SaveSystem, WorldFlags, ItemDatabase, GameFlow, SpriteLoop, `Vfx/` (VfxService, PixelSprites) |
+| `Core/` | Character, PlayerCombat, SkillBook, `Skills/` (executors), SkillTree, QuestSystem, InventorySystem, SaveSystem, WorldFlags, ItemDatabase, GameFlow, SpriteLoop, `Vfx/` (VfxService, PixelSprites) |
 | `Controllers/` | PlayerController, special_move (Dash/Teleport/Charge), CameraFollow, TargetingSystem |
 | `AI/` | Enemy, state machine, Melee/Ranged/Support/Boss, EnemySpawner, EliteBuff |
 | `Boss/` | Agis (3 phase, 2 ending) |

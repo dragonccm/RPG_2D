@@ -37,13 +37,74 @@ public class ModularSkillManager : MonoBehaviour
 
     private void Awake()
     {
-        player = GetComponent<Character>();
-        InitializeSkillSlots();
+        EnsureInitialized();
+    }
+
+    /// <summary>Dựng ô kỹ năng + đăng ký SkillBook (idempotent — test EditMode không chạy Awake/OnEnable).</summary>
+    public void EnsureInitialized()
+    {
+        if (player == null) player = GetComponent<Character>();
+        if (skillSlots.Count == 0) InitializeSkillSlots();
+        SkillBook.Changed -= OnSkillBookChanged;
+        SkillBook.Changed += OnSkillBookChanged;
     }
 
     private void Start()
     {
         UpdateUnlockedSlots();
+    }
+
+    private void OnEnable() { EnsureInitialized(); }
+    private void OnDisable() { SkillBook.Changed -= OnSkillBookChanged; }
+
+    /// <summary>Học kỹ năng mới → tự gắn vào ô trống đầu tiên đã mở khoá (người chơi đổi được sau).</summary>
+    private void OnSkillBookChanged(string skillId)
+    {
+        if (skillId == null) return; // nạp save: ImportEquipped lo phần gắn ô
+        var skill = FindSkill(skillId);
+        if (skill == null || GetSlotIndexOfSkill(skill) >= 0) return;
+        for (int i = 0; i < skillSlots.Count; i++)
+        {
+            if (skillSlots[i].isUnlocked && !skillSlots[i].HasSkill() && EquipSkill(i, skill)) return;
+        }
+    }
+
+    /// <summary>Tra SkillModule theo id trong danh mục kỹ năng của nhân vật.</summary>
+    public SkillModule FindSkill(string skillId)
+    {
+        foreach (var s in availableSkills)
+            if (s != null && s.Id == skillId) return s;
+        return null;
+    }
+
+    private int GetSlotIndexOfSkill(SkillModule skill)
+    {
+        for (int i = 0; i < skillSlots.Count; i++)
+            if (skillSlots[i].HasSkill() && skillSlots[i].equippedSkill == skill) return i;
+        return -1;
+    }
+
+    /// <summary>Danh sách "ô=skillId" để lưu — bền vững theo id, không theo thứ tự danh sách.</summary>
+    public List<string> ExportEquipped()
+    {
+        var result = new List<string>();
+        for (int i = 0; i < skillSlots.Count; i++)
+            if (skillSlots[i].HasSkill()) result.Add($"{i}={skillSlots[i].equippedSkill.Id}");
+        return result;
+    }
+
+    public void ImportEquipped(List<string> saved)
+    {
+        for (int i = 0; i < skillSlots.Count; i++)
+            if (skillSlots[i].HasSkill()) UnequipSkill(i);
+        if (saved == null) return;
+        foreach (var entry in saved)
+        {
+            var kv = entry.Split('=');
+            if (kv.Length != 2 || !int.TryParse(kv[0], out int slot)) continue;
+            var skill = FindSkill(kv[1]);
+            if (skill != null) EquipSkill(slot, skill);
+        }
     }
 
     private void Update()
@@ -1058,6 +1119,12 @@ public class ModularSkillManager : MonoBehaviour
             return false;
         }
 
+        // Chưa học (cuộn / quest / boss) thì không gắn được
+        if (!SkillBook.Has(skill))
+        {
+            return false;
+        }
+
         // Remove reference to UnifiedSkillSystem as it's been removed
         
         bool success = slot.EquipSkill(skill);
@@ -1111,7 +1178,7 @@ public class ModularSkillManager : MonoBehaviour
 
     public List<SkillModule> GetAvailableSkills()
     {
-        return availableSkills.Where(skill => GetPlayerLevel() >= skill.requiredLevel).ToList();
+        return availableSkills.Where(skill => SkillBook.Has(skill) && GetPlayerLevel() >= skill.requiredLevel).ToList();
     }
 
     public List<SkillSlot> GetUnlockedSlots()

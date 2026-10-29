@@ -289,7 +289,7 @@ GameObject:
   - component: {fileID: 7849050928950934719}
   - component: {fileID: 42132069003039448}
   - component: {fileID: 6334476476338937206}
-  - component: {fileID: 5945288167509884603}
+  - component: {fileID: 2816063753521328007}
   m_Layer: 3
   m_Name: Enemy_Rat
   m_TagString: Enemy
@@ -523,7 +523,7 @@ NavMeshAgent:
   m_BaseOffset: 0.2
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
---- !u!114 &5945288167509884603
+--- !u!114 &2816063753521328007
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

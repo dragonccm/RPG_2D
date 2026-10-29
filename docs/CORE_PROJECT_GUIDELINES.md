@@ -170,6 +170,8 @@ Mọi đòn đánh của Player và Enemy phải tuân thủ nghiêm ngặt 3 ph
 - Skill tree chỉ lưu *nâng cấp* (`SkillUpgrade` trỏ tới `SkillDef` cha); node cha chưa học = node khóa.
 - Tách `SkillExecutors.cs` thành 1 file / 1 executor (≤ 200 dòng), đăng ký qua bảng `executorId → class`, không reflection.
 
+**Trạng thái 30/10/2026:** ✅ `SkillBook` (Core/SkillBook.cs) là nguồn "đã học gì": nhân vật khởi đầu **không có kỹ năng nào**; `ModularSkillManager` chỉ liệt kê/gắn kỹ năng đã học, tự gắn vào ô trống đầu tiên khi học, lưu `learnedSkills` + `equippedSkills` ("ô=skillId") trong save. `SkillModule` giữ vai trò `SkillDef` (thêm `skillId` ổn định + `source`; không đổi tên class để khỏi gãy asset). Cuộn kỹ năng = `ItemData.learnSkill` (Băng Tiễn ở rương đầm, Hồi Phục ở hang, Lôi Kích ở rương tháp); cuộn di chuyển (`unlockSkillId`) vẫn mở nút gốc cây kỹ năng, tier 1 `scrollOnly`. `SkillExecutors.cs` (1720 dòng) tách thành `Core/Skills/*` (mỗi executor 1 file, base và projectile là partial), bỏ reflection, xoá `UnifiedSkillSystem`, `SkillSystemDocumentation`, `ISkill`. Còn nợ: dữ liệu cân bằng 11 kỹ năng cũ trong `Data/Skills/Old`; `ModularSkillManager` vẫn 1400 dòng (hotkey/preview/save cũ) — tách tiếp khi đụng tới UI kỹ năng.
+
 ### 6.6 Inventory & Item
 - `ItemDef` (SO, có `id` ổn định, không đổi tên sau khi phát hành save). Lưu bằng `id` + số lượng, không lưu tham chiếu asset.
 - Mọi thao tác túi qua `InventorySystem.TryAdd/TryRemove/Use` (trả `bool` + lý do); UI chỉ đọc sự kiện `InventoryChanged`.

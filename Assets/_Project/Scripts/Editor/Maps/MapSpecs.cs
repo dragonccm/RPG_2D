@@ -75,7 +75,7 @@ public static class MapSpecs
         });
         s.signs.Add(new SignDef { text = DialogueDatabase.CaveMuralLeft });
         s.signs.Add(new SignDef { text = DialogueDatabase.CaveMuralRight });
-        s.chests.Add(new ChestDef { id = "cave_hoard", itemId = "potion_hp", count = 5 });
+        s.chests.Add(new ChestDef { id = "cave_hoard", itemId = "scroll_skill_heal" });
         s.encounters['1'] = new EncounterDef { id = "cave_rats_w", radius = 6f, enemies = { new EnemyDef("Rat", -1f, 0f), new EnemyDef("Rat", 1f, 0.6f), new EnemyDef("Rat", 0f, -1f), new EnemyDef("Rat", 1.4f, -0.7f) } };
         s.encounters['3'] = new EncounterDef { id = "cave_rats_e", radius = 6f, enemies = { new EnemyDef("Rat", -1f, 0f), new EnemyDef("Rat", 1f, 0.6f), new EnemyDef("Rat", 0f, -1f) } };
         s.encounters['2'] = new EncounterDef
@@ -366,7 +366,7 @@ public static class MapSpecs
             name = "Lao_Cau", pawnColor = "Blue",
             first = DialogueDatabase.LaoCauFirst, repeat = DialogueDatabase.LaoCauRepeat,
         });
-        s.chests.Add(new ChestDef { id = "marsh_rune", itemId = "potion_hp", count = 3 });                 // sau rào rune (Hư Không)
+        s.chests.Add(new ChestDef { id = "marsh_rune", itemId = "scroll_skill_ice_blast" });                 // sau rào rune (Hư Không)
         s.chests.Add(new ChestDef
         {
             id = "marsh_key", itemId = "key_tower", questId = "q3", objectiveId = "q3_key",
@@ -455,7 +455,7 @@ public static class MapSpecs
         s.stairs.Add(new StairDef { toSpawnId = "tower_f1_stair", arrivalSpawnId = "tower_top", arrivalOffset = Vector2.up });
         s.stairs.Add(new StairDef { toSpawnId = "tower_top", arrivalSpawnId = "tower_f1_stair", arrivalOffset = Vector2.down });
         s.signs.Add(new SignDef { text = DialogueDatabase.TowerInscription });
-        s.chests.Add(new ChestDef { id = "tower_rune", itemId = "potion_hp", count = 3 });
+        s.chests.Add(new ChestDef { id = "tower_rune", itemId = "scroll_skill_thunder_strike" });
         s.dartDirections.AddRange(new[] { Vector2.down, Vector2.down, Vector2.right, Vector2.left });
         s.encounters['7'] = new EncounterDef { id = "tower_hall_w", radius = 5f, enemies = { new EnemyDef("Lancer", 0f, 0f) { tint = new Color(0.55f, 0.45f, 0.7f) }, new EnemyDef("Goblin", 1.5f, 0.5f) } };
         s.encounters['9'] = new EncounterDef { id = "tower_hall_e", radius = 5f, enemies = { new EnemyDef("Lancer", 0f, 0f), new EnemyDef("Archer", 0f, 1.5f) } };

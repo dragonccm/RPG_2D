@@ -31,6 +31,8 @@ public static class SaveSystem
         public List<QuestSaveEntry> questEntries = new List<QuestSaveEntry>();
         public int playerXp;
         public List<InventorySaveEntry> inventoryEntries = new List<InventorySaveEntry>();
+        public List<string> learnedSkills = new List<string>();   // SkillBook
+        public List<string> equippedSkills = new List<string>();  // "slot=skillId"
     }
 
     /// <summary>Override cho unit test (mặc định persistentDataPath).</summary>
@@ -113,6 +115,8 @@ public static class SaveSystem
             data.questEntries = QuestManager.Instance.ExportSave();
         data.playerXp = LevelSystem.Xp;
         data.questFlags = WorldFlags.Export();
+        data.learnedSkills = SkillBook.Export();
+        if (skill != null) data.equippedSkills = skill.ExportEquipped();
 
         if (InventoryManager.Instance != null)
         {
@@ -154,6 +158,8 @@ public static class SaveSystem
             QuestManager.Instance.ImportSave(d.questEntries);
         LevelSystem.Import(d.level, d.playerXp);
         WorldFlags.Import(d.questFlags);
+        SkillBook.Import(d.learnedSkills);
+        if (skill != null) skill.ImportEquipped(d.equippedSkills);
         if (InventoryManager.Instance != null)
             InventoryManager.Instance.ImportSave(d.inventoryEntries);
         player.transform.position = new Vector3(d.posX, d.posY, 0f);

@@ -30,6 +30,7 @@ public static class GameFlow
     public static void NewGame()
     {
         WorldFlags.Import(null);
+        SkillBook.Import(null);
         if (InventoryManager.Instance != null) InventoryManager.Instance.ClearAll();
         LevelSystem.Import(1, 0);
         carry = null;

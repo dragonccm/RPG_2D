@@ -42,6 +42,7 @@ public static class MapBuilder
         MapArt.Reset();
         MapArt.EnsureFolder(MapFolder);
         RenderSetup.EnsureAll();
+        SkillScrollBuilder.BuildAll();
         EnemyPrefabBuilder.BuildAll();
         var built = new List<string>();
         foreach (var spec in MapSpecs.All())

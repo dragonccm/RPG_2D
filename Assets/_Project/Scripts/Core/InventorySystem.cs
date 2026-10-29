@@ -173,6 +173,23 @@ public class InventoryManager : MonoBehaviour
         // 1. DÙNG CUỘN KỸ NĂNG (SKILL SCROLL)
         if (item.itemType == ItemType.SkillScroll)
         {
+            // 1a. Cuộn kỹ năng chủ động (SkillModule) → SkillBook
+            if (item.learnSkill != null)
+            {
+                if (SkillBook.Has(item.learnSkill))
+                {
+                    OnNotificationMessage?.Invoke($"Bạn đã lĩnh ngộ {item.learnSkill.skillName} trước đó rồi!");
+                    return false;
+                }
+                SkillBook.Learn(item.learnSkill);
+                slot.quantity--;
+                if (slot.quantity <= 0) slot.Clear();
+                OnNotificationMessage?.Invoke($"Lĩnh ngộ thành công: {item.learnSkill.skillName}!");
+                OnInventoryChanged?.Invoke();
+                return true;
+            }
+
+            // 1b. Cuộn mở kỹ năng di chuyển (Dash/Teleport/Charge) → nút gốc của cây kỹ năng
             if (string.IsNullOrEmpty(item.unlockSkillId)) return false;
 
             if (SkillTreeManager.Instance != null)

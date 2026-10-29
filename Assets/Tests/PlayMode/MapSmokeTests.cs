@@ -175,6 +175,31 @@ public class MapSmokeTests
     }
 
     [UnityTest]
+    public IEnumerator Player_StartsWithoutSkills_ChestScrollTeachesOne()
+    {
+        WorldFlags.Import(null);
+        SkillBook.Import(null);
+        InventoryManager.Instance?.ClearAll();
+        yield return Load("M5_Cave");
+        var player = Object.FindAnyObjectByType<PlayerController>();
+        var skills = player.GetComponent<ModularSkillManager>();
+        Assert.IsEmpty(skills.GetAvailableSkills(), "nhân vật khởi đầu chưa có kỹ năng nào");
+
+        var chest = Object.FindObjectsByType<TreasureChest>().First(c => c.Flag == "chest:cave_hoard");
+        chest.OpenChest();
+        Assert.AreEqual(1, InventoryManager.Instance.GetItemCount("scroll_skill_heal"), "rương cho cuộn Hồi Phục");
+
+        PlayerPrefs.SetInt("PlayerLevel", 3);
+        skills.UpdateUnlockedSlots();
+        int slot = Enumerable.Range(0, InventoryManager.TOTAL_SLOTS).First(i => !InventoryManager.Instance.GetSlot(i).IsEmpty);
+        Assert.IsTrue(InventoryManager.Instance.UseItem(slot));
+        Assert.IsTrue(SkillBook.Has("heal"));
+        Assert.IsTrue(skills.GetSlot(0).HasSkill(), "tự gắn vào ô kỹ năng đầu");
+        PlayerPrefs.DeleteKey("PlayerLevel");
+        Assert.IsEmpty(errors, string.Join("\n", errors));
+    }
+
+    [UnityTest]
     public IEnumerator Portal_Travel_CarriesStateAndPlacesAtSpawn()
     {
         yield return Load("M1_Village");

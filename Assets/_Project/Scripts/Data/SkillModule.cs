@@ -6,9 +6,20 @@ using UnityEngine;
 /// Description: Core skill data container and behavior definition for the Enhanced RPG Skill System.
 /// Supports Melee, Projectile, Area and Support skills with visualization and execution logic.
 /// </summary>
+/// <summary>Kỹ năng học từ đâu — nhân vật khởi đầu không có kỹ năng nào (xem SkillBook).</summary>
+public enum SkillSource { Scroll, Quest, Boss }
+
 [CreateAssetMenu(fileName = "SkillModule", menuName = "RPG/Skill Module")]
 public class SkillModule : ScriptableObject
 {
+    [Header("Định danh & nguồn (SkillBook)")]
+    [Tooltip("Id ổn định dùng khi lưu game — đừng đổi sau khi phát hành. Để trống = tên asset.")]
+    public string skillId;
+    public SkillSource source = SkillSource.Scroll;
+
+    /// <summary>Id ổn định (skillId, hoặc tên asset nếu chưa đặt).</summary>
+    public string Id => string.IsNullOrEmpty(skillId) ? name : skillId;
+
     [Header("Basic Information")]
     public string skillName;
     [TextArea(2, 4)]
