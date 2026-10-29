@@ -97,7 +97,8 @@
 - Smoke test Play Mode 60s qua CLI (`EditorApplication.isPlaying`) sau mỗi thay đổi logic — đếm exception trong `Logs/Editor.log` phải = 0 (trừ bug Unity-internal đã liệt kê).
 - Không sửa scene bằng tay khi đang Play Mode.
 
-### 2.2 Danh sách việc P0
+### 2.2 Danh sách việc P0 — **✅ HOÀN THÀNH 29/10/2026**
+> Kết quả thực tế: recompile **0 errors / 0 warnings**; EditMode tests **8/8 xanh**; Play Mode smoke 60s **0 exception**; đã commit `8ec5653`+`8ec565e`. Ghi chú: P0-1 thực thi bằng cách xoá hẳn thư mục `Debug/` (4 script lỗi encoding, không được tham chiếu); P0-2 xoá `Deprecated/`; thêm asmdef `RPG.Game` (+Editor/Tools) & `RPG.Tests.EditMode` (P0-6 cần).
 | # | Việc | Chi tiết | Nghiem thu |
 |---|---|---|---|
 | P0-1 | Tách code Debug ra khỏi build | Thêm assembly definition cho `Debug/` (chỉ Editor) hoặc guard `#if UNITY_EDITOR` + `#if DEVELOPMENT_BUILD` | Build WebGL không chứa 4 script Debug; scene chạy không sinh log test |
@@ -483,7 +484,7 @@ Quest flag lưu trong save JSON; UI quest chỉ 1 panel gọn (đã có `UIManag
 ### Giai đoạn tổng (10 tuần ước tính, 1 dev + AI hỗ trợ)
 | Sprint | Tuần | Deliverable | Tiêu chí nghiệm thu |
 |---|---|---|---|
-| **S0 — Dọn nền** | 1 | P0-1…P0-7 (mục 2) | recompile 0/0; test xanh; README khớp |
+| **S0 — Dọn nền** | 1 | P0-1…P0-7 (mục 2) | ✅ **XONG 29/10** — recompile 0/0, test 8/8, play smoke 0 exception |
 | **S1 — Cảm giác chơi** | 2 | P1-1…P1-7 (mục 3) | Test 8 hướng sai số ≤1%; bóng + y-sort đúng; hit feedback |
 | **S2 — Lõi combat** | 3–4 | State machine player + combo + crit + damage numbers + pooling | Play 10 phút 0 exception; 60 FPS 25 enemy |
 | **S3 — Map M1+M2** | 4–5 | 2 map + mini-boss 1 + checkpoint + save/load | Đi từ làng tới sau rừng 1 mạch không lỗi |
