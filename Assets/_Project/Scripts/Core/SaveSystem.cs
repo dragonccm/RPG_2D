@@ -30,6 +30,7 @@ public static class SaveSystem
         public List<string> unlockedSkills = new List<string>();
         public List<QuestSaveEntry> questEntries = new List<QuestSaveEntry>();
         public int playerXp;
+        public List<InventorySaveEntry> inventoryEntries = new List<InventorySaveEntry>();
     }
 
     /// <summary>Override cho unit test (mặc định persistentDataPath).</summary>
@@ -111,6 +112,23 @@ public static class SaveSystem
         if (QuestManager.Instance != null)
             data.questEntries = QuestManager.Instance.ExportSave();
         data.playerXp = LevelSystem.Xp;
+
+        if (InventoryManager.Instance != null)
+        {
+            for (int i = 0; i < InventoryManager.TOTAL_SLOTS; i++)
+            {
+                var s = InventoryManager.Instance.GetSlot(i);
+                if (s != null && !s.IsEmpty)
+                {
+                    data.inventoryEntries.Add(new InventorySaveEntry
+                    {
+                        slotIndex = i,
+                        itemId = s.item.itemId,
+                        quantity = s.quantity
+                    });
+                }
+            }
+        }
         return data;
     }
 

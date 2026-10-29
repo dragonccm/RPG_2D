@@ -1,0 +1,9 @@
+fileFormatVersion: 2
+guid: 265ac37eed514de0af02b0a74eed4f9b
+AnimationClip:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Warrior_Attack2
+  serializedVersion: 7

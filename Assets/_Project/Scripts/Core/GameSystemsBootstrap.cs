@@ -15,6 +15,8 @@ public static class GameSystemsBootstrap
             new GameObject("QuestManager").AddComponent<QuestManager>();
         if (SkillTreeManager.Instance == null)
             new GameObject("SkillTreeManager").AddComponent<SkillTreeManager>();
+        if (InventoryManager.Instance == null)
+            new GameObject("InventoryManager").AddComponent<InventoryManager>();
 
         var canvas = UnityEngine.Object.FindFirstObjectByType<Canvas>();
         if (canvas == null)
@@ -37,6 +39,12 @@ public static class GameSystemsBootstrap
             var s = new GameObject("SkillTreeUI");
             s.transform.SetParent(canvasTransform, false);
             s.AddComponent<SkillTreeUI>();
+        }
+        if (InventoryUI.Instance == null)
+        {
+            var inv = new GameObject("InventoryUI");
+            inv.transform.SetParent(canvasTransform, false);
+            inv.AddComponent<InventoryUI>();
         }
         // (Debug log tắt để không spam mỗi scene load)
     }

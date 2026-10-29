@@ -4,8 +4,8 @@ using System.Collections;
 using System;
 
 /// <summary>
-/// Script c? s? cho t?t c? k? ??ch - ch?a thu?c tÌnh v‡ ch?c n?ng chung
-/// M?i k? ??ch ??u c?n script n‡y ?? ho?t ??ng
+/// Script c? s? cho t?t c? k? ??ch - ch?a thu?c t√≠nh v√† ch?c n?ng chung
+/// M?i k? ??ch ??u c?n script n√†y ?? ho?t ??ng
 /// </summary>
 [RequireComponent(typeof(NavMeshAgent))]
 [RequireComponent(typeof(Animator))]
@@ -36,7 +36,7 @@ public class CoreEnemy : MonoBehaviour, IDamageable
     [SerializeField] private float detectionRange = 8f;
     [SerializeField] private float chaseRange = 15f;
     [SerializeField] private float loseTargetRange = 20f;
-    [SerializeField] private LayerMask playerLayerMask = 1 << 7;
+    [SerializeField] private LayerMask playerLayerMask = 1 << 6; // Layer 6 l√† Player theo TagManager
     [SerializeField] private LayerMask obstacleLayerMask = 1;
     [SerializeField] private bool useLineOfSight = true;
     [SerializeField] private float targetUpdateInterval = 0.2f;
@@ -285,8 +285,8 @@ public class CoreEnemy : MonoBehaviour, IDamageable
     
     private Transform FindBestTarget()
     {
-        // Find all potential targets in detection range
-        Collider[] hitColliders = Physics.OverlapSphere(transform.position, detectionRange, playerLayerMask);
+        // Find all potential targets in detection range (d√πng Physics2D cho game 2D top-down)
+        Collider2D[] hitColliders = Physics2D.OverlapCircleAll(transform.position, detectionRange, playerLayerMask);
         
         Transform bestTarget = null;
         float bestScore = float.MinValue;

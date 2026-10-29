@@ -36,7 +36,7 @@ public class Enemy : MonoBehaviour
     [Tooltip("Sát thương cơ bản của kẻ địch.")]
     public float baseDamage = 10f;
     [Tooltip("Layer của Player để kẻ địch có thể phát hiện.")]
-    public LayerMask playerLayerMask = 1 << 7; // Layer của Player
+    public LayerMask playerLayerMask = 1 << 6; // Layer 6 là Player (TagManager)
 
     protected Transform target; // Mục tiêu hiện tại của kẻ địch (không SerializeField)
     [SerializeField] protected NavMeshAgent agent; // NavMeshAgent để điều khiển di chuyển
@@ -534,9 +534,9 @@ public class Enemy : MonoBehaviour
             }
         }
 
-        // BƯỚC 2: Tìm players bằng multiple methods
+        // BƯỚC 2: Tìm players bằng Physics2D (game 2D top-down)
         tempPlayerList.Clear();
-        var colliders = Physics.OverlapSphere(transform.position, detectionRange, playerLayerMask);
+        var colliders = Physics2D.OverlapCircleAll(transform.position, detectionRange, playerLayerMask);
         foreach (var col in colliders)
         {
             if (col != null && IsValidTarget(col.transform))

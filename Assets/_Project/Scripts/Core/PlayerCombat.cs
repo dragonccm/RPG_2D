@@ -80,11 +80,42 @@ public class PlayerCombat : MonoBehaviour
         lastAttackTime = Time.time;
     }
 
+    private static readonly Collider2D[] hitBuffer = new Collider2D[32];
+
+    private Character[] QueryEnemies(Vector2 center, float range)
+    {
+        int count = Physics2D.OverlapCircleNonAlloc(center, range, hitBuffer);
+        var list = new System.Collections.Generic.List<Character>(count);
+        for (int i = 0; i < count; i++)
+        {
+            var col = hitBuffer[i];
+            if (col == null) continue;
+            var ch = col.GetComponent<Character>() ?? col.GetComponentInParent<Character>();
+            if (ch != null && ch != character && !ch.IsDead && !list.Contains(ch))
+            {
+                // Loại trừ người chơi
+                if (ch.CompareTag("Player") || ch.GetComponent<PlayerController>() != null) continue;
+                list.Add(ch);
+            }
+        }
+        // Fallback cho môi trường test EditMode hoặc mock không có 2D collider
+        if (list.Count == 0 && probe != null)
+        {
+            return probe.EnemiesInRange(center, range, character);
+        }
+        return list.ToArray();
+    }
+
     private IEnumerator AttackRoutine(int index)
     {
         playerController.SetBusy(true);
         var animator = playerController.GetComponent<Animator>();
-        if (animator != null) animator.SetTrigger("Attack");
+        if (animator != null)
+        {
+            animator.SetTrigger("Attack");
+            // Set combo index parameter nếu animator có hỗ trợ
+            animator.SetInteger("ComboIndex", index);
+        }
 
         yield return new WaitForSeconds(windup);
 
@@ -100,7 +131,7 @@ public class PlayerCombat : MonoBehaviour
             if (toMouse.sqrMagnitude > 0.05f) aim = toMouse.normalized;
         }
         Vector2 center = (Vector2)transform.position + aim * attackReach;
-        var targets = probe.EnemiesInRange(center, attackRange, character);
+        var targets = QueryEnemies(center, attackRange);
 
         bool isFinisher = index == comboMultipliers.Length - 1;
         bool anyHit = false;
@@ -125,6 +156,12 @@ public class PlayerCombat : MonoBehaviour
                 fx.ScreenShake(finisherShake, 0.12f);
                 fx.HitStop(0.05f);
                 fx.CreateImpactEffect(center, Color.yellow, 1.4f);
+            }
+            else
+            {
+                fx.ScreenShake(0.04f, 0.08f);
+                fx.HitStop(0.04f);
+                fx.CreateImpactEffect(center, Color.white, 0.9f);
             }
         }
 

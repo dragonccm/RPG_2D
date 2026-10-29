@@ -156,22 +156,35 @@ public class SkillTreeManager : MonoBehaviour
         return UnlockResult.Ok;
     }
 
-    public bool Unlock(string nodeId)
+    public bool Unlock(string nodeId, bool bypassCost = false)
     {
-        var r = CanUnlock(nodeId, out var reason);
-        if (r != UnlockResult.Ok)
+        if (unlocked.Contains(nodeId)) return false;
+        var n = FindNode(nodeId);
+        if (n == null) return false;
+
+        if (!bypassCost)
         {
-            Debug.Log($"🌳 Không mở được [{nodeId}]: {reason}");
-            return false;
+            var r = CanUnlock(nodeId, out var reason);
+            if (r != UnlockResult.Ok)
+            {
+                Debug.Log($"🌳 Không mở được [{nodeId}]: {reason}");
+                return false;
+            }
+            if (nodeId != "root")
+            {
+                SkillPoints--;
+                OnPointsChanged?.Invoke(SkillPoints);
+            }
         }
+        else
+        {
+            // Nếu dùng cuộn bí kíp: tự động mở nút root (gốc) nếu chưa có
+            if (!unlocked.Contains("root")) unlocked.Add("root");
+        }
+
         unlocked.Add(nodeId);
-        if (nodeId != "root")
-        {
-            SkillPoints--;
-            OnPointsChanged?.Invoke(SkillPoints);
-        }
         ApplyNode(nodeId);
-        Debug.Log($"🌳 Đã mở nút: {FindNode(nodeId).name} (còn {SkillPoints} điểm)");
+        Debug.Log($"🌳 Đã mở nút: {n.name} (còn {SkillPoints} điểm)");
         OnNodeUnlocked?.Invoke(nodeId);
         return true;
     }
