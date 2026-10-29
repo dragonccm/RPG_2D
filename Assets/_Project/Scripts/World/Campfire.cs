@@ -12,11 +12,39 @@ public class Campfire : MonoBehaviour
     [SerializeField] private KeyCode interactKey = KeyCode.F;
 
     private float nextInteractTime;
+    private UnityEngine.Rendering.Universal.Light2D fireLight;
 
     public string CheckpointId => checkpointId;
 
+    private void Awake()
+    {
+        EnsureLight();
+    }
+
+    private void EnsureLight()
+    {
+        fireLight = GetComponentInChildren<UnityEngine.Rendering.Universal.Light2D>();
+        if (fireLight == null)
+        {
+            var lightGo = new GameObject("CampfireLight");
+            lightGo.transform.SetParent(transform, false);
+            lightGo.transform.localPosition = new Vector3(0f, 0.2f, 0f);
+            fireLight = lightGo.AddComponent<UnityEngine.Rendering.Universal.Light2D>();
+            fireLight.lightType = UnityEngine.Rendering.Universal.Light2D.LightType.Point;
+            fireLight.color = new Color(1f, 0.65f, 0.25f, 1f); // Cam vàng ấm
+            fireLight.intensity = 1.35f;
+            fireLight.pointLightOuterRadius = 4.5f;
+        }
+    }
+
     private void Update()
     {
+        // Hiệu ứng bập bùng ấm áp của ngọn lửa
+        if (fireLight != null)
+        {
+            fireLight.intensity = 1.3f + Mathf.Sin(Time.time * 7f) * 0.12f + Random.Range(-0.04f, 0.04f);
+        }
+
         if (!Input.GetKeyDown(interactKey)) return;
         if (Time.unscaledTime < nextInteractTime) return;
 

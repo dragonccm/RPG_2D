@@ -78,6 +78,29 @@ public class QuestManager : MonoBehaviour
             rewardXp = 120,
             rewardSkillPoints = 1,
         },
+        new QuestDef
+        {
+            id = "q3", title = "Phong ấn Tháp Cổ",
+            desc = "Giải câu đố công tắc đá tại đầm sương và thu thập Chìa Khóa Tháp Cổ.",
+            objectives = new[]
+            {
+                new QuestObjective { id = "q3_switch", label = "Kích hoạt công tắc cổ", required = 1 },
+                new QuestObjective { id = "q3_key", label = "Thu thập Chìa Khóa Tháp", required = 1 },
+            },
+            rewardXp = 150,
+            rewardSkillPoints = 1,
+        },
+        new QuestDef
+        {
+            id = "q4", title = "Đỉnh Tháp Trăng Đỏ",
+            desc = "Tiến vào đỉnh tháp đối mặt với Pháp sư Agis và kết thúc đêm trăng đỏ.",
+            objectives = new[]
+            {
+                new QuestObjective { id = "q4_agis", label = "Đánh bại Pháp sư Agis", required = 1 },
+            },
+            rewardXp = 300,
+            rewardSkillPoints = 2,
+        },
     };
 
     private readonly Dictionary<string, QuestState> states = new Dictionary<string, QuestState>();
@@ -188,6 +211,8 @@ public class QuestManager : MonoBehaviour
         }
         Debug.Log($"📜 Đã nhận thưởng quest: {questId}");
         OnQuestCompleted?.Invoke(questId);
+        if (questId == "q2") StartQuest("q3");
+        else if (questId == "q3") StartQuest("q4");
         return true;
     }
 

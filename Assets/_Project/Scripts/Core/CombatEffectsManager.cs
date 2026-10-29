@@ -53,11 +53,15 @@ public class CombatEffectsManager : MonoBehaviour
         if (instance == null)
         {
             instance = this;
-            DontDestroyOnLoad(gameObject);
+            if (Application.isPlaying)
+            {
+                DontDestroyOnLoad(gameObject);
+            }
         }
         else if (instance != this)
         {
-            Destroy(gameObject);
+            if (Application.isPlaying) Destroy(gameObject);
+            else DestroyImmediate(gameObject);
             return;
         }
 
@@ -67,8 +71,19 @@ public class CombatEffectsManager : MonoBehaviour
             originalCameraPosition = mainCamera.transform.position;
         }
 
-        damageNumberPool = new ObjectPool(CreateDamageNumberObject, transform);
-        impactEffectPool = new ObjectPool(CreateImpactObject, transform);
+        InitializePoolsIfNeeded();
+    }
+
+    private void InitializePoolsIfNeeded()
+    {
+        if (damageNumberPool == null)
+        {
+            damageNumberPool = new ObjectPool(CreateDamageNumberObject, transform);
+        }
+        if (impactEffectPool == null)
+        {
+            impactEffectPool = new ObjectPool(CreateImpactObject, transform);
+        }
     }
 
     private static Sprite GetCircleSprite()
@@ -113,6 +128,8 @@ public class CombatEffectsManager : MonoBehaviour
 
     public void ShowDamageNumber(float damage, Vector3 worldPosition, bool isCritical = false)
     {
+        if (!Application.isPlaying) return;
+        InitializePoolsIfNeeded();
         if (damageNumberPrefab != null)
         {
             GameObject damageNumberObj = Instantiate(damageNumberPrefab, worldPosition, Quaternion.identity);
@@ -223,7 +240,7 @@ public class CombatEffectsManager : MonoBehaviour
 
     public void ScreenShake(float intensity = -1f, float duration = -1f)
     {
-        if (mainCamera == null) return;
+        if (!Application.isPlaying || mainCamera == null) return;
         
         float shakeIntensity = intensity > 0 ? intensity : screenShakeIntensity;
         float shakeDuration = duration > 0 ? duration : screenShakeDuration;
@@ -259,6 +276,7 @@ public class CombatEffectsManager : MonoBehaviour
 
     public void HitStop(float duration = -1f)
     {
+        if (!Application.isPlaying) return;
         float stopDuration = duration > 0 ? duration : hitStopDuration;
         StartCoroutine(HitStopCoroutine(stopDuration));
     }
@@ -275,6 +293,8 @@ public class CombatEffectsManager : MonoBehaviour
 
     public void CreateImpactEffect(Vector3 position, Color color, float scale = 1f)
     {
+        if (!Application.isPlaying) return;
+        InitializePoolsIfNeeded();
         // S2: pooled sprite effect (2D, URP-safe) thay primitive 3D Standard shader
         StartCoroutine(CreateImpactEffectCoroutine(position, color, scale));
     }

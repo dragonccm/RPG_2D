@@ -76,6 +76,10 @@ public class agis_wizzar : MonoBehaviour
     private float fireballCooldownTimer = 0f;
     private float aoeCooldownTimer = 0f;
 
+    private bool isDowned = false;
+    private bool endingChosen = false;
+    private GameObject endingPromptGo;
+
     // Properties utilizing Character system
     public float CurrentHealth => character != null ? character.CurrentHealth : 0f;
     public float MaxHealth => character != null ? character.MaxHealth : maxHealth;
@@ -134,6 +138,12 @@ public class agis_wizzar : MonoBehaviour
 
     void Update()
     {
+        if (isDowned)
+        {
+            HandleEndingChoice();
+            return;
+        }
+
         UpdateCooldowns();
         
         if (Input.GetKeyDown(KeyCode.B))
@@ -403,6 +413,15 @@ public class agis_wizzar : MonoBehaviour
     {
         isSkillActive = true;
         
+        // TELEGRAPH: Boss chớp vàng và hiện cảnh báo trước khi bắn 0.35s
+        if (spriteRenderer != null) spriteRenderer.color = Color.yellow;
+        if (CombatEffectsManager.Instance != null && playerTarget != null)
+        {
+            CombatEffectsManager.Instance.CreateImpactEffect(playerTarget.position, new Color(1f, 0.8f, 0.2f, 0.7f), 0.8f);
+        }
+        yield return new WaitForSeconds(0.35f);
+        if (spriteRenderer != null) spriteRenderer.color = isBerserk ? Color.red : Color.white;
+
         Debug.Log($"Agis Wizzar casting fireball! Berserk: {isBerserk}");
         
         if (isBerserk)
@@ -412,6 +431,7 @@ public class agis_wizzar : MonoBehaviour
             
             for (int i = 0; i < berserkFireballCount; i++)
             {
+                if (playerTarget == null) break;
                 Vector2 targetPos = (Vector2)playerTarget.position + Random.insideUnitCircle * 1f;
                 LaunchFireball2D(targetPos);
                 
@@ -422,7 +442,7 @@ public class agis_wizzar : MonoBehaviour
         {
             // Normal mode
             fireballCooldownTimer = fireballCooldown;
-            LaunchFireball2D(playerTarget.position);
+            if (playerTarget != null) LaunchFireball2D(playerTarget.position);
         }
         
         yield return new WaitForSeconds(0.2f);
@@ -774,14 +794,96 @@ public class agis_wizzar : MonoBehaviour
         if (rb2d != null)
             rb2d.linearVelocity = Vector2.zero;
             
-        // Dừng tất cả coroutines
+        // Dừng tất cả coroutines chiến đấu
         StopAllCoroutines();
+
+        // Báo cáo tiến trình quest Q4
+        if (QuestManager.Instance != null)
+        {
+            QuestManager.Instance.ReportProgress("q4", "q4_agis");
+        }
+
+        // Tác động rung chấn màn hình hoành tráng khi boss gục
+        if (CombatEffectsManager.Instance != null)
+        {
+            CombatEffectsManager.Instance.ScreenShake(0.25f, 0.6f);
+            CombatEffectsManager.Instance.CreateImpactEffect(transform.position, Color.yellow, 2.5f);
+        }
+
+        // Thưởng cuộn bí kíp Hư Không cho người chơi
+        if (InventoryManager.Instance != null)
+        {
+            var scroll = Resources.Load<ItemData>("Scroll_ShadowTeleport");
+            if (scroll != null) InventoryManager.Instance.AddItem(scroll, 1);
+        }
         
-        // Disable movement và skills
-        this.enabled = false;
-        
-        // Destroy sau một khoảng thời gian
-        Destroy(gameObject, 3f);
+        isDowned = true;
+        ShowEndingChoicePrompt();
+    }
+
+    private void ShowEndingChoicePrompt()
+    {
+        if (endingPromptGo != null) return;
+        endingPromptGo = new GameObject("EndingChoicePrompt");
+        endingPromptGo.transform.SetParent(transform, false);
+        endingPromptGo.transform.localPosition = new Vector3(0, 1.8f, 0);
+
+        var tm = endingPromptGo.AddComponent<TextMesh>();
+        tm.text = "[F] Tha thứ   |   [J] Kết liễu";
+        tm.characterSize = 0.22f;
+        tm.anchor = TextAnchor.MiddleCenter;
+        tm.alignment = TextAlignment.Center;
+        tm.color = new Color(1f, 0.9f, 0.3f, 1f);
+    }
+
+    private void HandleEndingChoice()
+    {
+        if (endingChosen) return;
+
+        Transform pc = playerTarget;
+        if (pc == null)
+        {
+            var playerCtrl = FindFirstObjectByType<PlayerController>();
+            if (playerCtrl != null) pc = playerCtrl.transform;
+        }
+
+        if (pc != null && Vector2.Distance(transform.position, pc.position) <= 4.0f)
+        {
+            if (endingPromptGo != null) endingPromptGo.SetActive(true);
+
+            if (Input.GetKeyDown(KeyCode.F))
+            {
+                endingChosen = true;
+                if (endingPromptGo != null) Destroy(endingPromptGo);
+                if (DialogueUI.Instance != null)
+                {
+                    DialogueUI.Instance.StartDialogue(DialogueDatabase.AgisEndingForgive);
+                }
+                Debug.Log("🕊️ Người chơi chọn [THA THỨ] Agis - Đêm Trăng Đỏ khép lại trong ánh bình minh.");
+                Destroy(gameObject, 5f);
+            }
+            else if (Input.GetKeyDown(KeyCode.J) || Input.GetMouseButtonDown(0))
+            {
+                endingChosen = true;
+                if (endingPromptGo != null) Destroy(endingPromptGo);
+                if (DialogueUI.Instance != null)
+                {
+                    DialogueUI.Instance.StartDialogue(DialogueDatabase.AgisEndingDestroy);
+                }
+                var fx = CombatEffectsManager.Instance;
+                if (fx != null)
+                {
+                    fx.ScreenShake(0.35f, 0.8f);
+                    fx.CreateImpactEffect(transform.position, Color.red, 3.0f);
+                }
+                Debug.Log("⚔️ Người chơi chọn [KẾT LIỄU] Agis - Ác mộng Trăng Đỏ bị chém vỡ thành tro bụi.");
+                Destroy(gameObject, 3f);
+            }
+        }
+        else
+        {
+            if (endingPromptGo != null) endingPromptGo.SetActive(false);
+        }
     }
 
     void OnDrawGizmosSelected()

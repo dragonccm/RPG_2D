@@ -3,7 +3,9 @@
     "rootNamespace": "",
     "references": [
         "Unity.TextMeshPro",
-        "Unity.VisualScripting"
+        "Unity.VisualScripting",
+        "Unity.RenderPipelines.Universal.Runtime",
+        "Unity.RenderPipelines.Universal.2D.Runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -37,4 +37,17 @@ public class WorldSceneStructureTests
         Assert.IsNotNull(player.GetComponent<Rigidbody2D>(),
             "Player phải có Rigidbody2D (di chuyển bằng MovePosition)");
     }
+
+    [Test]
+    public void WorldScene_HasInteractiveWorldElements()
+    {
+        var scene = EditorSceneManager.OpenScene(SCENE_PATH, OpenSceneMode.Single);
+        var names = scene.GetRootGameObjects().Select(go => go.name).ToArray();
+
+        Assert.Contains("Chest_Village_Dash", names, "World phải có rương Làng chứa Cuộn Lướt Gió");
+        Assert.Contains("Puzzle_Barrier", names, "World phải có rào cản cổ Puzzle_Barrier");
+        Assert.Contains("Puzzle_Switch", names, "World phải có công tắc câu đố Puzzle_Switch");
+        Assert.Contains("Chest_Ruins_Key", names, "World phải có rương Tháp Cổ chứa chìa khóa");
+        Assert.Contains("SpikeTrap_1", names, "World phải có bẫy gai SpikeTrap_1");
+    }
 }

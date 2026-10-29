@@ -56,4 +56,27 @@ public static class DialogueDatabase
     public static readonly DialogueBlock OngTeRepeat = new DialogueBlock(
         "ongte_repeat",
         new DialogueLine("Ông Tễ", "Rừng Thảm Vàng đêm nay đỏ rực. Cẩn thận — bóng ở đó không phải bóng người."));
+
+    // M4 — Agis trước trận boss (plan 9.3)
+    public static readonly DialogueBlock AgisPreBoss = new DialogueBlock(
+        "agis_pre_boss",
+        new DialogueLine("Agis", "Ngươi cũng đến cướp vầng trăng à? Được... Nhưng trăng đêm nay là của con gái ta!"),
+        new DialogueLine("Kiền", "Tôi đến để đưa ông và con bé trở về làng — chứ không phải để cướp nó."),
+        new DialogueLine("Agis", "Đã quá muộn rồi... Sức mạnh của Trăng Đỏ không thể đảo ngược!"))
+    { startQuestOnEnd = "q4" };
+
+    // M4 — Agis sau trận boss (kết cục tha thứ)
+    public static readonly DialogueBlock AgisEndingForgive = new DialogueBlock(
+        "agis_ending_forgive",
+        new DialogueLine("Agis", "Ta... ta đã lạc lối sao? Lam... con vẫn ở đây ư?"),
+        new DialogueLine("Kiền", "Hãy nắm lấy tay con bé. Làng Phong Nguyệt vẫn luôn mở rộng cửa đón ông trở về."),
+        new DialogueLine("Agis", "Cảm ơn ngươi... Vầng trăng đỏ... cuối cùng cũng đã tắt."))
+    { claimQuestOnEnd = "q4" };
+
+    // M4 — Agis sau trận boss (kết cục hủy diệt)
+    public static readonly DialogueBlock AgisEndingDestroy = new DialogueBlock(
+        "agis_ending_destroy",
+        new DialogueLine("Kiền", "Ác mộng của ông... chấm dứt tại đây."),
+        new DialogueLine("Agis", "Vầng trăng vỡ tan rồi... Nhưng ký ức này... ngươi sẽ phải mang theo suốt đời..."))
+    { claimQuestOnEnd = "q4" };
 }
