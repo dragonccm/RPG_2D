@@ -15,4 +15,13 @@ public class CameraFollow : MonoBehaviour
             transform.position = smoothedPosition;
         }
     }
+
+    /// <summary>S3 (ScenePortal): đặt camera ngay lập tức tới target — teleport không lerp.</summary>
+    public void SnapTo(Vector3 targetPosition)
+    {
+        if (target != null)
+            transform.position = target.position + offset;
+        else
+            transform.position = targetPosition + offset;
+    }
 }
