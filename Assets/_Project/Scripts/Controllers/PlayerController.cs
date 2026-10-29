@@ -49,7 +49,9 @@ public class PlayerController : MonoBehaviour
         {
             float moveX = Input.GetAxisRaw("Horizontal");
             float moveY = Input.GetAxisRaw("Vertical");
-            movement = new Vector2(moveX, moveY);
+            // P1-1 (GAME_MASTER_PLAN 3.1): chuẩn hoá chéo TẠI NGUỒN —
+            // mọi hệ thống đọc .movement (dash/teleport/charge) đều nhận vector |v| ≤ 1
+            movement = MovementMath.ClampDiagonal(new Vector2(moveX, moveY));
 
             // Debug animation state
             if (animator != null)
@@ -215,9 +217,10 @@ public class PlayerController : MonoBehaviour
 
         if (!isBusy && canMove)
         {
-            // Làm mượt di chuyển
-            Vector2 targetPosition = rb.position + movement.normalized * moveSpeed * Time.fixedDeltaTime;
-            rb.MovePosition(Vector2.SmoothDamp(rb.position, targetPosition, ref currentVelocity, smoothMoveTime));
+            // P1-1: movement đã chuẩn hoá ở Update (|v| ≤ 1) → tốc độ chéo = tốc độ trục.
+            // Bỏ SmoothDamp per-axis: nội suy từng trục riêng làm cong quỹ đạo +
+            // lệch tốc độ chéo. Di chuyển thẳng theo vector chuẩn hoá.
+            rb.MovePosition(rb.position + movement * (moveSpeed * Time.fixedDeltaTime));
         }
     }
 

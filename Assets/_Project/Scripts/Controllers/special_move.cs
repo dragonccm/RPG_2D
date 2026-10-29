@@ -150,6 +150,12 @@ public class special_move : MonoBehaviour
         {
             Instantiate(dashEffect, transform.position, Quaternion.identity);
         }
+        // P1-7 (GAME_MASTER_PLAN 3.6): bụi khởi động + kết thúc dash
+        var fx = CombatEffectsManager.Instance;
+        if (fx != null)
+        {
+            fx.CreateImpactEffect(transform.position, new Color(0.75f, 0.68f, 0.55f), 0.8f);
+        }
         
         // Perform dash movement
         Vector2 startPos = transform.position;
@@ -171,6 +177,12 @@ public class special_move : MonoBehaviour
         // Animation trigger
         if (animator != null)
             animator.SetTrigger("Dash");
+        
+        // P1-7: bụi khi kết thúc dash
+        if (fx != null)
+        {
+            fx.CreateImpactEffect(transform.position, new Color(0.75f, 0.68f, 0.55f), 0.6f);
+        }
         
         isDashing = false;
         
