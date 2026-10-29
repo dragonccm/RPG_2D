@@ -21,6 +21,9 @@ public class PuzzleSwitch : MonoBehaviour, IDamageable
     [SerializeField] private Color offColor = new Color(0.7f, 0.7f, 0.7f);
     [SerializeField] private Color onColor = new Color(0.2f, 0.9f, 0.3f); // Xanh lá sáng khi mở
 
+    [SerializeField] private Sprite offSprite;
+    [SerializeField] private Sprite onSprite;
+
     public bool IsActivated { get; private set; }
     public float CurrentHealth => IsActivated ? 0f : 1f;
     public float MaxHealth => 1f;
@@ -102,7 +105,13 @@ public class PuzzleSwitch : MonoBehaviour, IDamageable
 
     private void UpdateVisual()
     {
-        if (spriteRenderer != null)
+        if (spriteRenderer == null) return;
+        if (onSprite != null && offSprite != null)
+        {
+            spriteRenderer.sprite = IsActivated ? onSprite : offSprite;
+            spriteRenderer.color = Color.white;
+        }
+        else
         {
             spriteRenderer.color = IsActivated ? onColor : offColor;
         }

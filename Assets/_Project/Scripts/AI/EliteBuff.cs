@@ -49,10 +49,23 @@ public class EliteBuff : MonoBehaviour
         if (character != null) character.OnDeath += GrantReward;
     }
 
+    /// <summary>Đặt tên/phần thưởng khi gắn bằng code (EncounterGroup). Buff đã áp ở Awake.</summary>
+    public void Configure(string displayName, string rewardId)
+    {
+        if (!string.IsNullOrEmpty(displayName))
+        {
+            eliteName = displayName;
+            gameObject.name = displayName;
+        }
+        rewardItemId = rewardId ?? "";
+        defeatedFlag = "boss:" + eliteName.ToLowerInvariant().Replace(' ', '_');
+    }
+
     private void GrantReward()
     {
         if (WorldFlags.Has(defeatedFlag)) return; // đã nhận ở lần chơi trước
         WorldFlags.Set(defeatedFlag);
+        if (string.IsNullOrEmpty(rewardItemId)) return;
         var item = ItemDatabase.Get(rewardItemId);
         if (item != null && InventoryManager.Instance != null)
         {

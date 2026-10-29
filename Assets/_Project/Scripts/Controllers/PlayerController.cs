@@ -346,6 +346,11 @@ public class PlayerController : MonoBehaviour
     public bool ValidateComponents()
     {
         bool isValid = true;
+        // Tra trực tiếp: OnValidate có thể chạy trước Awake (field cache còn null → báo lỗi sai)
+        var character = GetComponent<Character>();
+        var skillManager = GetComponent<ModularSkillManager>();
+        var animator = GetComponent<Animator>();
+        var rb = GetComponent<Rigidbody2D>();
 
         if (character == null)
         {

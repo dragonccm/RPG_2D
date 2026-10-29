@@ -2,7 +2,12 @@
     "name": "RPG.Game.Editor",
     "rootNamespace": "",
     "references": [
-        "RPG.Game"
+        "RPG.Game",
+        "Unity.2D.Sprite.Editor",
+        "Unity.2D.Tilemap.Extras",
+        "NavMeshPlus",
+        "Unity.RenderPipelines.Universal.Runtime",
+        "Unity.RenderPipelines.Universal.2D.Runtime"
     ],
     "includePlatforms": [
         "Editor"

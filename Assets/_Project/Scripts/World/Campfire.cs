@@ -34,6 +34,7 @@ public class Campfire : MonoBehaviour
             fireLight.color = new Color(1f, 0.65f, 0.25f, 1f); // Cam vàng ấm
             fireLight.intensity = 1.35f;
             fireLight.pointLightOuterRadius = 4.5f;
+            LightUtil.TargetAllLayers(fireLight);
         }
     }
 

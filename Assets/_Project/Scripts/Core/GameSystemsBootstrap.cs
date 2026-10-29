@@ -9,8 +9,27 @@ using UnityEngine.UI;
 public static class GameSystemsBootstrap
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+    private static void Init()
+    {
+        // Manager không DontDestroyOnLoad → dựng lại mỗi lần đổi map; trạng thái đi theo GameFlow (SaveData)
+        UnityEngine.SceneManagement.SceneManager.sceneLoaded -= OnSceneLoaded;
+        UnityEngine.SceneManagement.SceneManager.sceneLoaded += OnSceneLoaded;
+        EnsureSystems();
+        GameFlow.OnSceneReady();
+    }
+
+    private static void OnSceneLoaded(UnityEngine.SceneManagement.Scene scene, UnityEngine.SceneManagement.LoadSceneMode mode)
+    {
+        if (mode != UnityEngine.SceneManagement.LoadSceneMode.Single) return;
+        EnsureSystems();
+        GameFlow.OnSceneReady();
+    }
+
     private static void EnsureSystems()
     {
+        // Menu chính không cần manager gameplay
+        if (UnityEngine.Object.FindAnyObjectByType<PlayerController>() == null) return;
+
         if (QuestManager.Instance == null)
             new GameObject("QuestManager").AddComponent<QuestManager>();
         if (SkillTreeManager.Instance == null)
@@ -18,7 +37,7 @@ public static class GameSystemsBootstrap
         if (InventoryManager.Instance == null)
             new GameObject("InventoryManager").AddComponent<InventoryManager>();
 
-        var canvas = UnityEngine.Object.FindFirstObjectByType<Canvas>();
+        var canvas = UnityEngine.Object.FindAnyObjectByType<Canvas>();
         if (canvas == null)
         {
             var go = new GameObject("GameUICanvas",

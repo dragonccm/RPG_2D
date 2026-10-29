@@ -24,6 +24,8 @@ public class DialogueBlock
     public string startQuestOnEnd;        // ví dụ "q1"
     public string reportObjectiveOnEnd;   // "questId:objectiveId"
     public string claimQuestOnEnd;        // nhận thưởng quest
+    public string giveItemOnEnd;          // itemId trao cho người chơi (ItemDatabase)
+    public string setFlagOnEnd;           // world flag bật khi xong (mở cổng, đổi NPC...)
 
     public DialogueBlock(string blockId, params DialogueLine[] lines)
     {
@@ -56,6 +58,59 @@ public static class DialogueDatabase
     public static readonly DialogueBlock OngTeRepeat = new DialogueBlock(
         "ongte_repeat",
         new DialogueLine("Ông Tễ", "Rừng Thảm Vàng đêm nay đỏ rực. Cẩn thận — bóng ở đó không phải bóng người."));
+
+    // M1 — Mai trao Cuộn Lướt Gió sau q1, mở cổng bắc (LEVEL_DESIGN 3.1, 2.2)
+    public static readonly DialogueBlock MaiReward = new DialogueBlock(
+        "mai_reward",
+        new DialogueLine("Mai", "Ông Tễ bảo tay kiếm con đã vững. Cầm lấy — cuộn này là của cha con để lại."),
+        new DialogueLine("Mai", "Lướt Gió: chạy như gió qua khe nước, qua hố đất. Không có nó, rừng sẽ nuốt con."),
+        new DialogueLine("Kiền", "Cổng bắc...?"),
+        new DialogueLine("Mai", "Ta đã cho mở. Đi đi — trước khi trăng lên tới đỉnh."))
+    { giveItemOnEnd = "scroll_dash", setFlagOnEnd = "gate:village_north" };
+
+    public static readonly DialogueBlock MaiAfter = new DialogueBlock(
+        "mai_after",
+        new DialogueLine("Mai", "Nhớ: chỗ nào có lửa ấm thì trăng đỏ yếu đi. Nghỉ ở đống lửa khi cần."));
+
+    // M1 — bảng gỗ ở cổng bắc
+    public static readonly DialogueBlock SignNorthGate = new DialogueBlock(
+        "sign_north",
+        new DialogueLine("Bảng gỗ", "↑ Rừng Thảm Vàng. Cổng đóng từ khi trăng đỏ mọc — theo lệnh trưởng làng Mai."));
+
+    // M2 — Bé Na trốn sau tảng đá (lore về Lam)
+    public static readonly DialogueBlock NaFirst = new DialogueBlock(
+        "na_first",
+        new DialogueLine("Bé Na", "Anh Kiền! Em... em chạy theo con cừu rồi lạc mất đường về."),
+        new DialogueLine("Bé Na", "Chị Lam ngày xưa hay dẫn em ra đây hát bài cúng trăng. Chị bảo trăng trắng là trăng hiền."),
+        new DialogueLine("Bé Na", "Cầm cái này đi — mẹ dặn em đưa cho người canh làng."))
+    { giveItemOnEnd = "potion_hp", setFlagOnEnd = "npc:na_met" };
+
+    public static readonly DialogueBlock NaRepeat = new DialogueBlock(
+        "na_repeat",
+        new DialogueLine("Bé Na", "Em sẽ chờ ở đây tới khi anh dọn đường. Đừng để bọn mắt đỏ lại gần nhé..."));
+
+    // M2 — bàn thờ rừng
+    public static readonly DialogueBlock AltarStone = new DialogueBlock(
+        "altar_forest",
+        new DialogueLine("Bia đá", "\"Ba ngọn lửa canh ba phía. Thắp cùng lúc, đá sẽ nhường đường.\""));
+
+    // M3 — Lão Câu chèo đò
+    public static readonly DialogueBlock LaoCauFirst = new DialogueBlock(
+        "laocau_first",
+        new DialogueLine("Lão Câu", "Hừm, người làng Phong Nguyệt hả? Đầm này ba năm nay không ai dám qua."),
+        new DialogueLine("Lão Câu", "Bọn mặc áo cúng đóng trại trên đảo giữa đầm. Chúng giữ Chìa Khóa Tháp."),
+        new DialogueLine("Lão Câu", "Hạ được kẻ cầm đầu thì quay lại đây — lão chở ngươi về làng bằng đò."))
+    { setFlagOnEnd = "npc:laocau_met" };
+
+    public static readonly DialogueBlock LaoCauRepeat = new DialogueBlock(
+        "laocau_repeat",
+        new DialogueLine("Lão Câu", "Bùn ở phía bắc sâu lắm. Đi chậm thì chết, đi nhanh thì... lướt qua."));
+
+    // M4 — bia trước cầu thang tầng 2
+    public static readonly DialogueBlock TowerInscription = new DialogueBlock(
+        "tower_inscription",
+        new DialogueLine("Bia khắc", "\"Kẻ đổi trăng lấy người — trăng sẽ đòi lại gấp đôi.\""),
+        new DialogueLine("Kiền", "Agis... ông biết điều này mà vẫn làm."));
 
     // M4 — Agis trước trận boss (plan 9.3)
     public static readonly DialogueBlock AgisPreBoss = new DialogueBlock(

@@ -15,7 +15,7 @@ public class ScenePortal : MonoBehaviour
     [Header("S4 — quest tự bắt đầu khi qua cổng (VD: q2)")]
     public string startQuestOnEnter = "";
 
-    /// <summary>Setter để WorldBuilder/test gán điểm đến lúc dựng map.</summary>
+    /// <summary>Setter để MapBuilder/test gán điểm đến lúc dựng map.</summary>
     public Transform destinationRef
     {
         get => destination;

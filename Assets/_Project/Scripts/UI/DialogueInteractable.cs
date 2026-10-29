@@ -11,6 +11,10 @@ public class DialogueInteractable : MonoBehaviour
     [SerializeField] private DialogueBlock questBlock;
     [SerializeField] private DialogueBlock repeat;
 
+    [Header("Phần thưởng sau quest (trao 1 lần — đánh dấu bằng setFlagOnEnd của block)")]
+    [SerializeField] private DialogueBlock rewardBlock;
+    [SerializeField] private string rewardAfterQuest = "";
+
     [SerializeField] private float interactRange = 1.6f;
     [SerializeField] private KeyCode interactKey = KeyCode.F;
 
@@ -21,15 +25,26 @@ public class DialogueInteractable : MonoBehaviour
         firstMeet = first; questBlock = quest; repeat = rep;
     }
 
+    public void SetReward(DialogueBlock reward, string afterQuest)
+    {
+        rewardBlock = reward; rewardAfterQuest = afterQuest;
+    }
+
+    private Transform player;
+
     private void Update()
     {
         if (!Input.GetKeyDown(interactKey)) return;
         if (Time.unscaledTime < nextInteractTime) return;
         if (DialogueUI.Instance != null && DialogueUI.Instance.IsOpen) return;
 
-        var player = UnityEngine.Object.FindFirstObjectByType<PlayerController>();
-        if (player == null) return;
-        if (Vector2.Distance(player.transform.position, transform.position) > interactRange) return;
+        if (player == null)
+        {
+            var pc = UnityEngine.Object.FindAnyObjectByType<PlayerController>();
+            if (pc == null) return;
+            player = pc.transform;
+        }
+        if (Vector2.Distance(player.position, transform.position) > interactRange) return;
 
         var block = PickBlock();
         if (block == null) return;
@@ -39,6 +54,12 @@ public class DialogueInteractable : MonoBehaviour
 
     private DialogueBlock PickBlock()
     {
+        // Quest xong → trao thưởng 1 lần (flag do block đặt khi kết thúc)
+        if (rewardBlock != null && !string.IsNullOrEmpty(rewardAfterQuest) && QuestManager.Instance != null
+            && QuestManager.Instance.GetState(rewardAfterQuest) == QuestState.Done
+            && !WorldFlags.Has(rewardBlock.setFlagOnEnd))
+            return rewardBlock;
+
         if (questBlock != null)
         {
             // block quest gắn với quest trong reportObjectiveOnEnd / startQuestOnEnd

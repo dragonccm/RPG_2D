@@ -168,7 +168,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 64
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -235,19 +235,19 @@ TextureImporter:
       name: Pawn_Purple_0
       rect:
         serializedVersion: 2
-        x: 66
-        y: 1023
-        width: 60
-        height: 61
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 0
+        y: 960
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: ce27354feaa51cc90800000000000000
+      spriteID: bfcffe757a25d171aabb8e7810b1c541
       internalID: -7151335025817718036
       vertices: []
       indices: 
@@ -257,19 +257,19 @@ TextureImporter:
       name: Pawn_Purple_1
       rect:
         serializedVersion: 2
-        x: 257
-        y: 1023
-        width: 60
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 192
+        y: 960
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 26e97e75f27c95ac0800000000000000
+      spriteID: 5553c7c3710d901c7b41cf30a538c87f
       internalID: -3865839798968672670
       vertices: []
       indices: 
@@ -279,19 +279,19 @@ TextureImporter:
       name: Pawn_Purple_2
       rect:
         serializedVersion: 2
-        x: 449
-        y: 1023
-        width: 60
-        height: 58
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 384
+        y: 960
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 73fbf485cff97fd50800000000000000
+      spriteID: 366d78a2c423185a7a7df3649aa1a35d
       internalID: 6771056470937026359
       vertices: []
       indices: 
@@ -301,19 +301,19 @@ TextureImporter:
       name: Pawn_Purple_3
       rect:
         serializedVersion: 2
-        x: 642
-        y: 1023
-        width: 60
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 576
+        y: 960
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: df0f3abce9063acb0800000000000000
+      spriteID: 3aafa11ce93a5ad62a5c995dae26370d
       internalID: -4853929738237644547
       vertices: []
       indices: 
@@ -323,19 +323,19 @@ TextureImporter:
       name: Pawn_Purple_4
       rect:
         serializedVersion: 2
-        x: 835
-        y: 1023
-        width: 60
-        height: 60
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 768
+        y: 960
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: b2f20ddbd9af76f30800000000000000
+      spriteID: 5a55aa6cdb7a3568086dcfd976393d6d
       internalID: 4568895902392004395
       vertices: []
       indices: 
@@ -345,19 +345,19 @@ TextureImporter:
       name: Pawn_Purple_5
       rect:
         serializedVersion: 2
-        x: 1027
-        y: 1023
-        width: 60
-        height: 61
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 960
+        y: 960
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: fbce82be70c339d20800000000000000
+      spriteID: 563f0424fdad5395fab420223aca0086
       internalID: 3284034557990988991
       vertices: []
       indices: 
@@ -367,19 +367,19 @@ TextureImporter:
       name: Pawn_Purple_6
       rect:
         serializedVersion: 2
-        x: 64
-        y: 831
-        width: 60
-        height: 62
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 0
+        y: 768
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 6b7a9014449851240800000000000000
+      spriteID: d11ae9d23556a8ade9611eae55ad9e78
       internalID: 4761863107256100790
       vertices: []
       indices: 
@@ -389,19 +389,19 @@ TextureImporter:
       name: Pawn_Purple_7
       rect:
         serializedVersion: 2
-        x: 257
-        y: 831
-        width: 60
-        height: 61
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 192
+        y: 768
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: a677fe695cff38860800000000000000
+      spriteID: cf517af56a34e86df8eed343f21afcdf
       internalID: 7531144225999517546
       vertices: []
       indices: 
@@ -411,19 +411,19 @@ TextureImporter:
       name: Pawn_Purple_8
       rect:
         serializedVersion: 2
-        x: 450
-        y: 831
-        width: 60
-        height: 57
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 384
+        y: 768
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 26a69fc09f9ecabd0800000000000000
+      spriteID: f9340aa9e10b79e35986505e38b63456
       internalID: -2617460027535299998
       vertices: []
       indices: 
@@ -433,19 +433,19 @@ TextureImporter:
       name: Pawn_Purple_9
       rect:
         serializedVersion: 2
-        x: 641
-        y: 831
-        width: 64
-        height: 62
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 576
+        y: 768
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: b569d052dfdba75d0800000000000000
+      spriteID: f00676dfdf823fe76b4ae70b9cedf1ec
       internalID: -3063927701526178213
       vertices: []
       indices: 
@@ -455,19 +455,19 @@ TextureImporter:
       name: Pawn_Purple_10
       rect:
         serializedVersion: 2
-        x: 834
-        y: 831
-        width: 61
-        height: 61
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 768
+        y: 768
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 02b800dba21c73cc0800000000000000
+      spriteID: d18beb8073dcdefe8ab97faa9e1fe2a9
       internalID: -3731301376949449952
       vertices: []
       indices: 
@@ -477,19 +477,19 @@ TextureImporter:
       name: Pawn_Purple_11
       rect:
         serializedVersion: 2
-        x: 1026
-        y: 831
-        width: 60
-        height: 57
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 960
+        y: 768
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 978f6a970e6c65aa0800000000000000
+      spriteID: 1eccda7665138a6e0bed690f2f8dadd1
       internalID: -6172527571848726407
       vertices: []
       indices: 
@@ -499,19 +499,19 @@ TextureImporter:
       name: Pawn_Purple_12
       rect:
         serializedVersion: 2
-        x: 63
-        y: 639
-        width: 67
-        height: 77
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 0
+        y: 576
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 75ae39407ee6eb170800000000000000
+      spriteID: c65d91418347c93b5af59b5f8a41f6e3
       internalID: 8196110310354184791
       vertices: []
       indices: 
@@ -521,19 +521,19 @@ TextureImporter:
       name: Pawn_Purple_13
       rect:
         serializedVersion: 2
-        x: 254
-        y: 639
-        width: 67
-        height: 79
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 192
+        y: 576
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 0f0300143441c1890800000000000000
+      spriteID: cb41704e0b18a64bfa4a11b817b2d9dc
       internalID: -7486086201510711056
       vertices: []
       indices: 
@@ -543,19 +543,19 @@ TextureImporter:
       name: Pawn_Purple_14
       rect:
         serializedVersion: 2
-        x: 446
-        y: 639
-        width: 67
-        height: 79
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 384
+        y: 576
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 0665bb1e6bcab2b80800000000000000
+      spriteID: a8463e117000461f894f457f02f86b3d
       internalID: -8418445176967834016
       vertices: []
       indices: 
@@ -565,19 +565,19 @@ TextureImporter:
       name: Pawn_Purple_15
       rect:
         serializedVersion: 2
-        x: 639
-        y: 639
-        width: 94
-        height: 64
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 576
+        y: 576
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 9714046f08c4c4990800000000000000
+      spriteID: 8e66b79d8f12ec80d80ea685f6ba2cf3
       internalID: -7400455970905636487
       vertices: []
       indices: 
@@ -587,19 +587,19 @@ TextureImporter:
       name: Pawn_Purple_16
       rect:
         serializedVersion: 2
-        x: 679
-        y: 696
-        width: 24
-        height: 11
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 768
+        y: 576
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 9fd8c0e6021055950800000000000000
+      spriteID: 956cc8d31f1e43442bd075b44ee44e16
       internalID: 6437052481192889849
       vertices: []
       indices: 
@@ -609,19 +609,19 @@ TextureImporter:
       name: Pawn_Purple_17
       rect:
         serializedVersion: 2
-        x: 832
-        y: 639
-        width: 69
-        height: 58
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 960
+        y: 576
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: f56d5497d988c2440800000000000000
+      spriteID: f82f10a3757a9d9d38f141a2b07e4c96
       internalID: 4912451503480231519
       vertices: []
       indices: 
@@ -631,19 +631,19 @@ TextureImporter:
       name: Pawn_Purple_18
       rect:
         serializedVersion: 2
-        x: 884
-        y: 642
-        width: 39
-        height: 54
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 0
+        y: 384
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: a0d344f7cabde3cf0800000000000000
+      spriteID: 635f46c52f2039844a6e3f2cecdb14c8
       internalID: -270537393679614710
       vertices: []
       indices: 
@@ -653,19 +653,19 @@ TextureImporter:
       name: Pawn_Purple_19
       rect:
         serializedVersion: 2
-        x: 1029
-        y: 639
-        width: 78
-        height: 60
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 192
+        y: 384
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 443e0debefdd9b610800000000000000
+      spriteID: 53427f7fbac23a72dbc2c3a79f1421bf
       internalID: 1637584025718678340
       vertices: []
       indices: 
@@ -675,19 +675,19 @@ TextureImporter:
       name: Pawn_Purple_20
       rect:
         serializedVersion: 2
-        x: 42
-        y: 447
-        width: 83
-        height: 62
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 384
+        y: 384
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 4e1fb9804e86be2d0800000000000000
+      spriteID: 2240a85bc40a27b8b9c20b01d3ab4c97
       internalID: -3248387377611410972
       vertices: []
       indices: 
@@ -697,19 +697,19 @@ TextureImporter:
       name: Pawn_Purple_21
       rect:
         serializedVersion: 2
-        x: 228
-        y: 447
-        width: 90
-        height: 66
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 576
+        y: 384
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 120d0da30d8688270800000000000000
+      spriteID: 33a0a8c9e29a4e28d9f97a316cadeef4
       internalID: 8252961560705683489
       vertices: []
       indices: 
@@ -719,19 +719,19 @@ TextureImporter:
       name: Pawn_Purple_22
       rect:
         serializedVersion: 2
-        x: 420
-        y: 447
-        width: 90
-        height: 66
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 768
+        y: 384
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: dfeab4d4141b0b3d0800000000000000
+      spriteID: a9a99f3821ef3f426a4d58b0a7704823
       internalID: -3192857241777885443
       vertices: []
       indices: 
@@ -741,19 +741,19 @@ TextureImporter:
       name: Pawn_Purple_23
       rect:
         serializedVersion: 2
-        x: 628
-        y: 473
-        width: 7
-        height: 14
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 960
+        y: 384
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: da2f37428aa0a9a40800000000000000
+      spriteID: af666ed7a340e56c3bcdf53e5f8a2f1f
       internalID: 5375620822502470317
       vertices: []
       indices: 
@@ -763,19 +763,19 @@ TextureImporter:
       name: Pawn_Purple_24
       rect:
         serializedVersion: 2
-        x: 632
-        y: 447
-        width: 108
-        height: 56
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 0
+        y: 192
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: e410010dd3fce3780800000000000000
+      spriteID: 781dd6fb48d64298796878492b12650f
       internalID: -8701289565642555058
       vertices: []
       indices: 
@@ -785,19 +785,19 @@ TextureImporter:
       name: Pawn_Purple_25
       rect:
         serializedVersion: 2
-        x: 830
-        y: 461
-        width: 11
-        height: 13
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 192
+        y: 192
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: c6bf095bb765d6900800000000000000
+      spriteID: 6d736612336348b8aa8ad932ad647826
       internalID: 679294208129956716
       vertices: []
       indices: 
@@ -807,19 +807,19 @@ TextureImporter:
       name: Pawn_Purple_26
       rect:
         serializedVersion: 2
-        x: 841
-        y: 447
-        width: 90
-        height: 58
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 384
+        y: 192
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 404b03024a459dac0800000000000000
+      spriteID: bd51f427f0080d8d78bb6c613de9f2e4
       internalID: -3829936944210463740
       vertices: []
       indices: 
@@ -829,19 +829,19 @@ TextureImporter:
       name: Pawn_Purple_27
       rect:
         serializedVersion: 2
-        x: 1018
-        y: 439
-        width: 71
-        height: 68
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 576
+        y: 192
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 75a6657b89100ccf0800000000000000
+      spriteID: 00bb4c44f6b984812a7077b391fdc990
       internalID: -234185425200715177
       vertices: []
       indices: 
@@ -851,19 +851,19 @@ TextureImporter:
       name: Pawn_Purple_28
       rect:
         serializedVersion: 2
-        x: 66
-        y: 255
-        width: 60
-        height: 62
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 768
+        y: 192
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: fe565198415dea080800000000000000
+      spriteID: 19971e861040e2431bf57e7b3ca3c685
       internalID: -9174161106731178513
       vertices: []
       indices: 
@@ -873,19 +873,19 @@ TextureImporter:
       name: Pawn_Purple_29
       rect:
         serializedVersion: 2
-        x: 257
-        y: 255
-        width: 60
-        height: 61
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 960
+        y: 192
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 67d60f9592db02450800000000000000
+      spriteID: eade22b37c8e86f7c8e2bf2f278a87bc
       internalID: 6062053083740925302
       vertices: []
       indices: 
@@ -895,19 +895,19 @@ TextureImporter:
       name: Pawn_Purple_30
       rect:
         serializedVersion: 2
-        x: 449
-        y: 255
-        width: 60
-        height: 60
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 0
+        y: 0
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 4411f9296cff7d1b0800000000000000
+      spriteID: e236b17ead18d0fd9b95ba4f6644e9af
       internalID: -5631751580675010236
       vertices: []
       indices: 
@@ -917,19 +917,19 @@ TextureImporter:
       name: Pawn_Purple_31
       rect:
         serializedVersion: 2
-        x: 642
-        y: 255
-        width: 60
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 192
+        y: 0
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: b0bce8f8278512560800000000000000
+      spriteID: 80a40a6c75000157d99f8dbd4bb2d63d
       internalID: 7287202921120189195
       vertices: []
       indices: 
@@ -939,19 +939,19 @@ TextureImporter:
       name: Pawn_Purple_32
       rect:
         serializedVersion: 2
-        x: 835
-        y: 255
-        width: 60
-        height: 60
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 384
+        y: 0
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 678d263acab5869b0800000000000000
+      spriteID: bdbc9571fd36eb2e48874befdacde344
       internalID: -5086714982081308554
       vertices: []
       indices: 
@@ -961,19 +961,19 @@ TextureImporter:
       name: Pawn_Purple_33
       rect:
         serializedVersion: 2
-        x: 1027
-        y: 255
-        width: 60
-        height: 61
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 576
+        y: 0
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 54647793724becb00800000000000000
+      spriteID: 2e0c0ed9a18e15c8c87da71dab2a3136
       internalID: 850815460180444741
       vertices: []
       indices: 
@@ -983,19 +983,19 @@ TextureImporter:
       name: Pawn_Purple_34
       rect:
         serializedVersion: 2
-        x: 64
-        y: 63
-        width: 60
-        height: 62
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 768
+        y: 0
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: fc9a7919aa89b8ce0800000000000000
+      spriteID: ae99f68f5cfad7bf191ccbcfecaa4420
       internalID: -1401859000641279537
       vertices: []
       indices: 
@@ -1005,108 +1005,20 @@ TextureImporter:
       name: Pawn_Purple_35
       rect:
         serializedVersion: 2
-        x: 257
-        y: 63
-        width: 60
-        height: 62
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 960
+        y: 0
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: d6cc578cf37147350800000000000000
+      spriteID: 5a3c0668b2755709dbcbfda82b56aeda
       internalID: 6013456965159996525
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Pawn_Purple_36
-      rect:
-        serializedVersion: 2
-        x: 450
-        y: 63
-        width: 60
-        height: 58
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: cea4127a9875b3c30800000000000000
-      internalID: 4340158914627717868
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Pawn_Purple_37
-      rect:
-        serializedVersion: 2
-        x: 644
-        y: 63
-        width: 60
-        height: 62
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 9cfb1ef392e4227f0800000000000000
-      internalID: -638862258060804151
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Pawn_Purple_38
-      rect:
-        serializedVersion: 2
-        x: 835
-        y: 63
-        width: 60
-        height: 62
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 76e97e6db1eae3870800000000000000
-      internalID: 8664554167700266599
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Pawn_Purple_39
-      rect:
-        serializedVersion: 2
-        x: 1026
-        y: 63
-        width: 60
-        height: 58
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: fb91446506cd79d40800000000000000
-      internalID: 5591179768726034879
       vertices: []
       indices: 
       edges: []
@@ -1115,7 +1027,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 80be2fd96a27931738fbd3449e85ec60
     internalID: 0
     vertices: []
     indices: 
@@ -1155,10 +1067,6 @@ TextureImporter:
       Pawn_Purple_33: 850815460180444741
       Pawn_Purple_34: -1401859000641279537
       Pawn_Purple_35: 6013456965159996525
-      Pawn_Purple_36: 4340158914627717868
-      Pawn_Purple_37: -638862258060804151
-      Pawn_Purple_38: 8664554167700266599
-      Pawn_Purple_39: 5591179768726034879
       Pawn_Purple_4: 4568895902392004395
       Pawn_Purple_5: 3284034557990988991
       Pawn_Purple_6: 4761863107256100790

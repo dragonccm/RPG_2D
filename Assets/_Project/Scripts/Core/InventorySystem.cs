@@ -277,6 +277,12 @@ public class InventoryManager : MonoBehaviour
         return total;
     }
 
+    /// <summary>Hiện thông báo ngắn trên màn hình (cổng khoá, túi đầy...).</summary>
+    public void Notify(string message)
+    {
+        if (!string.IsNullOrEmpty(message)) OnNotificationMessage?.Invoke(message);
+    }
+
     public void ClearAll()
     {
         EnsureSlotsInitialized();

@@ -253,11 +253,29 @@ public class special_move : MonoBehaviour
 
     private IEnumerator DecoyRoutine(Vector2 pos, float duration)
     {
-        var decoy = WorldBuilder.CreateCircleSprite("Decoy_PhansThan", pos, new Color(0.8f, 0.8f, 1f, 0.4f), 0.45f);
-        var taunted = new List<(EnemyAIController ai, Transform old)>();
-        foreach (var e in Object.FindObjectsByType<Enemy>(FindObjectsSortMode.None))
+        // Bản sao = bóng mờ tím của chính sprite nhân vật (không dùng hình tròn placeholder)
+        var decoy = new GameObject("Decoy_PhanThan");
+        decoy.transform.position = pos;
+        var ownSr = GetComponentInChildren<SpriteRenderer>();
+        var dsr = decoy.AddComponent<SpriteRenderer>();
+        if (ownSr != null)
         {
-            if (Vector2.Distance(e.transform.position, pos) > 12f) continue;
+            dsr.sprite = ownSr.sprite;
+            dsr.flipX = ownSr.flipX;
+            dsr.sortingLayerName = ownSr.sortingLayerName;
+            dsr.sortingOrder = ownSr.sortingOrder - 1;
+            decoy.transform.localScale = ownSr.transform.lossyScale;
+        }
+        dsr.color = new Color(0.65f, 0.55f, 1f, 0.55f);
+        RuntimeMaterials.MakeUnlit(dsr);
+        VfxService.Impact(pos, new Color(0.65f, 0.45f, 1f), 0.9f);
+
+        var taunted = new List<(EnemyAIController ai, Transform old)>();
+        var all = Character.Active;
+        for (int i = 0; i < all.Count; i++)
+        {
+            var e = all[i];
+            if (!e.CompareTag("Enemy") || Vector2.Distance(e.transform.position, pos) > 12f) continue;
             var ai = e.GetComponent<EnemyAIController>();
             if (ai != null && ai.playerTarget != null)
             {
@@ -268,7 +286,11 @@ public class special_move : MonoBehaviour
         yield return new WaitForSeconds(duration);
         foreach (var (ai, old) in taunted)
             if (ai != null) ai.playerTarget = old;
-        if (decoy != null) Destroy(decoy);
+        if (decoy != null)
+        {
+            VfxService.Impact(decoy.transform.position, new Color(0.65f, 0.45f, 1f), 0.7f);
+            Destroy(decoy);
+        }
     }
 
     // ================== CHARGE (giữ-thả) ==================

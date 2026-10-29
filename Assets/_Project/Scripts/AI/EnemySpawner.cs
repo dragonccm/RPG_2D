@@ -10,6 +10,9 @@ public class EnemySpawner : MonoBehaviour
     /// <summary>S4: phát khi 1 enemy spawn — QuestManager đăng ký theo dõi kill.</summary>
     public static event System.Action<GameObject> EnemySpawned;
 
+    /// <summary>Cho nguồn sinh quái khác (EncounterGroup) báo cùng một sự kiện — quest đếm kill thống nhất.</summary>
+    public static void NotifySpawned(GameObject enemy) => EnemySpawned?.Invoke(enemy);
+
     [Tooltip("Prefab kẻ địch cần spawn")]
     public GameObject enemyPrefab;
 

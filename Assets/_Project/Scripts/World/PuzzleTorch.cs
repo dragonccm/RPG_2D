@@ -42,6 +42,7 @@ public class PuzzleTorch : MonoBehaviour, IDamageable
             flame.lightType = Light2D.LightType.Point;
             flame.color = litColor;
             flame.pointLightOuterRadius = 3f;
+            LightUtil.TargetAllLayers(flame);
         }
     }
 

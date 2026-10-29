@@ -154,5 +154,13 @@ public class DialogueUI : MonoBehaviour
         }
         if (!string.IsNullOrEmpty(block.claimQuestOnEnd) && QuestManager.Instance != null)
             QuestManager.Instance.ClaimReward(block.claimQuestOnEnd);
+        if (!string.IsNullOrEmpty(block.giveItemOnEnd) && InventoryManager.Instance != null)
+        {
+            var item = ItemDatabase.Get(block.giveItemOnEnd);
+            if (item != null && InventoryManager.Instance.AddItem(item, 1))
+                InventoryManager.Instance.Notify($"Nhận được: {item.itemName}");
+        }
+        if (!string.IsNullOrEmpty(block.setFlagOnEnd))
+            WorldFlags.Set(block.setFlagOnEnd);
     }
 }

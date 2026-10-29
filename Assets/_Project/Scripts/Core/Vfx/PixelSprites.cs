@@ -82,6 +82,31 @@ public static class PixelSprites
         return s;
     }
 
+    private static Sprite fogPuff;
+
+    /// <summary>
+    /// Mây sương pixel: elip dither thưa dần ra mép, KHÔNG viền — không đọc thành "hình tròn".
+    /// 96×40 px, mật độ theo nhiễu cố định (không đổi giữa các lần chạy).
+    /// </summary>
+    public static Sprite FogPuff
+    {
+        get
+        {
+            if (fogPuff != null) return fogPuff;
+            fogPuff = Build(96, 40, (x, y) =>
+            {
+                float nx = (x + 0.5f - 48f) / 48f, ny = (y + 0.5f - 20f) / 20f;
+                float d = nx * nx + ny * ny;
+                if (d >= 1f) return false;
+                int h = (x * 73856093) ^ (y * 19349663);
+                float noise = ((h >> 4) & 255) / 255f;
+                bool checker = (((x >> 1) + (y >> 1)) & 1) == 0;
+                return checker && noise > d * 0.9f;
+            }, 0.5f, 0.5f);
+            return fogPuff;
+        }
+    }
+
     private static float Dist(int x, int y, float c)
     {
         float dx = x + 0.5f - c, dy = y + 0.5f - c;

@@ -21,6 +21,10 @@ public class TreasureChest : MonoBehaviour
     [SerializeField] private Color closedColor = new Color(0.85f, 0.65f, 0.2f); // Vàng kim
     [SerializeField] private Color openedColor = new Color(0.45f, 0.45f, 0.45f); // Xám bạc
 
+    [Header("Sprite (tuỳ chọn) — có thì đổi sprite thay vì chỉ đổi màu")]
+    [SerializeField] private Sprite closedSprite;
+    [SerializeField] private Sprite openSprite;
+
     public bool IsOpened { get; private set; }
 
     private SpriteRenderer spriteRenderer;
@@ -82,7 +86,13 @@ public class TreasureChest : MonoBehaviour
 
     private void UpdateVisual()
     {
-        if (spriteRenderer != null)
+        if (spriteRenderer == null) return;
+        if (openSprite != null && closedSprite != null)
+        {
+            spriteRenderer.sprite = IsOpened ? openSprite : closedSprite;
+            spriteRenderer.color = Color.white;
+        }
+        else
         {
             spriteRenderer.color = IsOpened ? openedColor : closedColor;
         }

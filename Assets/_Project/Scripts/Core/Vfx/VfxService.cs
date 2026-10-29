@@ -154,6 +154,7 @@ public static class VfxService
         sr.color = tint;
         sr.sortingLayerName = "Effects";
         sr.sortingOrder = 4000;
+        RuntimeMaterials.MakeUnlit(sr); // vùng cảnh báo luôn nhìn thấy
         var t = go.AddComponent<VfxTelegraph>();
         t.Init(sr, tint, duration, follow);
         return go;
@@ -315,6 +316,7 @@ public static class VfxService
                 var sr = go.AddComponent<SpriteRenderer>();
                 sr.sortingLayerName = "Effects";
                 sr.sortingOrder = 5000;
+                RuntimeMaterials.MakeUnlit(sr); // máu/tia lửa đọc rõ cả trong đêm
                 it = new Item { tr = go.transform, sr = sr };
             }
             it.tr.gameObject.SetActive(true);
