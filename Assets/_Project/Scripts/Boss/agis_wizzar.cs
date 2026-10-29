@@ -805,12 +805,8 @@ public class agis_wizzar : MonoBehaviour
         VfxService.Shake(ShakeLevel.Boss);
         VfxService.Impact(transform.position, Color.yellow, 2.5f);
 
-        // Thưởng cuộn bí kíp Hư Không cho người chơi
-        if (InventoryManager.Instance != null)
-        {
-            var scroll = Resources.Load<ItemData>("Scroll_ShadowTeleport");
-            if (scroll != null) InventoryManager.Instance.AddItem(scroll, 1);
-        }
+        // Cuộn Hư Không đã chuyển sang mini-boss Thợ Săn Bóng (LEVEL_DESIGN 2.2) — Agis chỉ đánh dấu kết thúc
+        WorldFlags.Set("boss:agis");
         
         isDowned = true;
         ShowEndingChoicePrompt();

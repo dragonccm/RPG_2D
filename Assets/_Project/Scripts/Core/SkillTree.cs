@@ -19,6 +19,8 @@ public class SkillNodeDef
     public string name;
     public string desc;
     public int requiredLevel;
+    /// <summary>Chỉ mở được bằng cuộn bí kíp (InventoryManager.UseItem), không mua bằng điểm.</summary>
+    public bool scrollOnly;
 }
 
 public class SkillTreeManager : MonoBehaviour
@@ -41,17 +43,17 @@ public class SkillTreeManager : MonoBehaviour
     {
         new SkillNodeDef { id = "root", branch = (SkillBranch)0, tier = 0, name = "Kiến Thức Tỉnh", desc = "Mở cây kỹ năng (Tab)", requiredLevel = 1 },
         // NHÁNH GIÓ (Dash)
-        new SkillNodeDef { id = "gio_1", branch = SkillBranch.Gio, tier = 1, name = "Gió Lạnh", desc = "Mở Dash", requiredLevel = 1 },
+        new SkillNodeDef { id = "gio_1", branch = SkillBranch.Gio, tier = 1, name = "Gió Lạnh", desc = "Học từ Cuộn Lướt Gió — mở Dash", requiredLevel = 1, scrollOnly = true },
         new SkillNodeDef { id = "gio_2", branch = SkillBranch.Gio, tier = 2, name = "Lướt Xuyên", desc = "Dash xuyên địch", requiredLevel = 2 },
         new SkillNodeDef { id = "gio_3", branch = SkillBranch.Gio, tier = 3, name = "Kích Ứng", desc = "Dash gây 20 dmg", requiredLevel = 6 },
         new SkillNodeDef { id = "gio_4", branch = SkillBranch.Gio, tier = 4, name = "CUỒNG GIÓ", desc = "Đại kỹ: dash không hồi 5s", requiredLevel = 12 },
         // NHÁNH KHÔNG (Teleport)
-        new SkillNodeDef { id = "khong_1", branch = SkillBranch.Khong, tier = 1, name = "Bước Ngắn", desc = "Mở Teleport", requiredLevel = 1 },
+        new SkillNodeDef { id = "khong_1", branch = SkillBranch.Khong, tier = 1, name = "Bước Ngắn", desc = "Học từ Cuộn Hư Không — mở Teleport", requiredLevel = 1, scrollOnly = true },
         new SkillNodeDef { id = "khong_2", branch = SkillBranch.Khong, tier = 2, name = "Đổi Vị", desc = "Teleport qua tường mỏng", requiredLevel = 2 },
         new SkillNodeDef { id = "khong_3", branch = SkillBranch.Khong, tier = 3, name = "Phân Thân", desc = "Tạo bản sao dụ địch 2s", requiredLevel = 6 },
         new SkillNodeDef { id = "khong_4", branch = SkillBranch.Khong, tier = 4, name = "HOÁ BÓNG ẤM", desc = "Đại kỹ: teleport 3 điểm liên tiếp", requiredLevel = 12 },
         // NHÁNH LỬA (Charge)
-        new SkillNodeDef { id = "lua_1", branch = SkillBranch.Lua, tier = 1, name = "Sốc Nhiệt", desc = "Mở Charge", requiredLevel = 1 },
+        new SkillNodeDef { id = "lua_1", branch = SkillBranch.Lua, tier = 1, name = "Sốc Nhiệt", desc = "Học từ Cuộn Hỏa Kích — mở Charge", requiredLevel = 1, scrollOnly = true },
         new SkillNodeDef { id = "lua_2", branch = SkillBranch.Lua, tier = 2, name = "Cháy Lan", desc = "Charge gây burn 3s", requiredLevel = 2 },
         new SkillNodeDef { id = "lua_3", branch = SkillBranch.Lua, tier = 3, name = "Trấn Áp", desc = "Charge stun 1s", requiredLevel = 6 },
         new SkillNodeDef { id = "lua_4", branch = SkillBranch.Lua, tier = 4, name = "THIÊN PHỤC", desc = "Đại kỹ: charge nổ diện rộng", requiredLevel = 12 },
@@ -132,7 +134,7 @@ public class SkillTreeManager : MonoBehaviour
         return null;
     }
 
-    public enum UnlockResult { Ok, NoPoints, LockedPrereq, LevelTooLow, AlreadyUnlocked, UnknownNode }
+    public enum UnlockResult { Ok, NoPoints, LockedPrereq, LevelTooLow, AlreadyUnlocked, UnknownNode, ScrollOnly }
 
     public UnlockResult CanUnlock(string nodeId, out string reason)
     {
@@ -140,6 +142,7 @@ public class SkillTreeManager : MonoBehaviour
         var n = FindNode(nodeId);
         if (n == null) return UnlockResult.UnknownNode;
         if (unlocked.Contains(nodeId)) { reason = "Đã mở"; return UnlockResult.AlreadyUnlocked; }
+        if (n.scrollOnly) { reason = "Chỉ lĩnh ngộ được từ cuộn bí kíp"; return UnlockResult.ScrollOnly; }
         var prereq = PrereqId(nodeId);
         if (prereq != null && !unlocked.Contains(prereq))
         {

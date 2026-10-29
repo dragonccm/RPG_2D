@@ -7,7 +7,8 @@ using UnityEngine;
 /// Rewrite toàn bộ từ bản cũ — giữ tên class special_move để scene/prefab không vỡ.
 ///
 /// Kiến trúc chuẩn:
-/// - MỌI kỹ năng phải mở qua SkillTreeManager (gio_1 dash, khong_1 teleport, lua_1 charge).
+/// - Kỹ năng gốc chỉ mở bằng cuộn bí kíp (gio_1 dash, khong_1 teleport, lua_1 charge);
+///   cây kỹ năng chỉ cường hoá (tier 2–4).
 ///   Chưa mở nút → phím bấm vô hiệu + log 1 lần.
 /// - Input theo plan 5.2: Shift = Dash, Q = Teleport, E = Charge (giữ để tích, thả để bùng).
 /// - F = tương tác (Campfire/NPC) — không còn là charge key (tránh xung đột bản cũ).
@@ -88,7 +89,7 @@ public class special_move : MonoBehaviour
         if (Unlocked(nodeId)) return true;
         if (!warned)
         {
-            Debug.Log($"🔒 [{nodeId}] chưa mở trên cây kỹ năng (Tab) — hãy mở nút nhánh tương ứng.");
+            Debug.Log($"🔒 [{nodeId}] chưa lĩnh ngộ — cần dùng cuộn bí kíp tương ứng (túi đồ).");
             warned = true;
         }
         return false;

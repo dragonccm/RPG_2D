@@ -112,6 +112,7 @@ public static class SaveSystem
         if (QuestManager.Instance != null)
             data.questEntries = QuestManager.Instance.ExportSave();
         data.playerXp = LevelSystem.Xp;
+        data.questFlags = WorldFlags.Export();
 
         if (InventoryManager.Instance != null)
         {
@@ -152,6 +153,9 @@ public static class SaveSystem
         if (QuestManager.Instance != null)
             QuestManager.Instance.ImportSave(d.questEntries);
         LevelSystem.Import(d.level, d.playerXp);
+        WorldFlags.Import(d.questFlags);
+        if (InventoryManager.Instance != null)
+            InventoryManager.Instance.ImportSave(d.inventoryEntries);
         player.transform.position = new Vector3(d.posX, d.posY, 0f);
     }
 }

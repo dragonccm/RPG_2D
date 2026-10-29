@@ -53,7 +53,9 @@ public class QuestSkillTests
         LevelSystem.Import(6, 0);
         mgr.GrantPoints(3);
         Assert.IsTrue(mgr.Unlock("root"), "Gốc mở miễn phí");
-        Assert.IsTrue(mgr.Unlock("gio_1"));
+        Assert.AreEqual(SkillTreeManager.UnlockResult.ScrollOnly,
+            mgr.CanUnlock("gio_1", out _), "tier 1 nhánh kỹ năng chỉ học từ cuộn");
+        Assert.IsTrue(mgr.Unlock("gio_1", bypassCost: true), "cuộn Lướt Gió mở gio_1");
         Assert.IsTrue(mgr.Unlock("gio_2"));
         Assert.IsTrue(mgr.Unlock("gio_3"));
         Assert.AreEqual(SkillTreeManager.UnlockResult.LevelTooLow,

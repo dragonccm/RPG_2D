@@ -39,8 +39,11 @@ public class CombatV2Tests
         var mgr = SkillTreeManager.Instance;
         mgr.Unlock("root"); // miễn phí
         mgr.GrantPoints(3);
-        Assert.IsTrue(mgr.Unlock("gio_1"));
-        Assert.IsFalse(sm.IsSkillGated("gio_1"), "Mở gio_1 → dash giải khoá");
+        Assert.IsFalse(mgr.Unlock("gio_1"), "Không mua gio_1 bằng điểm được — chỉ học từ cuộn");
+        Assert.IsTrue(sm.IsSkillGated("gio_1"));
+        Assert.IsTrue(mgr.Unlock("gio_1", bypassCost: true), "Dùng cuộn Lướt Gió");
+        Assert.IsFalse(sm.IsSkillGated("gio_1"), "Học cuộn → dash giải khoá");
+        Assert.AreEqual(3, mgr.SkillPoints, "Học từ cuộn không tốn điểm");
         Object.DestroyImmediate(sm.gameObject);
     }
 
@@ -108,7 +111,8 @@ public class CombatV2Tests
         var qm = QuestManager.Instance;
         mgr.Unlock("root");
         mgr.GrantPoints(2);
-        mgr.Unlock("gio_1");
+        mgr.Unlock("gio_1", bypassCost: true); // học từ cuộn, không tốn điểm
+        mgr.Unlock("than_1");                  // mua bằng điểm
         qm.StartQuest("q2");
         qm.ReportProgress("q2", "q2_kill");
 
@@ -116,6 +120,7 @@ public class CombatV2Tests
         Assert.AreEqual(1, data.skillPoints, "2 điểm - 1 đã tiêu = 1");
         Assert.Contains("root", data.unlockedSkills);
         Assert.Contains("gio_1", data.unlockedSkills);
+        Assert.Contains("than_1", data.unlockedSkills);
         Assert.AreEqual(1, data.questEntries.Count);
         Assert.AreEqual("q2", data.questEntries[0].questId);
 

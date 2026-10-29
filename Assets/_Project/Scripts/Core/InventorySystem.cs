@@ -284,6 +284,29 @@ public class InventoryManager : MonoBehaviour
         OnInventoryChanged?.Invoke();
     }
 
+    /// <summary>Khôi phục túi đồ từ save (tra item theo id qua ItemDatabase).</summary>
+    public void ImportSave(List<InventorySaveEntry> entries)
+    {
+        EnsureSlotsInitialized();
+        for (int i = 0; i < TOTAL_SLOTS; i++) slots[i].Clear();
+        if (entries != null)
+        {
+            foreach (var e in entries)
+            {
+                if (e == null || e.slotIndex < 0 || e.slotIndex >= TOTAL_SLOTS || e.quantity <= 0) continue;
+                var item = ItemDatabase.Get(e.itemId);
+                if (item == null)
+                {
+                    Debug.LogWarning($"[Inventory] Save có item lạ '{e.itemId}' — bỏ qua");
+                    continue;
+                }
+                slots[e.slotIndex].item = item;
+                slots[e.slotIndex].quantity = Mathf.Min(e.quantity, item.maxStack);
+            }
+        }
+        OnInventoryChanged?.Invoke();
+    }
+
     public static void ResetForTest()
     {
         if (_instance != null)

@@ -30,9 +30,32 @@ public class PuzzleSwitch : MonoBehaviour, IDamageable
     private SpriteRenderer spriteRenderer;
     private bool playerInRange = false;
 
+    public string Flag => "switch:" + switchId;
+
     private void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
+        UpdateVisual();
+    }
+
+    private void Start()
+    {
+        // Công tắc một lần đã bật trong save → giữ trạng thái mở (không báo quest lại)
+        if (oneTimeOnly && WorldFlags.Has(Flag)) RestoreActivated();
+    }
+
+    private void OnEnable() { WorldFlags.Changed += OnFlagsChanged; }
+    private void OnDisable() { WorldFlags.Changed -= OnFlagsChanged; }
+
+    private void OnFlagsChanged(string flag)
+    {
+        if (flag == null && oneTimeOnly && WorldFlags.Has(Flag) && !IsActivated) RestoreActivated();
+    }
+
+    private void RestoreActivated()
+    {
+        IsActivated = true;
+        if (targetBarrier != null) targetBarrier.SetActive(false);
         UpdateVisual();
     }
 
@@ -49,6 +72,7 @@ public class PuzzleSwitch : MonoBehaviour, IDamageable
         if (IsActivated && oneTimeOnly) return;
 
         IsActivated = true;
+        if (oneTimeOnly) WorldFlags.Set(Flag);
         UpdateVisual();
 
         if (targetBarrier != null)

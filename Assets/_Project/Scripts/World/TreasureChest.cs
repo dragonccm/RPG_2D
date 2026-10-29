@@ -26,9 +26,23 @@ public class TreasureChest : MonoBehaviour
     private SpriteRenderer spriteRenderer;
     private bool playerInRange = false;
 
+    public string Flag => "chest:" + chestId;
+
     private void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
+        IsOpened = WorldFlags.Has(Flag);
+        UpdateVisual();
+    }
+
+    private void OnEnable() { WorldFlags.Changed += OnFlagsChanged; }
+    private void OnDisable() { WorldFlags.Changed -= OnFlagsChanged; }
+
+    // Load save: rương đã mở ở lần chơi trước → hiện trạng thái mở, không phát thưởng lại
+    private void OnFlagsChanged(string flag)
+    {
+        if (flag != null && flag != Flag) return;
+        IsOpened = WorldFlags.Has(Flag);
         UpdateVisual();
     }
 
@@ -45,6 +59,7 @@ public class TreasureChest : MonoBehaviour
         if (IsOpened) return;
 
         IsOpened = true;
+        WorldFlags.Set(Flag);
         UpdateVisual();
 
         // Thưởng vật phẩm vào túi đồ

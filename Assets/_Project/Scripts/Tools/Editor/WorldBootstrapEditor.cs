@@ -55,7 +55,7 @@ public static class WorldBootstrapEditor
         }
 
         // 4. Rương Làng: Cuộn Bí Kíp Lướt Gió (Scroll_WindDash)
-        var dashItem = AssetDatabase.LoadAssetAtPath<ItemData>("Assets/_Project/Data/Items/Scroll_WindDash.asset");
+        var dashItem = AssetDatabase.LoadAssetAtPath<ItemData>("Assets/_Project/Resources/Items/Scroll_WindDash.asset");
         CreateOrUpdateChest("Chest_Village_Dash", new Vector3(-4.5f, -20.5f, 0f), dashItem, 1);
 
         // 5. Câu đố Rừng & Rào cản (Q3)
@@ -82,7 +82,7 @@ public static class WorldBootstrapEditor
         SetPrivateField(ps, "objectiveId", "q3_switch");
 
         // 6. Rương Tháp Cổ: Chìa Khóa Tháp (Key_Tower) sau rào chắn
-        var keyItem = AssetDatabase.LoadAssetAtPath<ItemData>("Assets/_Project/Data/Items/Key_Tower.asset");
+        var keyItem = AssetDatabase.LoadAssetAtPath<ItemData>("Assets/_Project/Resources/Items/Key_Tower.asset");
         var chestKey = CreateOrUpdateChest("Chest_Ruins_Key", new Vector3(17f, 16.5f, 0f), keyItem, 1);
         if (chestKey != null)
         {

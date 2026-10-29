@@ -13,6 +13,11 @@ public class EliteBuff : MonoBehaviour
     [SerializeField] private float scaleMultiplier = 1.4f;
     [SerializeField] private string eliteName = "Thợ Săn Bóng";
 
+    [Header("Phần thưởng khi hạ (LEVEL_DESIGN 2.2)")]
+    [Tooltip("itemId trong Resources/Items — mặc định Cuộn Hư Không")]
+    [SerializeField] private string rewardItemId = "scroll_teleport";
+    [SerializeField] private string defeatedFlag = "boss:tho_san_bong";
+
     private bool applied;
 
     private void Awake()
@@ -40,5 +45,19 @@ public class EliteBuff : MonoBehaviour
 
         transform.localScale *= scaleMultiplier;
         gameObject.name = eliteName;
+
+        if (character != null) character.OnDeath += GrantReward;
+    }
+
+    private void GrantReward()
+    {
+        if (WorldFlags.Has(defeatedFlag)) return; // đã nhận ở lần chơi trước
+        WorldFlags.Set(defeatedFlag);
+        var item = ItemDatabase.Get(rewardItemId);
+        if (item != null && InventoryManager.Instance != null)
+        {
+            InventoryManager.Instance.AddItem(item, 1);
+            Debug.Log($"🎁 {eliteName} rơi: {item.itemName}");
+        }
     }
 }
