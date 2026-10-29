@@ -131,7 +131,7 @@ public class special_move : MonoBehaviour
         
         // Set player busy
         if (playerController != null)
-            playerController.SetBusy(true);
+            playerController.SetBusy(true, PlayerController.PlayerState.Dash);
         
         // Get dash direction (current movement or forward if not moving)
         Vector2 dashDirection = Vector2.zero;
@@ -221,7 +221,7 @@ public class special_move : MonoBehaviour
         
         // Set player busy
         if (playerController != null)
-            playerController.SetBusy(true);
+            playerController.SetBusy(true, PlayerController.PlayerState.Dash);
         
         // Create teleport effect at start position
         if (teleportEffect != null)
@@ -308,7 +308,7 @@ public class special_move : MonoBehaviour
         
         // Set player busy
         if (playerController != null)
-            playerController.SetBusy(true);
+            playerController.SetBusy(true, PlayerController.PlayerState.Charge);
         
         // Animation trigger
         if (animator != null)

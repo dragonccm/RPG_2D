@@ -5,6 +5,9 @@ using UnityEngine;
 [RequireComponent(typeof(Animator))]
 public class PlayerController : MonoBehaviour
 {
+    /// <summary>S2 (GAME_MASTER_PLAN 5.4): trạng thái nhân vật thay cờ bool rải rác.</summary>
+    public enum PlayerState { Normal, Attack, Dash, Charge, Stunned, Dead }
+
     public float moveSpeed = 3.5f;
     public float smoothMoveTime = 0.2f; // Thời gian làm mượt di chuyển
     public float flipSmoothTime = 0.08f; // Thời gian làm mượt lật
@@ -15,7 +18,7 @@ public class PlayerController : MonoBehaviour
     private ModularSkillManager skillManager; // Reference to skill manager for level up
     public Vector2 movement;
     private Vector2 currentVelocity; // Cho SmoothDamp
-    private bool isBusy = false; // Tấn công/phòng thủ thì sẽ true
+    private bool isBusy = false; // Tấn công/phòng thủ thì sẽ true (compat — đọc qua IsBusy())
 
     private float targetScaleX = 1f;
     private float currentScaleX = 1f;
@@ -274,11 +277,17 @@ public class PlayerController : MonoBehaviour
     }
 
     /// <summary>
-    /// Set busy state externally
+    /// S2: state hiện tại — isBusy ⇔ state khác Normal.
     /// </summary>
-    public void SetBusy(bool busy)
+    public PlayerState CurrentState { get; private set; } = PlayerState.Normal;
+
+    /// <summary>
+    /// Set busy state externally (PlayerState tùy chọn — special_move gọi Dash/Charge)
+    /// </summary>
+    public void SetBusy(bool busy, PlayerState state = PlayerState.Attack)
     {
         isBusy = busy;
+        CurrentState = busy ? state : PlayerState.Normal;
         if (busy)
         {
             movement = Vector2.zero;
