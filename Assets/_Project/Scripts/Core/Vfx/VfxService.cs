@@ -160,6 +160,32 @@ public static class VfxService
         return go;
     }
 
+    /// <summary>
+    /// Vùng báo hiệu hình chữ nhật (đòn đâm / húc / đạn): từ start theo hướng dir, dài length, rộng width.
+    /// duration ≤ 0 = tồn tại tới khi người gọi Destroy.
+    /// </summary>
+    public static GameObject TelegraphRect(Vector3 start, Vector2 dir, float length, float width, float duration, Color tint)
+    {
+        if (!Application.isPlaying) return null;
+        if (dir.sqrMagnitude < 0.0001f) dir = Vector2.right;
+        var go = new GameObject("VfxTelegraphRect");
+        go.transform.position = start;
+        go.transform.rotation = Quaternion.Euler(0f, 0f, Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg);
+        var sr = go.AddComponent<SpriteRenderer>();
+        int wPx = Mathf.RoundToInt(length * PixelSprites.PPU), hPx = Mathf.RoundToInt(width * PixelSprites.PPU);
+        sr.sprite = PixelSprites.DitherRect(wPx, hPx);
+        // Sprite đã làm tròn theo bậc 8/4 px → co giãn nhẹ để khớp đúng kích thước yêu cầu
+        var size = sr.sprite.bounds.size;
+        go.transform.localScale = new Vector3(length / size.x, width / size.y, 1f);
+        sr.color = tint;
+        sr.sortingLayerName = "Effects";
+        sr.sortingOrder = 4000;
+        RuntimeMaterials.MakeUnlit(sr);
+        var t = go.AddComponent<VfxTelegraph>();
+        t.Init(sr, tint, duration, null);
+        return go;
+    }
+
     // ───────────────────────── Số sát thương ─────────────────────────
 
     public static void DamageNumber(float value, Vector3 position, bool critical = false, bool heal = false)

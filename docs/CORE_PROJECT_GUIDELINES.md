@@ -146,6 +146,8 @@ Mọi đòn đánh của Player và Enemy phải tuân thủ nghiêm ngặt 3 ph
 - Telegraph bắt buộc ≥ 0.4s với đòn thường của boss, ≥ 0.8s với đòn diện rộng; không đòn nào "ra ngay" mà không báo hiệu.
 - Test tự động: mỗi `AttackDef` có `windup > 0`, `hitShape` hợp lệ, chuỗi `nextInChain` không vòng lặp.
 
+**Trạng thái 30/10/2026:** ✅ `AttackDef` (Core/Combat) + `AttackRunner` chạy Player, quái và Agis. Dữ liệu ở `Resources/Attacks` (sinh bởi `Tools/RPG/Combat/Build Attack Defs`): combo Player_Slash1→2→3 (nối đòn trong cửa sổ hủy `cancelFrom`, Dash/Teleport/Charge hủy được Recovery), Goblin_Club, Sheep_Ram (húc), Rat_Bite, Archer_Shot (đạn), Lancer_Thrust (đâm), Agis_Fireball/Barrage/Slam. Mọi đòn quái/boss có telegraph pixel (đĩa dither / chữ nhật dither), bị choáng/hất/chết trong windup thì hủy. Test dữ liệu (`AttackDefTests`): windup tối thiểu theo team, AoE boss ≥ 0.8s, quái bắt buộc telegraph, chuỗi không vòng. **Phát hiện khi chuyển:** Goblin trước đây gây 1 sát thương mỗi 0.2s không báo hiệu, Lancer ném nổ 40 sát thương không báo hiệu, cừu/chuột (prefab `Prefabs/Enemy_Sheep` là bù nhìn không AI) không bao giờ gây sát thương, và `Enemy.OnDealDamage` không bao giờ được phát (lifesteal của elite vô tác dụng). Còn nợ: các đòn skill của `EnemyShielder`/`EnemyElite`/`EnemyBoss` (frenzy, thorns, teleport) vẫn tự viết.
+
 ### 6.3 Animation mượt (bổ sung cho mục 1.1)
 - **Animator chỉ có 1 tham số trạng thái** (`State` hoặc trigger theo `AttackDef`), không dùng chồng `bool` chéo nhau.
 - Transition Idle ↔ Run: `Has Exit Time = off`, duration 0–0.05s (pixel art không blend dài). Attack → Idle: cho exit sau cửa sổ recovery.

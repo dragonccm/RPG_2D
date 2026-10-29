@@ -107,6 +107,32 @@ public static class PixelSprites
         }
     }
 
+    private static readonly Dictionary<long, Sprite> rects = new Dictionary<long, Sprite>();
+    private static Sprite orb;
+
+    /// <summary>Hình chữ nhật dither (caro 2px) + viền 2px — vùng cảnh báo đòn đâm/húc. Pivot ở mép trái giữa.</summary>
+    public static Sprite DitherRect(int widthPx, int heightPx)
+    {
+        widthPx = Mathf.Clamp(widthPx / 8 * 8, 8, 1024);
+        heightPx = Mathf.Clamp(heightPx / 4 * 4, 8, 512);
+        long key = ((long)widthPx << 20) | (long)heightPx;
+        if (rects.TryGetValue(key, out var s) && s != null) return s;
+        s = Build(widthPx, heightPx, (x, y) =>
+        {
+            bool edge = x < 2 || y < 2 || x >= widthPx - 2 || y >= heightPx - 2;
+            return edge || (((x >> 1) + (y >> 1)) & 1) == 0;
+        }, 0f, 0.5f);
+        rects[key] = s;
+        return s;
+    }
+
+    /// <summary>Đĩa đặc 12 px (đạn cầu). Tint bằng màu; thêm lõi sáng bằng sprite thứ hai nếu cần.</summary>
+    public static Sprite Orb => orb != null ? orb : (orb = Build(12, 12, (x, y) =>
+    {
+        float dx = x + 0.5f - 6f, dy = y + 0.5f - 6f;
+        return dx * dx + dy * dy <= 36f;
+    }, 0.5f, 0.5f));
+
     private static float Dist(int x, int y, float c)
     {
         float dx = x + 0.5f - c, dy = y + 0.5f - c;

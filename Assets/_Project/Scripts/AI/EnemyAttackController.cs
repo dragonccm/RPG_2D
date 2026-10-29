@@ -1,66 +1,75 @@
 using UnityEngine;
 
 /// <summary>
-/// Điều khiển hành vi tấn công của kẻ địch. Có thể dùng cho mọi loại AI (Melee, Ranged, Boss).
-/// Tích hợp với EnemyAIController để lấy target và kiểm soát cooldown, phạm vi tấn công.
+/// Điều khiển tấn công của kẻ địch (Melee, Ranged, Elite). Đòn đánh là AttackDef chạy qua AttackRunner
+/// (windup có telegraph → active → recovery) — CORE_PROJECT_GUIDELINES 6.2. AI chỉ gọi Attack(target).
+/// attackRange (khoảng AI bắt đầu đánh) lấy từ AttackDef.TriggerRange khi có đòn.
 /// </summary>
 public class EnemyAttackController : MonoBehaviour
 {
-    // === Các thuộc tính cấu hình tấn công ===
+    [Header("Đòn đánh")]
+    [Tooltip("Đòn thường của kẻ địch (dữ liệu AttackDef). Nhiều đòn: xâu bằng AttackDef.next.")]
+    public AttackDef attack;
 
-    [Tooltip("Phạm vi tấn công của kẻ địch.")]
+    [Header("Chế độ cũ (không có AttackDef)")]
+    [Tooltip("Phạm vi tấn công — tự lấy từ AttackDef nếu có.")]
     public float attackRange = 2f;
-
-    [Tooltip("Thời gian hồi chiêu giữa các đòn tấn công.")]
+    [Tooltip("Thời gian hồi chiêu giữa các đòn (chế độ cũ).")]
     public float attackCooldown = 1f;
 
     protected float lastAttackTime;
+    private AttackRunner runner;
 
-    // Property để truy cập attackRange từ bên ngoài (ví dụ: Gizmos)
-    public float AttackRange => attackRange;
+    public AttackRunner Runner
+    {
+        get
+        {
+            if (runner == null)
+            {
+                runner = GetComponent<AttackRunner>();
+                if (runner == null) runner = gameObject.AddComponent<AttackRunner>();
+            }
+            return runner;
+        }
+    }
 
-    // === Các phương thức chính ===
+    /// <summary>Có đòn dạng dữ liệu → AttackState dùng controller này thay vì EnemySkillManager.</summary>
+    public bool HasAttackDef => attack != null;
 
-    /// <summary>
-    /// Kiểm tra mục tiêu có trong phạm vi tấn công không.
-    /// </summary>
+    // Property để truy cập attackRange từ bên ngoài (ví dụ: Gizmos, AttackState)
+    public float AttackRange => attack != null ? attack.TriggerRange : attackRange;
+
+    public bool IsAttacking => runner != null && runner.IsBusy;
+
     public virtual bool IsInAttackRange(Transform target)
     {
         if (target == null) return false;
-        return Vector3.Distance(transform.position, target.position) <= attackRange;
+        return Vector3.Distance(transform.position, target.position) <= AttackRange;
     }
 
-    /// <summary>
-    /// Thực hiện tấn công mục tiêu (có kiểm tra cooldown). Có thể override để mở rộng logic.
-    /// </summary>
-    /// <param name="target">Mục tiêu cần tấn công.</param>
+    /// <summary>Thực hiện tấn công mục tiêu. AttackRunner lo cooldown/telegraph; đang đánh thì bỏ qua.</summary>
     public virtual void Attack(Transform target)
     {
-        // Kiểm tra thời gian hồi chiêu
-        if (Time.time < lastAttackTime + attackCooldown)
+        if (attack != null)
         {
-            Debug.Log($"[{gameObject.name}] Attack on cooldown. Next attack in: {lastAttackTime + attackCooldown - Time.time:F2}s");
+            Vector2 aim = target != null ? (Vector2)(target.position - transform.position) : Vector2.right;
+            Runner.TryStart(attack, aim);
             return;
         }
 
-        // Lật sprite về phía target nếu có
+        // ── Chế độ cũ: chỉ cooldown + animation (prefab chưa có AttackDef) ──
+        if (Time.time < lastAttackTime + attackCooldown) return;
         if (target != null)
         {
             var spriteRenderer = GetComponentInChildren<SpriteRenderer>();
             if (spriteRenderer != null)
             {
                 float dx = target.position.x - transform.position.x;
-                if (Mathf.Abs(dx) > 0.01f)
-                    spriteRenderer.flipX = dx < 0f;
+                if (Mathf.Abs(dx) > 0.01f) spriteRenderer.flipX = dx < 0f;
             }
         }
-
-        // Gọi animation tấn công nếu có EnemyAnimatorController
         var enemy = GetComponentInParent<Enemy>();
-        if (enemy != null && enemy.EnemyAnimatorController != null)
-        {
-            enemy.EnemyAnimatorController.PlayAttackAnimation();
-        }
-        lastAttackTime = Time.time; // Cập nhật thời gian tấn công cuối cùng
+        if (enemy != null && enemy.EnemyAnimatorController != null) enemy.EnemyAnimatorController.PlayAttackAnimation();
+        lastAttackTime = Time.time;
     }
 }

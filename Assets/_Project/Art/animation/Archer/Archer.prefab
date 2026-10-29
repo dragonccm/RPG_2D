@@ -222,6 +222,7 @@ GameObject:
   - component: {fileID: 2909400027528569250}
   - component: {fileID: 5981342221518902621}
   - component: {fileID: 8471360417664754981}
+  - component: {fileID: 1530401450820946329}
   m_Layer: 3
   m_Name: Archer
   m_TagString: Enemy
@@ -482,7 +483,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e544bbe398ffc8d4399e076279f7ee19, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackRange: 5
+  attack: {fileID: 11400000, guid: 01830401bc223a9dcaefd33e4392f299, type: 2}
+  attackRange: 8.099999
   attackCooldown: 1
 --- !u!114 &5442186086577326791
 MonoBehaviour:
@@ -573,8 +575,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e34b7e077b5548148ac2bd04d2a3c9ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  skillModules:
-  - {fileID: 11400000, guid: eca2b7514aae5ba41bb939c5632bdd49, type: 2}
+  skillModules: []
   useRandomSkill: 0
 --- !u!114 &8471360417664754981
 MonoBehaviour:
@@ -589,6 +590,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   animator: {fileID: 0}
+--- !u!114 &1530401450820946329
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3300779137972288831}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6305de1344665ea580c3a057a5bb8ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RPG.Game::AttackRunner
 --- !u!1 &3926712535967707481
 GameObject:
   m_ObjectHideFlags: 0

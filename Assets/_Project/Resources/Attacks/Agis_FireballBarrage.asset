@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e980ae217bc9637cda62c1c1c0ed2c2f, type: 3}
+  m_Name: Agis_FireballBarrage
+  m_EditorClassIdentifier: RPG.Game::AttackDef
+  attackId: agis_fireballbarrage
+  team: 2
+  shape: 2
+  windup: 0.4
+  active: 0.08
+  recovery: 0.08
+  cooldown: 0
+  reach: 1
+  radius: 0.35
+  centerOnOwner: 0
+  damageMultiplier: 2
+  knockback: 2
+  stunSeconds: 0
+  canCrit: 0
+  lungeDistance: 0
+  telegraph: 1
+  telegraphColor: {r: 1, g: 0.5, b: 0.2, a: 0.8}
+  feedback: 0
+  slashColor: {r: 1, g: 1, b: 1, a: 1}
+  slashSize: 1
+  animTrigger: 
+  comboIndex: 0
+  projectileSpeed: 11
+  projectileRange: 12
+  projectileStyle: 0
+  projectileColor: {r: 1, g: 0.25, b: 0.1, a: 1}
+  projectilePrefab: {fileID: 0}
+  next: {fileID: 0}
+  chainWindow: 0.35
+  cancelFrom: 0.4

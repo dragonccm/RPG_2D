@@ -57,6 +57,7 @@ public class special_move : MonoBehaviour
     private Character character;
     private Animator animator;
     private Collider2D selfCollider;
+    private AttackRunner attackRunner;
 
     // Truy vấn va chạm không cấp phát: buffer dùng lại cho dash/charge
     private readonly Collider2D[] hitBuffer = new Collider2D[32];
@@ -104,18 +105,21 @@ public class special_move : MonoBehaviour
         character = GetComponent<Character>();
         animator = GetComponent<Animator>();
         selfCollider = GetComponent<Collider2D>();
+        attackRunner = GetComponent<AttackRunner>();
     }
 
     private void Update()
     {
         TickCooldowns();
 
+        // Hủy hồi chiêu (Dodge Cancel — GUIDELINES 1.2): đang khựng Recovery của đòn chém vẫn được Dash/Teleport/Charge
+        bool recovering = attackRunner != null && attackRunner.CurrentPhase == AttackRunner.Phase.Recovery;
         bool canAct = character != null && character.CanMove()
-            && playerController != null && !playerController.IsBusy();
+            && playerController != null && (!playerController.IsBusy() || recovering);
 
         // Charge: GIỮ phím để tích — chiếm state Charge, thả để bùng
         if (Unlocked("lua_1") && canAct && Input.GetKeyDown(chargeKey) && cooldownTimers["charge"] <= 0f)
-            BeginCharge();
+            { CancelAttackRecovery(); BeginCharge(); }
         if (isCharging && Input.GetKeyUp(chargeKey))
             ReleaseCharge();
 
@@ -123,16 +127,21 @@ public class special_move : MonoBehaviour
         {
             if (Input.GetKeyDown(dashKey) && WarnNotUnlockedOnce("gio_1", ref warnedDash)
                 && cooldownTimers["dash"] <= 0f)
-                StartCoroutine(PerformDash());
+                { CancelAttackRecovery(); StartCoroutine(PerformDash()); }
             else if (Input.GetKeyDown(teleportKey) && WarnNotUnlockedOnce("khong_1", ref warnedTeleport)
                 && cooldownTimers["teleport"] <= 0f)
-                StartCoroutine(PerformTeleport());
+                { CancelAttackRecovery(); StartCoroutine(PerformTeleport()); }
         }
 
         // Mở khoá lần đầu → xoá cảnh báo
         if (Unlocked("gio_1")) warnedDash = false;
         if (Unlocked("khong_1")) warnedTeleport = false;
         if (Unlocked("lua_1")) warnedCharge = false;
+    }
+
+    private void CancelAttackRecovery()
+    {
+        if (attackRunner != null && attackRunner.CurrentPhase == AttackRunner.Phase.Recovery) attackRunner.Abort();
     }
 
     private void TickCooldowns()

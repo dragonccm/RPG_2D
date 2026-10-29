@@ -69,6 +69,9 @@ public class Enemy : MonoBehaviour
     public event Action OnDeath;
     public event Action<Enemy, float, float> OnDamageTaken;
     public event Action<GameObject, float> OnDealDamage;
+
+    /// <summary>AttackRunner báo mỗi đòn trúng (trước đây sự kiện này không bao giờ được phát → lifesteal elite vô tác dụng).</summary>
+    public void RaiseDealDamage(GameObject target, float damage) => OnDealDamage?.Invoke(target, damage);
     public event Action<int> OnPhaseChanged;
 
     private float _currentHealth = 100f;

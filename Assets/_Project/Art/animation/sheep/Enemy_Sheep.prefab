@@ -123,6 +123,7 @@ GameObject:
   - component: {fileID: 2272584851557909624}
   - component: {fileID: 1954196316648329661}
   - component: {fileID: 267565324889056900}
+  - component: {fileID: 5115119156874229816}
   m_Layer: 3
   m_Name: Enemy_Sheep
   m_TagString: Enemy
@@ -382,7 +383,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e544bbe398ffc8d4399e076279f7ee19, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackRange: 20
+  attack: {fileID: 11400000, guid: 8fc4d1c2d9642a7559e0cbf69ccd6348, type: 2}
+  attackRange: 2.635
   attackCooldown: 1
 --- !u!114 &1954196316648329661
 MonoBehaviour:
@@ -425,6 +427,18 @@ MonoBehaviour:
   playerTarget: {fileID: 0}
   patrolPoints: []
   enemyType: 0
+--- !u!114 &5115119156874229816
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5526733400143600553}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6305de1344665ea580c3a057a5bb8ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RPG.Game::AttackRunner
 --- !u!1 &5801204870006732794
 GameObject:
   m_ObjectHideFlags: 0

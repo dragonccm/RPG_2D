@@ -50,7 +50,7 @@ RPG_SNAP_DIR=/tmp/play unity test --mode PlayMode
 
 | Thư mục | Nội dung chính |
 |---|---|
-| `Core/` | Character, PlayerCombat, SkillBook, `Skills/` (executors), SkillTree, QuestSystem, InventorySystem, SaveSystem, WorldFlags, ItemDatabase, GameFlow, SpriteLoop, `Vfx/` (VfxService, PixelSprites) |
+| `Core/` | Character, PlayerCombat, SkillBook, `Skills/` (executors), `Combat/` (AttackDef, AttackRunner), SkillTree, QuestSystem, InventorySystem, SaveSystem, WorldFlags, ItemDatabase, GameFlow, SpriteLoop, `Vfx/` (VfxService, PixelSprites) |
 | `Controllers/` | PlayerController, special_move (Dash/Teleport/Charge), CameraFollow, TargetingSystem |
 | `AI/` | Enemy, state machine, Melee/Ranged/Support/Boss, EnemySpawner, EliteBuff |
 | `Boss/` | Agis (3 phase, 2 ending) |

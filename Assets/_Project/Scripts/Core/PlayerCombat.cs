@@ -1,177 +1,100 @@
-using System.Collections;
 using UnityEngine;
 
 /// <summary>
-/// S2 (GAME_MASTER_PLAN 5.2, sprint S2): combo đánh thường 3 nhịp của player.
+/// Combo đánh thường 3 nhịp của player, chạy qua AttackRunner (CORE_PROJECT_GUIDELINES 1.2 / 6.2).
 /// Gắn vào Player (cùng PlayerController). Input: chuột trái hoặc phím J.
-/// - Nhịp 1/2: 1.0× AttackPower; nhịp 3: 1.5× + screen shake nhẹ.
-/// - Combo window 0.8s: nối tiếp nhịp kế; quá hạn → về nhịp 1.
-/// - Chí mạng: roll theo Character.CriticalChance / CriticalMultiplier.
-/// - Damage + feedback (damage number, impact, hit-stop) đi qua Character.TakeDamage
-///   và VfxService — không vẽ trùng hệ thống cũ.
-/// - Tái sử dụng FindEnemiesInRange + CalculateEnhancedDamage của SkillExecutorBase
-///   (probe nội bộ) để bảo đảm guard "không bắn player".
+/// - Chuỗi đòn là dữ liệu: Resources/Attacks/Player_Slash1 → 2 → 3 (AttackDef.next). Sửa nhịp/sát thương bằng asset.
+/// - Nối đòn: bấm đánh trong cửa sổ hủy của Recovery (hoặc chainWindow sau đó). Quá hạn → về nhịp 1.
+/// - Hướng đánh theo chuột. Sát thương = AttackPower × damageMultiplier, chí mạng theo Character.
+/// - Phản hồi (vệt chém, rung, hit-stop) do AttackRunner phát; máu/số sát thương do Character.TakeDamage.
 /// </summary>
 [RequireComponent(typeof(PlayerController))]
 public class PlayerCombat : MonoBehaviour
 {
-    [Header("Combo (mảng 3 nhịp)")]
-    [SerializeField] private float[] comboMultipliers = { 1f, 1f, 1.5f };
-    [SerializeField] private float comboWindow = 0.8f;   // giây để nối nhịp kế
-
-    [Header("Tấn công")]
-    [SerializeField] private float attackRange = 1.6f;    // bán kính quét quanh điểm trước mặt
-    [SerializeField] private float attackReach = 0.7f;    // tâm quét dịch trước mặt bao xa
-    [SerializeField] private float attackCooldown = 0.45f;
-    [SerializeField] private float windup = 0.25f;        // trễ khớp animation
+    [Header("Chuỗi đòn (để trống = Resources/Attacks/Player_Slash1)")]
+    [SerializeField] private AttackDef comboHead;
 
     private PlayerController playerController;
     private Character character;
-    private int comboIndex = 0;
-    private float lastAttackTime = -999f;
-    private float nextAttackAllowed = 0f;
-    private Probe probe;
+    private AttackRunner runner;
 
-    private class Probe : SkillExecutorBase
-    {
-        public Probe(SkillModule module) : base(module) { }
-        public override void Execute(Character user, Vector2 targetPosition) { }
-        public Character[] EnemiesInRange(Vector2 center, float range, Character caster)
-            => FindEnemiesInRange(center, range, caster);
-    }
-
-    public int ComboIndex => comboIndex;
+    /// <summary>Nhịp đang/vừa đánh (0 = nhịp đầu).</summary>
+    public int ComboIndex { get; private set; }
+    public AttackRunner Runner => runner;
 
     private void Awake()
     {
         playerController = GetComponent<PlayerController>();
         character = GetComponent<Character>();
-        probe = new Probe(ScriptableObject.CreateInstance<SkillModule>());
+        runner = GetComponent<AttackRunner>();
+        if (runner == null) runner = gameObject.AddComponent<AttackRunner>();
+        if (comboHead == null) comboHead = Resources.Load<AttackDef>("Attacks/Player_Slash1");
+        if (comboHead == null) Debug.LogError("[PlayerCombat] Thiếu AttackDef Player_Slash1 (Resources/Attacks) — chạy Tools/RPG/Combat/Build Attack Defs");
+    }
+
+    private void OnEnable()
+    {
+        if (runner == null) return;
+        runner.Started += OnAttackStarted;
+        runner.Finished += OnAttackFinished;
+    }
+
+    private void OnDisable()
+    {
+        if (runner == null) return;
+        runner.Started -= OnAttackStarted;
+        runner.Finished -= OnAttackFinished;
     }
 
     private void Update()
     {
-        bool pressed = Input.GetKeyDown(KeyCode.J) || Input.GetMouseButtonDown(0);
-        if (pressed) TryAttack();
-        // Combo window hết hạn → reset (checked lazily mỗi frame, không tốn allocation)
-        if (comboIndex != 0 && Time.time - lastAttackTime > comboWindow)
-            comboIndex = 0;
+        if (Input.GetKeyDown(KeyCode.J) || Input.GetMouseButtonDown(0)) TryAttack();
     }
 
     private void TryAttack()
     {
-        if (playerController == null || playerController.IsBusy()) return;
+        if (comboHead == null || playerController == null) return;
         if (character != null && !character.CanMove()) return;
-        if (Time.time < nextAttackAllowed) return;
 
-        // Combo logic thuần (đã test): advance trong window, else reset
-        bool withinWindow = (Time.time - lastAttackTime) <= comboWindow && lastAttackTime > -900f;
-        comboIndex = NextComboIndex(comboIndex, withinWindow, comboMultipliers.Length);
+        Vector2 aim = AimDirection();
+        if (runner.IsBusy)
+        {
+            runner.TryChain(aim); // đang khựng: nối đòn kế nếu đã qua mốc hủy
+            return;
+        }
+        if (playerController.IsBusy()) return; // đang Dash/Charge
 
-        StartCoroutine(AttackRoutine(comboIndex));
-        nextAttackAllowed = Time.time + attackCooldown;
-
-        // S4 (plan 10 — Q1): báo khi tới nhịp finisher trong window (combo trọn)
-        if (withinWindow && comboIndex == comboMultipliers.Length - 1 && QuestManager.Instance != null)
-            QuestManager.Instance.ReportProgress("q1", "q1_combo");
-        lastAttackTime = Time.time;
+        var def = runner.NextInChain() ?? comboHead;
+        runner.TryStart(def, aim);
     }
 
-    private static readonly Collider2D[] hitBuffer = new Collider2D[32];
-    private int lastHitCount;
-
-    private Character[] QueryEnemies(Vector2 center, float range)
+    private void OnAttackStarted(AttackDef def)
     {
-        int count = Physics2D.OverlapCircle(center, range,
-            new ContactFilter2D { useTriggers = Physics2D.queriesHitTriggers }, hitBuffer);
-        lastHitCount = count;
-        var list = new System.Collections.Generic.List<Character>(count);
-        for (int i = 0; i < count; i++)
-        {
-            var col = hitBuffer[i];
-            if (col == null) continue;
-            var ch = col.GetComponent<Character>() ?? col.GetComponentInParent<Character>();
-            if (ch != null && ch != character && !ch.IsDead && !list.Contains(ch))
-            {
-                // Loại trừ người chơi
-                if (ch.CompareTag("Player") || ch.GetComponent<PlayerController>() != null) continue;
-                list.Add(ch);
-            }
-        }
-        // Fallback cho môi trường test EditMode hoặc mock không có 2D collider
-        if (list.Count == 0 && probe != null)
-        {
-            return probe.EnemiesInRange(center, range, character);
-        }
-        return list.ToArray();
-    }
-
-    private IEnumerator AttackRoutine(int index)
-    {
+        ComboIndex = def.comboIndex;
         playerController.SetBusy(true);
-        var animator = playerController.GetComponent<Animator>();
-        if (animator != null)
-        {
-            animator.SetTrigger("Attack");
-            // Set combo index parameter nếu animator có hỗ trợ
-            animator.SetInteger("ComboIndex", index);
-        }
+        // Quest Q1: chạm tới nhịp cuối của chuỗi bằng nối đòn (combo trọn)
+        if (def.next == null && def.comboIndex > 0 && QuestManager.Instance != null)
+            QuestManager.Instance.ReportProgress("q1", "q1_combo");
+    }
 
-        yield return new WaitForSeconds(windup);
+    private void OnAttackFinished(AttackDef def, bool completed)
+    {
+        // Nối đòn: Finished(def) phát trước khi đòn kế bắt đầu → SetBusy(false) rồi Started bật lại ngay
+        playerController.SetBusy(false);
+    }
 
-        if (character == null) { playerController.SetBusy(false); yield break; }
-
-        // Tâm quét: hướng về chuột (plan 5.2 "Hướng theo chuột"), không có chuột → theo mặt lật
-        Vector2 aim = Vector2.right;
+    /// <summary>Hướng về chuột (plan 5.2); không có chuột → mặt đang quay.</summary>
+    private Vector2 AimDirection()
+    {
         var cam = Camera.main;
         if (cam != null)
         {
-            var mouseWorld = cam.ScreenToWorldPoint(Input.mousePosition);
-            Vector2 toMouse = new Vector2(mouseWorld.x - transform.position.x, mouseWorld.y - transform.position.y);
-            if (toMouse.sqrMagnitude > 0.05f) aim = toMouse.normalized;
+            Vector3 m = cam.ScreenToWorldPoint(Input.mousePosition);
+            Vector2 d = new Vector2(m.x - transform.position.x, m.y - transform.position.y);
+            if (d.sqrMagnitude > 0.05f) return d.normalized;
         }
-        Vector2 center = (Vector2)transform.position + aim * attackReach;
-        var targets = QueryEnemies(center, attackRange);
-
-        bool isFinisher = index == comboMultipliers.Length - 1;
-        bool anyHit = false;
-
-        foreach (var target in targets)
-        {
-            // Chí mạng: roll từ chỉ số Character (plan 5.3: crit mặc định 10% ×2.0)
-            float roll = Random.value;
-            bool crit = roll < character.CriticalChance;
-            float dmg = character.AttackPower * comboMultipliers[index];
-            if (crit) dmg *= character.CriticalMultiplier;
-
-            target.TakeDamage(dmg, crit);
-            anyHit = true;
-        }
-
-        // Vật thể thế giới chém được (công tắc, đuốc câu đố...) — IDamageable không phải Character
-        for (int i = 0; i < lastHitCount; i++)
-        {
-            var col = hitBuffer[i];
-            if (col == null || col.GetComponentInParent<Character>() != null) continue;
-            var dmgable = col.GetComponentInParent<IDamageable>();
-            if (dmgable == null || dmgable.IsDead) continue;
-            dmgable.TakeDamage(character.AttackPower);
-            VfxService.Hit(col.bounds.center, aim, HitMaterial.Stone);
-            anyHit = true;
-        }
-
-        if (anyHit)
-        {
-            // Máu/tia lửa do Character.TakeDamage của mục tiêu phát; ở đây chỉ vệt chém + rung + hit-stop
-            var level = isFinisher ? ShakeLevel.Heavy : ShakeLevel.Light;
-            VfxService.Slash(transform.position, aim, isFinisher ? new Color(1f, 0.9f, 0.5f) : Color.white,
-                isFinisher ? 1.3f : 1f);
-            VfxService.Shake(level);
-            VfxService.HitStop(level);
-        }
-
-        yield return new WaitForSeconds(Mathf.Max(0.02f, attackCooldown - windup));
-        playerController.SetBusy(false);
+        var sr = GetComponentInChildren<SpriteRenderer>();
+        return sr != null && sr.flipX ? Vector2.left : Vector2.right;
     }
 
     // ---------- Logic thuần để test (P0-6 / S2) ----------

@@ -474,6 +474,7 @@ GameObject:
   - component: {fileID: 3149652930160656903}
   - component: {fileID: 5967497218502263471}
   - component: {fileID: 2060940688001907084}
+  - component: {fileID: 7779337184788337122}
   m_Layer: 3
   m_Name: Goblin
   m_TagString: Enemy
@@ -761,7 +762,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e544bbe398ffc8d4399e076279f7ee19, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackRange: 1.5
+  attack: {fileID: 11400000, guid: 018b7436cd56237aebc89e2720d06bad, type: 2}
+  attackRange: 1.2
   attackCooldown: 1
 --- !u!114 &5967497218502263471
 MonoBehaviour:
@@ -792,6 +794,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e34b7e077b5548148ac2bd04d2a3c9ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  skillModules:
-  - {fileID: 11400000, guid: 357eab4f901310b479c7047afbb9aec8, type: 2}
+  skillModules: []
   useRandomSkill: 1
+--- !u!114 &7779337184788337122
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8047856542747731292}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6305de1344665ea580c3a057a5bb8ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RPG.Game::AttackRunner

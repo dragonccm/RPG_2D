@@ -222,3 +222,193 @@ public class MapSmokeTests
         Assert.IsEmpty(errors, string.Join("\n", errors));
     }
 }
+
+/// <summary>AttackRunner chạy thật trong game: windup → hit → recovery, telegraph, hủy khi choáng, đạn, nối combo.</summary>
+public class AttackRunnerPlayTests
+{
+    private readonly List<string> errors = new List<string>();
+    private void OnLog(string msg, string stack, LogType type) { if (type == LogType.Exception || type == LogType.Error) errors.Add(msg); }
+    [SetUp] public void SetUp() { errors.Clear(); Application.logMessageReceived += OnLog; WorldFlags.Import(null); }
+    [TearDown] public void TearDown() { Application.logMessageReceived -= OnLog; }
+
+    private static void Snap(string name)
+    {
+        string dir = System.Environment.GetEnvironmentVariable("RPG_SNAP_DIR");
+        if (string.IsNullOrEmpty(dir) || Camera.main == null) return;
+        Directory.CreateDirectory(dir);
+        var cam = Camera.main;
+        var rt = new RenderTexture(1280, 720, 24);
+        var prev = cam.targetTexture;
+        cam.targetTexture = rt;
+        cam.Render();
+        RenderTexture.active = rt;
+        var tex = new Texture2D(1280, 720, TextureFormat.RGB24, false);
+        tex.ReadPixels(new Rect(0, 0, 1280, 720), 0, 0);
+        tex.Apply();
+        RenderTexture.active = null;
+        cam.targetTexture = prev;
+        File.WriteAllBytes(Path.Combine(dir, name + ".png"), tex.EncodeToPNG());
+        Object.Destroy(rt);
+    }
+
+    private static IEnumerator LoadForest()
+    {
+        SceneManager.LoadScene("M2_Forest");
+        yield return null;
+        yield return new WaitForSeconds(1.5f);
+    }
+
+    private static Character Spawn(string encounterId, out PlayerController player, string prefabName = null)
+    {
+        player = Object.FindAnyObjectByType<PlayerController>();
+        var enc = Object.FindObjectsByType<EncounterGroup>().First(e => e.name == "Encounter_" + encounterId);
+        enc.Activate();
+        return null;
+    }
+
+    private static Character FirstEnemy(Vector2 near, string nameStart)
+    {
+        return Object.FindObjectsByType<Character>()
+            .Where(c => c.GetComponent<PlayerController>() == null && c.name.StartsWith(nameStart))
+            .OrderBy(c => Vector2.Distance(c.transform.position, near)).First();
+    }
+
+    private static void Isolate(Character enemy)
+    {
+        // Tắt AI/di chuyển để kiểm tra riêng AttackRunner
+        foreach (var mb in enemy.GetComponents<MonoBehaviour>())
+            if (mb is EnemyAIController || mb is Enemy || mb is EnemyMovementController) mb.enabled = false;
+        var agent = enemy.GetComponent<UnityEngine.AI.NavMeshAgent>();
+        if (agent != null) agent.enabled = false;
+        var rb = enemy.GetComponent<Rigidbody2D>();
+        if (rb != null) { rb.linearVelocity = Vector2.zero; rb.bodyType = RigidbodyType2D.Kinematic; }
+    }
+
+    [UnityTest]
+    public IEnumerator Goblin_TelegraphsThenHits_AfterWindup()
+    {
+        yield return LoadForest();
+        var player = Object.FindAnyObjectByType<PlayerController>();
+        var pc = player.GetComponent<Character>();
+        Spawn("forest_e1", out _);
+        yield return null;
+        var goblin = FirstEnemy(player.transform.position, "Goblin");
+        Isolate(goblin);
+        var def = Resources.Load<AttackDef>("Attacks/Goblin_Club");
+        // đặt người chơi sát bên phải goblin
+        goblin.transform.position = new Vector3(player.transform.position.x - 0.7f, player.transform.position.y, 0f);
+        float hp = pc.health.currentValue;
+
+        goblin.GetComponent<EnemyAttackController>().Attack(player.transform);
+        var runner = goblin.GetComponent<AttackRunner>();
+        yield return new WaitForSeconds(0.15f);
+        Assert.AreEqual(AttackRunner.Phase.Windup, runner.CurrentPhase, "đang windup");
+        Assert.AreEqual(hp, pc.health.currentValue, "chưa gây sát thương trong windup");
+        Assert.IsNotNull(GameObject.Find("VfxTelegraph"), "có vùng báo hiệu trong windup");
+        Snap("attack_goblin_windup");
+
+        yield return new WaitForSeconds(def.windup + 0.25f);
+        float expected = goblin.AttackPower * def.damageMultiplier;
+        Assert.Less(pc.health.currentValue, hp, "trúng đòn sau windup");
+        Assert.AreEqual(hp - Mathf.Max(1f, expected - pc.Defense), pc.health.currentValue, 0.6f, "sát thương = AttackPower × hệ số");
+        Assert.IsNull(GameObject.Find("VfxTelegraph"), "telegraph biến mất khi đòn ra");
+        Assert.IsEmpty(errors, string.Join("\n", errors));
+    }
+
+    [UnityTest]
+    public IEnumerator StunDuringWindup_CancelsTheAttack()
+    {
+        yield return LoadForest();
+        var player = Object.FindAnyObjectByType<PlayerController>();
+        var pc = player.GetComponent<Character>();
+        Spawn("forest_e1", out _);
+        yield return null;
+        var goblin = FirstEnemy(player.transform.position, "Goblin");
+        Isolate(goblin);
+        goblin.transform.position = new Vector3(player.transform.position.x - 0.7f, player.transform.position.y, 0f);
+        float hp = pc.health.currentValue;
+
+        goblin.GetComponent<EnemyAttackController>().Attack(player.transform);
+        yield return new WaitForSeconds(0.2f);
+        goblin.ApplyStun(1.5f);
+        yield return new WaitForSeconds(1f);
+        Assert.AreEqual(hp, pc.health.currentValue, "choáng giữa windup → đòn bị hủy");
+        Assert.AreEqual(AttackRunner.Phase.Idle, goblin.GetComponent<AttackRunner>().CurrentPhase);
+    }
+
+    [UnityTest]
+    public IEnumerator Archer_FiresProjectile_AfterWindup()
+    {
+        yield return LoadForest();
+        var player = Object.FindAnyObjectByType<PlayerController>();
+        var pc = player.GetComponent<Character>();
+        Spawn("forest_e2", out _);
+        yield return null;
+        var archer = FirstEnemy(player.transform.position, "Archer");
+        Isolate(archer);
+        archer.transform.position = new Vector3(player.transform.position.x - 4f, player.transform.position.y, 0f);
+        float hp = pc.health.currentValue;
+
+        archer.GetComponent<EnemyAttackController>().Attack(player.transform);
+        yield return new WaitForSeconds(0.4f);
+        Assert.AreEqual(0, Object.FindObjectsByType<AttackProjectile>().Length, "chưa bắn trong windup");
+        Snap("attack_archer_windup");
+        yield return new WaitForSeconds(0.6f);
+        Assert.AreEqual(1, Object.FindObjectsByType<AttackProjectile>().Length, "đã bắn 1 mũi tên");
+        Snap("attack_archer_arrow");
+        yield return new WaitForSeconds(1.2f);
+        Assert.Less(pc.health.currentValue, hp, "mũi tên trúng người chơi");
+    }
+
+    [UnityTest]
+    public IEnumerator Sheep_AndRat_NowDealDamage()
+    {
+        // trước đây cừu/chuột không có kỹ năng nào → không bao giờ gây sát thương
+        SceneManager.LoadScene("M5_Cave");
+        yield return null;
+        yield return new WaitForSeconds(1.5f);
+        var player = Object.FindAnyObjectByType<PlayerController>();
+        var pc = player.GetComponent<Character>();
+        Object.FindObjectsByType<EncounterGroup>().First(e => e.name == "Encounter_cave_rats_w").Activate();
+        yield return null;
+        var rat = FirstEnemy(player.transform.position, "Enemy_Rat");
+        Isolate(rat);
+        rat.transform.position = new Vector3(player.transform.position.x - 0.5f, player.transform.position.y, 0f);
+        float hp = pc.health.currentValue;
+        rat.GetComponent<EnemyAttackController>().Attack(player.transform);
+        yield return new WaitForSeconds(1.2f);
+        Assert.Less(pc.health.currentValue, hp, "chuột cắn trúng");
+        Assert.IsEmpty(errors, string.Join("\n", errors));
+    }
+
+    [UnityTest]
+    public IEnumerator PlayerCombo_ChainsThreeSlashes_AndFinisherHitsHarder()
+    {
+        yield return LoadForest();
+        var player = Object.FindAnyObjectByType<PlayerController>();
+        var runner = player.GetComponent<AttackRunner>() ?? player.gameObject.AddComponent<AttackRunner>();
+        var dummy = new GameObject("Dummy");
+        dummy.tag = "Untagged";
+        dummy.transform.position = player.transform.position + Vector3.right * 0.9f;
+        dummy.AddComponent<CircleCollider2D>().radius = 0.3f;
+        var ch = dummy.AddComponent<Character>();
+        ch.health.Initialize(1000f, 0f);
+        ch.health.currentValue = 1000f;
+        float atk = player.GetComponent<Character>().AttackPower;
+
+        var head = Resources.Load<AttackDef>("Attacks/Player_Slash1");
+        var phases = new List<int>();
+        runner.Started += d => phases.Add(d.comboIndex);
+        Assert.IsTrue(runner.TryStart(head, Vector2.right));
+        yield return new WaitForSeconds(head.windup + head.active + head.recovery * head.cancelFrom + 0.05f);
+        Assert.IsTrue(runner.TryChain(Vector2.right), "qua mốc cancelFrom → nối được nhịp 2");
+        yield return new WaitForSeconds(head.next.windup + head.next.active + head.next.recovery * head.next.cancelFrom + 0.05f);
+        Assert.IsTrue(runner.TryChain(Vector2.right), "nối nhịp 3");
+        yield return new WaitForSeconds(2f);
+
+        CollectionAssert.AreEqual(new[] { 0, 1, 2 }, phases, "đúng chuỗi 3 nhịp");
+        float lost = 1000f - ch.health.currentValue;
+        Assert.AreEqual(atk * (1f + 1f + 1.5f), lost, atk * 0.6f, "tổng sát thương ≈ 1×+1×+1.5× AttackPower (trừ chí mạng)");
+        Object.Destroy(dummy);
+    }
+}

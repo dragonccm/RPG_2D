@@ -28,8 +28,7 @@ public class agis_wizzar : MonoBehaviour
     [Header("Fireball Skill")]
     public GameObject fireballPrefab;
     public float fireballCooldown = 1f;
-    public float fireballSpeed = 10f;
-    public float fireballDamage = 25f;
+    [Tooltip("Tầm bắt đầu bắn cầu lửa (AI). Tốc độ/sát thương/telegraph nằm trong AttackDef Agis_Fireball.")]
     public float fireballRange = 8f;
     public AudioClip fireballCastSound;
     public AudioClip fireballImpactSound;
@@ -46,11 +45,15 @@ public class agis_wizzar : MonoBehaviour
     public float berserkFireballCooldown = 0.3f;
     public int berserkFireballCount = 5; // Tăng từ 3 lên 5
     
+    [Header("Đòn đánh (AttackDef — Resources/Attacks)")]
+    public AttackDef fireballDef;
+    public AttackDef barrageDef;
+    public AttackDef slamDef;
+
     [Header("AOE Skill")]
     public GameObject aoePrefab;
     public float aoeCooldown = 8f;
-    public float aoeRadius = 3f;
-    public float aoeDamage = 50f;
+    [Tooltip("Thời gian scale hiệu ứng aoePrefab (nếu có). Windup/sát thương/bán kính nằm trong AttackDef Agis_Slam.")]
     public float aoeChargeTime = 1f;
     public AudioClip aoeCastSound;
     
@@ -86,8 +89,16 @@ public class agis_wizzar : MonoBehaviour
     public bool IsDead => character != null ? character.IsDead : false;
     public float GetHealthPercentage() => character != null ? character.CurrentHealth / character.MaxHealth : 0f;
 
+    private AttackRunner attackRunner;
+
     void Start()
     {
+        attackRunner = GetComponent<AttackRunner>();
+        if (attackRunner == null) attackRunner = gameObject.AddComponent<AttackRunner>();
+        if (fireballDef == null) fireballDef = Resources.Load<AttackDef>("Attacks/Agis_Fireball");
+        if (barrageDef == null) barrageDef = Resources.Load<AttackDef>("Attacks/Agis_FireballBarrage");
+        if (slamDef == null) slamDef = Resources.Load<AttackDef>("Attacks/Agis_Slam");
+
         // Tích hợp với Character system - tận dụng hệ thống cũ
         character = GetComponent<Character>();
         if (character == null)
@@ -411,191 +422,62 @@ public class agis_wizzar : MonoBehaviour
     IEnumerator FireballSkill()
     {
         isSkillActive = true;
-        
-        // TELEGRAPH: Boss chớp vàng và hiện cảnh báo trước khi bắn 0.35s
-        if (spriteRenderer != null) spriteRenderer.color = Color.yellow;
-        if (playerTarget != null)
-        {
-            VfxService.Telegraph(playerTarget.position, 0.6f, 0.35f, new Color(1f, 0.8f, 0.2f, 0.8f));
-        }
-        yield return new WaitForSeconds(0.35f);
-        if (spriteRenderer != null) spriteRenderer.color = isBerserk ? Color.red : Color.white;
+        PlaySound(fireballCastSound);
+        if (animator != null) animator.SetTrigger("CastFireball");
 
-        Debug.Log($"Agis Wizzar casting fireball! Berserk: {isBerserk}");
-        
+        // Boss chớp vàng suốt windup (AttackRunner vẽ đường báo hiệu hướng bắn)
+        if (spriteRenderer != null) spriteRenderer.color = Color.yellow;
+
         if (isBerserk)
         {
-            // Berserk mode - bắn nhiều fireball
+            // Berserk: loạt đạn — mỗi viên có windup 0.4s riêng (đọc được, né được)
             fireballCooldownTimer = berserkFireballCooldown;
-            
             for (int i = 0; i < berserkFireballCount; i++)
             {
                 if (playerTarget == null) break;
-                Vector2 targetPos = (Vector2)playerTarget.position + Random.insideUnitCircle * 1f;
-                LaunchFireball2D(targetPos);
-                
-                yield return new WaitForSeconds(0.15f); // Giảm delay giữa các fireball
+                Vector2 aim = (Vector2)(playerTarget.position - transform.position) + Random.insideUnitCircle * 1f;
+                yield return attackRunner.Perform(barrageDef, aim, null, fireballPrefab);
             }
         }
         else
         {
-            // Normal mode
             fireballCooldownTimer = fireballCooldown;
-            if (playerTarget != null) LaunchFireball2D(playerTarget.position);
+            if (playerTarget != null)
+                yield return attackRunner.Perform(fireballDef, (Vector2)(playerTarget.position - transform.position), null, fireballPrefab);
         }
-        
+
+        if (spriteRenderer != null) spriteRenderer.color = isBerserk ? Color.red : Color.white;
         yield return new WaitForSeconds(0.2f);
         isSkillActive = false;
-    }
-
-    void LaunchFireball2D(Vector2 targetPosition)
-    {
-        Vector2 spawnPosition = (Vector2)transform.position + Vector2.up * 0.5f;
-        
-        GameObject fireball;
-        
-        if (fireballPrefab != null)
-        {
-            fireball = Instantiate(fireballPrefab, spawnPosition, Quaternion.identity);
-        }
-        else
-        {
-            fireball = CreateDefaultFireball(spawnPosition);
-        }
-        
-        FireballProjectile2D projectile = fireball.GetComponent<FireballProjectile2D>();
-        if (projectile == null)
-        {
-            projectile = fireball.AddComponent<FireballProjectile2D>();
-        }
-        
-        projectile.Initialize(targetPosition, fireballSpeed, fireballDamage, fireballImpactSound);
-        
-        PlaySound(fireballCastSound);
-        
-        if (animator != null)
-            animator.SetTrigger("CastFireball");
-            
-        Debug.Log($"Fireball launched towards {targetPosition}!");
-    }
-
-    GameObject CreateDefaultFireball(Vector2 position)
-    {
-        GameObject fireball = new GameObject("DefaultFireball");
-        fireball.transform.position = position;
-        
-        // Sử dụng SpriteRenderer thay vì tạo texture phức tạp
-        var spriteRenderer = fireball.AddComponent<SpriteRenderer>();
-        
-        // Tạo sprite đơn giản cho fireball
-        Texture2D texture = CreateSimpleFireballTexture();
-        Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.one * 0.5f, 16f);
-        spriteRenderer.sprite = sprite;
-        spriteRenderer.sortingOrder = 10;
-        
-        var collider = fireball.AddComponent<CircleCollider2D>();
-        collider.isTrigger = true;
-        collider.radius = 0.3f;
-        
-        var rb = fireball.AddComponent<Rigidbody2D>();
-        rb.gravityScale = 0f;
-        
-        return fireball;
-    }
-
-    /// <summary>
-    /// Tạo texture đơn giản cho fireball fallback
-    /// </summary>
-    Texture2D CreateSimpleFireballTexture()
-    {
-        // Cầu lửa pixel 16×16: 3 vòng đặc (đỏ → cam → vàng), không gradient alpha
-        const int size = 16;
-        var texture = new Texture2D(size, size, TextureFormat.RGBA32, false) { filterMode = FilterMode.Point };
-        var colors = new Color32[size * size];
-        float c = (size - 1) * 0.5f;
-        for (int y = 0; y < size; y++)
-            for (int x = 0; x < size; x++)
-            {
-                float d = Mathf.Sqrt((x - c) * (x - c) + (y - c) * (y - c)) / (size * 0.45f);
-                colors[y * size + x] = d > 1f ? new Color32(0, 0, 0, 0)
-                    : d > 0.7f ? new Color32(190, 40, 20, 255)
-                    : d > 0.4f ? new Color32(255, 130, 20, 255)
-                    : new Color32(255, 230, 120, 255);
-            }
-        texture.SetPixels32(colors);
-        texture.Apply();
-        return texture;
     }
 
     IEnumerator AOESkill()
     {
         isSkillActive = true;
         aoeCooldownTimer = aoeCooldown;
-        
-        Debug.Log("Agis Wizzar casting AOE!");
-        
+
         PlaySound(aoeCastSound);
-        
-        if (animator != null)
-            animator.SetTrigger("AOECast");
-        
+        if (animator != null) animator.SetTrigger("AOECast");
+
+        // Đặt vùng đập xuống chân người chơi lúc bắt đầu; windup 1s = thời gian né (AttackDef Agis_Slam)
         Vector2 aoePosition = playerTarget.position;
-        GameObject chargeEffect = CreateAOEChargeEffect(aoePosition);
-            
-        yield return new WaitForSeconds(aoeChargeTime);
-        
-        DealAOEDamage2D(aoePosition);
-        
-        yield return new WaitForSeconds(0.5f);
+        bool customVisual = aoePrefab != null;
+        if (customVisual) CreateAOEChargeEffect(aoePosition);
+
+        yield return attackRunner.Perform(slamDef, (Vector2)(playerTarget.position - transform.position), aoePosition, null, !customVisual);
+
+        yield return new WaitForSeconds(0.3f);
         isSkillActive = false;
-        
-        Debug.Log("Agis Wizzar used AOE attack!");
     }
 
-    GameObject CreateAOEChargeEffect(Vector2 position)
+    /// <summary>Hiệu ứng art tuỳ chọn (aoePrefab) lớn dần trong lúc windup; không có thì AttackRunner vẽ telegraph pixel.</summary>
+    void CreateAOEChargeEffect(Vector2 position)
     {
-        if (aoePrefab != null)
-        {
-            GameObject effect = VfxService.PlayPrefab(aoePrefab, position, Quaternion.identity, 0.1f, 0f);
-            
-            // Scale effect từ từ
-            if (effect != null)
-            {
-                StartCoroutine(ScaleOverTime(effect, Vector3.one * aoeRadius * 2, aoeChargeTime));
-                // Destroy sau khi charge time + thêm 1s
-                Destroy(effect, aoeChargeTime + 1f);
-            }
-            
-            return effect;
-        }
-        else
-        {
-            // Fallback: AOE charge effect đơn giản
-            return VfxService.Telegraph(position, aoeRadius, aoeChargeTime + 1f, new Color(1f, 0.15f, 0.15f, 0.8f));
-        }
-    }
-
-    void DealAOEDamage2D(Vector2 center)
-    {
-        Collider2D[] hits = Physics2D.OverlapCircleAll(center, aoeRadius);
-        
-        foreach (var hit in hits)
-        {
-            if (hit.CompareTag("Player"))
-            {
-                IDamageable damageable = hit.GetComponent<IDamageable>();
-                if (damageable != null)
-                {
-                    float distance = Vector2.Distance(center, hit.transform.position);
-                    float damageMultiplier = 1f - (distance / aoeRadius * 0.5f);
-                    float finalDamage = aoeDamage * damageMultiplier;
-                    
-                    damageable.TakeDamage(finalDamage);
-                    
-                    Debug.Log($"AOE hit {hit.name} for {finalDamage} damage!");
-                }
-            }
-        }
+        GameObject effect = VfxService.PlayPrefab(aoePrefab, position, Quaternion.identity, 0.1f, 0f);
+        if (effect == null) return;
+        float radius = slamDef != null ? slamDef.radius : 3f;
+        StartCoroutine(ScaleOverTime(effect, Vector3.one * radius * 2, slamDef != null ? slamDef.windup : aoeChargeTime));
+        Destroy(effect, (slamDef != null ? slamDef.windup : aoeChargeTime) + 1f);
     }
 
     IEnumerator ScaleOverTime(GameObject obj, Vector3 targetScale, float duration)
@@ -882,7 +764,7 @@ public class agis_wizzar : MonoBehaviour
         }
         
         Gizmos.color = Color.magenta;
-        Gizmos.DrawWireSphere(transform.position, aoeRadius);
+        Gizmos.DrawWireSphere(transform.position, slamDef != null ? slamDef.radius : 3f);
     }
 
     public bool IsBerserk()
@@ -911,89 +793,5 @@ public class agis_wizzar : MonoBehaviour
             character.OnDamageTaken -= OnDamageTaken;
             character.OnDeath -= OnCharacterDeath;
         }
-    }
-}
-
-public class FireballProjectile2D : MonoBehaviour
-{
-    private Vector2 targetPosition;
-    private float speed;
-    private float damage;
-    private AudioClip impactSound;
-    private bool hasTarget = false;
-    private Rigidbody2D rb2d;
-
-    public void Initialize(Vector2 target, float projectileSpeed, float projectileDamage, AudioClip impact)
-    {
-        targetPosition = target;
-        speed = projectileSpeed;
-        damage = projectileDamage;
-        impactSound = impact;
-        hasTarget = true;
-        
-        rb2d = GetComponent<Rigidbody2D>();
-        if (rb2d == null)
-            rb2d = gameObject.AddComponent<Rigidbody2D>();
-            
-        rb2d.gravityScale = 0f;
-        rb2d.freezeRotation = true;
-        
-        Vector2 direction = (targetPosition - (Vector2)transform.position).normalized;
-        rb2d.linearVelocity = direction * speed;
-        
-        if (direction != Vector2.zero)
-        {
-            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-            transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
-        }
-        
-        Destroy(gameObject, 5f);
-    }
-
-    void Update()
-    {
-        if (hasTarget)
-        {
-            if (Vector2.Distance(transform.position, targetPosition) < 0.5f)
-            {
-                Explode();
-            }
-        }
-    }
-
-    void OnTriggerEnter2D(Collider2D other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            IDamageable damageable = other.GetComponent<IDamageable>();
-            if (damageable != null)
-            {
-                damageable.TakeDamage(damage);
-                Debug.Log($"Fireball hit {other.name} for {damage} damage!");
-            }
-            
-            Explode();
-        }
-        else if (other.gameObject.layer == LayerMask.NameToLayer("Obstacle"))
-        {
-            Explode();
-        }
-    }
-
-    void Explode()
-    {
-        if (impactSound != null)
-        {
-            AudioSource.PlayClipAtPoint(impactSound, transform.position);
-        }
-        
-        CreateExplosionEffect();
-        
-        Destroy(gameObject);
-    }
-    
-    void CreateExplosionEffect()
-    {
-        VfxService.Impact(transform.position, Color.red, 1.2f);
     }
 }

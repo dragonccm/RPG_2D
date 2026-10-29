@@ -47,7 +47,7 @@ public static class EnemyPrefabBuilder
         toIdle.hasExitTime = false; toIdle.duration = 0f;
         toIdle.AddCondition(AnimatorConditionMode.Less, 0.1f, "Speed");
 
-        const string src = "Assets/_Project/Prefabs/Enemy_Sheep.prefab";
+        const string src = "Assets/_Project/Art/animation/sheep/Enemy_Sheep.prefab"; // bản có Enemy + MeleeEnemyAI
         const string dst = "Assets/_Project/Prefabs/Enemy_Rat.prefab";
         AssetDatabase.DeleteAsset(dst);
         AssetDatabase.CopyAsset(src, dst);
@@ -75,10 +75,25 @@ public static class EnemyPrefabBuilder
         {
             var so = new SerializedObject(enemy);
             SetFloat(so, "baseDamage", 6f);
-            SetFloat(so, "moveSpeed", 3f);
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+        foreach (var move in root.GetComponents<EnemyMovementController>())
+        {
+            var so = new SerializedObject(move);
+            SetFloat(so, "moveSpeed", 3f); // chuột nhanh hơn cừu
             so.ApplyModifiedPropertiesWithoutUndo();
         }
         if (root.GetComponent<YSort>() == null) root.AddComponent<YSort>();
+
+        var bite = AssetDatabase.LoadAssetAtPath<AttackDef>(AttackDefBuilder.Folder + "/Rat_Bite.asset");
+        var atk = root.GetComponent<EnemyAttackController>();
+        if (atk != null && bite != null)
+        {
+            var aso = new SerializedObject(atk);
+            aso.FindProperty("attack").objectReferenceValue = bite;
+            aso.FindProperty("attackRange").floatValue = bite.TriggerRange;
+            aso.ApplyModifiedPropertiesWithoutUndo();
+        }
 
         PrefabUtility.SaveAsPrefabAsset(root, dst);
         PrefabUtility.UnloadPrefabContents(root);

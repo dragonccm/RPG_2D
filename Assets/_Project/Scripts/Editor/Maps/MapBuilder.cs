@@ -28,7 +28,7 @@ public static class MapBuilder
         { "Goblin", "Assets/_Project/Art/animation/Goblin/Goblin.prefab" },
         { "Archer", "Assets/_Project/Art/animation/Archer/Archer.prefab" },
         { "Lancer", "Assets/_Project/Art/animation/Lancer/Lancer.prefab" },
-        { "Sheep", "Assets/_Project/Prefabs/Enemy_Sheep.prefab" },
+        { "Sheep", "Assets/_Project/Art/animation/sheep/Enemy_Sheep.prefab" }, // bản có AI (Prefabs/Enemy_Sheep là bù nhìn đứng yên)
         { "Rat", "Assets/_Project/Prefabs/Enemy_Rat.prefab" },
     };
 
@@ -43,6 +43,7 @@ public static class MapBuilder
         MapArt.EnsureFolder(MapFolder);
         RenderSetup.EnsureAll();
         SkillScrollBuilder.BuildAll();
+        AttackDefBuilder.BuildAll();
         EnemyPrefabBuilder.BuildAll();
         var built = new List<string>();
         foreach (var spec in MapSpecs.All())
