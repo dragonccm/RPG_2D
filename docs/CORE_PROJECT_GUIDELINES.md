@@ -136,7 +136,7 @@ Mọi đòn đánh của Player và Enemy phải tuân thủ nghiêm ngặt 3 ph
 - **Quy tắc ghép:** effect gắn vào *sự kiện* (HitLanded, Parried, Died, SkillCast), không gắn vào *đối tượng*. Trúng thịt → tóe máu; trúng khiên/giáp → tia lửa kim loại; trúng đá/đất → bụi.
 - **Hướng & số hạt:** máu/tia lửa văng theo hướng đòn (hướng vung ± 30°), 3–5 hạt, sống ≤ 0.25s, rơi xuống sàn rồi mờ.
 - Gộp 4 manager thành `VfxService`, xóa file documentation khỏi runtime (chuyển sang `docs/`).
-- **Trạng thái 29/10/2026:** ✅ `Core/Vfx/VfxService.cs` + `PixelSprites.cs` đã thay `CombatEffectsManager`, `EnhancedEffectManager`, `Effect2DManager`, `VisualEffects`, `DamageAreaIndicator`, `CameraShake`. Sprite pixel sinh runtime là bản tạm — thay bằng art vẽ tay qua `VfxDefinition` sau. Còn nợ: `LineRenderer` hướng đạn trong `ModularSkillManager`, hạt `ParticleSystem` mượt trong `SkillExecutors` (xử lý khi refactor hệ kỹ năng), `BlobShadow` còn dùng `SetPixel`.
+- **Trạng thái 29/10/2026:** ✅ `Core/Vfx/VfxService.cs` + `PixelSprites.cs` đã thay `CombatEffectsManager`, `EnhancedEffectManager`, `Effect2DManager`, `VisualEffects`, `DamageAreaIndicator`, `CameraShake`. Sprite pixel sinh runtime là bản tạm — thay bằng art vẽ tay qua `VfxDefinition` sau. Đã dọn (30/10): đường ngắm kỹ năng → `PixelAimLine` (nét đứt pixel), `BlobShadow` và cầu lửa fallback của Agis → pixel dither/đặc, không gradient. Còn nợ: hạt `ParticleSystem` mượt trong `SkillExecutors` (xử lý khi refactor hệ kỹ năng), reflection `GetMethod("TriggerSkillAnimation")` ở `SkillExecutors`.
 
 ### 6.2 Chuẩn đòn đánh cho Player = Enemy = Boss (một khung duy nhất)
 - Mọi đòn đều là dữ liệu `AttackDef` (SO): `windup`, `active`, `recovery`, `hitShape`, `damage`, `knockback`, `telegraph`, `cancelWindow`, `nextInChain`.

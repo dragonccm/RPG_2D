@@ -489,7 +489,7 @@ public class agis_wizzar : MonoBehaviour
         
         // Tạo sprite đơn giản cho fireball
         Texture2D texture = CreateSimpleFireballTexture();
-        Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.one * 0.5f);
+        Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.one * 0.5f, 16f);
         spriteRenderer.sprite = sprite;
         spriteRenderer.sortingOrder = 10;
         
@@ -508,30 +508,21 @@ public class agis_wizzar : MonoBehaviour
     /// </summary>
     Texture2D CreateSimpleFireballTexture()
     {
-        int size = 32;
-        Texture2D texture = new Texture2D(size, size, TextureFormat.RGBA32, false);
-        Color[] colors = new Color[size * size];
-        Vector2 center = Vector2.one * (size * 0.5f);
-        float radius = size * 0.4f;
-
+        // Cầu lửa pixel 16×16: 3 vòng đặc (đỏ → cam → vàng), không gradient alpha
+        const int size = 16;
+        var texture = new Texture2D(size, size, TextureFormat.RGBA32, false) { filterMode = FilterMode.Point };
+        var colors = new Color32[size * size];
+        float c = (size - 1) * 0.5f;
         for (int y = 0; y < size; y++)
-        {
             for (int x = 0; x < size; x++)
             {
-                float distance = Vector2.Distance(new Vector2(x, y), center);
-                if (distance <= radius)
-                {
-                    float intensity = 1f - (distance / radius);
-                    colors[y * size + x] = new Color(1f, intensity * 0.3f, 0f, intensity);
-                }
-                else
-                {
-                    colors[y * size + x] = Color.clear;
-                }
+                float d = Mathf.Sqrt((x - c) * (x - c) + (y - c) * (y - c)) / (size * 0.45f);
+                colors[y * size + x] = d > 1f ? new Color32(0, 0, 0, 0)
+                    : d > 0.7f ? new Color32(190, 40, 20, 255)
+                    : d > 0.4f ? new Color32(255, 130, 20, 255)
+                    : new Color32(255, 230, 120, 255);
             }
-        }
-
-        texture.SetPixels(colors);
+        texture.SetPixels32(colors);
         texture.Apply();
         return texture;
     }

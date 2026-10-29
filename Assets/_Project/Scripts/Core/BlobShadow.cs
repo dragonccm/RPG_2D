@@ -44,7 +44,7 @@ public class BlobShadow : MonoBehaviour
 
         // Bóng co lại + mờ dần khi nâng lên
         float shrink = Mathf.Lerp(1f, 0.55f, t);
-        shadowRenderer.transform.localScale = new Vector3(baseWidth * shrink, baseHeight * shrink, 1f);
+        shadowRenderer.transform.localScale = new Vector3(baseWidth * shrink * SpriteWorldWidth, baseHeight * shrink * SpriteWorldWidth, 1f);
 
         var c = shadowRenderer.color;
         c.a = alpha * Mathf.Lerp(1f, 0.35f, t);
@@ -58,7 +58,7 @@ public class BlobShadow : MonoBehaviour
         var go = new GameObject("ShadowBlob");
         go.transform.SetParent(transform, false);
         go.transform.localPosition = new Vector3(0f, groundYOffset, 0f);
-        go.transform.localScale = new Vector3(baseWidth, baseHeight, 1f);
+        go.transform.localScale = new Vector3(baseWidth * SpriteWorldWidth, baseHeight * SpriteWorldWidth, 1f);
 
         var sr = go.AddComponent<SpriteRenderer>();
         sr.sprite = CreateEllipseSprite();
@@ -69,35 +69,35 @@ public class BlobShadow : MonoBehaviour
         return sr;
     }
 
+    // Sprite 64 px ở 64 PPU rộng 1 đơn vị; baseWidth/baseHeight (đã serialize trong scene) tính theo bóng cũ rộng 0.64 đơn vị
+    private const float SpriteWorldWidth = 0.64f;
+
+    private static Sprite ellipse;
+
     private static Sprite CreateEllipseSprite()
     {
-        // Ellipse mềm: vẽ gradient alpha từ tâm → mép (texture 64×32)
+        if (ellipse != null) return ellipse;
+        // Elip pixel-art 64×32: lõi đặc, vành dither caro, mép trong suốt — không gradient mềm
         const int W = 64, H = 32;
-        var tex = new Texture2D(W, H, TextureFormat.RGBA32, false);
-        tex.name = "BlobShadowTex";
+        var tex = new Texture2D(W, H, TextureFormat.RGBA32, false) { name = "BlobShadowTex", filterMode = FilterMode.Point };
         var pixels = new Color32[W * H];
-        var core = new Color32(0, 0, 0, 255);
-        var edge = new Color32(0, 0, 0, 0);
-        var cx = (W - 1) * 0.5f;
-        var cy = (H - 1) * 0.5f;
+        var solid = new Color32(0, 0, 0, 255);
+        var clear = new Color32(0, 0, 0, 0);
+        float cx = (W - 1) * 0.5f, cy = (H - 1) * 0.5f;
         for (int y = 0; y < H; y++)
-        {
             for (int x = 0; x < W; x++)
             {
-                float nx = (x - cx) / cx;   // -1..1
-                float ny = (y - cy) / cy;
+                float nx = (x - cx) / cx, ny = (y - cy) / cy;
                 float d = Mathf.Sqrt(nx * nx + ny * ny);
-                float a = Mathf.Clamp01(1f - d);
-                pixels[y * W + x] = Color32.Lerp(edge, core, a * a); // mềm ở mép
+                bool checker = (((x >> 1) + (y >> 1)) & 1) == 0;
+                bool on = d < 0.62f || (d < 0.88f && checker);
+                pixels[y * W + x] = on ? solid : clear;
             }
-        }
         tex.SetPixels32(pixels);
         tex.Apply();
-        tex.filterMode = FilterMode.Bilinear;
-
-        var sprite = Sprite.Create(tex, new Rect(0, 0, W, H), new Vector2(0.5f, 0.5f), 100f);
-        sprite.name = "BlobShadow";
-        return sprite;
+        ellipse = Sprite.Create(tex, new Rect(0, 0, W, H), new Vector2(0.5f, 0.5f), 64f);
+        ellipse.name = "BlobShadow";
+        return ellipse;
     }
 
     private void OnDestroy()

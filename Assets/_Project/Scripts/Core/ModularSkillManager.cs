@@ -546,21 +546,9 @@ public class ModularSkillManager : MonoBehaviour
     /// </summary>
     private GameObject CreateEnhancedDirectionLine(Vector2 playerPosition, Vector2 direction, float range, Color skillColor)
     {
-        GameObject directionLine = new GameObject("ProjectileDirectionLine_Enhanced");
-        var lineRenderer = directionLine.AddComponent<LineRenderer>();
-        
-        // Enhanced line renderer setup
-        lineRenderer.material = CreateEnhancedLineMaterial(skillColor);
-        lineRenderer.startWidth = 0.15f;
-        lineRenderer.endWidth = 0.05f;
-        lineRenderer.positionCount = 2;
-        lineRenderer.useWorldSpace = true;
-        
-        // Add glow effect
-        lineRenderer.material.EnableKeyword("_EMISSION");
-        lineRenderer.material.SetColor("_EmissionColor", skillColor * 0.5f);
-        
-        return directionLine;
+        var go = new GameObject("ProjectileDirectionLine_Enhanced");
+        go.AddComponent<PixelAimLine>();
+        return go;
     }
 
     /// <summary>
@@ -568,34 +556,8 @@ public class ModularSkillManager : MonoBehaviour
     /// </summary>
     private void UpdateProjectileDirectionLineEnhanced(Vector2 playerPosition, Vector2 direction, float range, Color skillColor)
     {
-        var lineRenderer = currentProjectileDirectionLine.GetComponent<LineRenderer>();
-        if (lineRenderer != null)
-        {
-            Vector3 startPos = new Vector3(playerPosition.x, playerPosition.y, -0.1f);
-            Vector3 endPos = startPos + (Vector3)(direction * range);
-            
-            lineRenderer.SetPosition(0, startPos);
-            lineRenderer.SetPosition(1, endPos);
-            lineRenderer.material.color = skillColor;
-        }
-    }
-
-    /// <summary>
-    /// Create enhanced line material with glow effect
-    /// </summary>
-    private Material CreateEnhancedLineMaterial(Color color)
-    {
-        var material = new Material(Shader.Find("Sprites/Default"));
-        material.color = color;
-        
-        // Add emission for glow
-        if (material.HasProperty("_EmissionColor"))
-        {
-            material.EnableKeyword("_EMISSION");
-            material.SetColor("_EmissionColor", color * 0.3f);
-        }
-        
-        return material;
+        var aim = currentProjectileDirectionLine != null ? currentProjectileDirectionLine.GetComponent<PixelAimLine>() : null;
+        if (aim != null) aim.SetLine(playerPosition, playerPosition + direction * range, skillColor);
     }
 
     /// <summary>
@@ -887,26 +849,11 @@ public class ModularSkillManager : MonoBehaviour
             if (currentProjectileDirectionLine == null)
             {
                 currentProjectileDirectionLine = new GameObject("ProjectileDirectionLine");
-                var lineRendererComponent = currentProjectileDirectionLine.AddComponent<LineRenderer>();
-                
-                // Thi?t l?p LineRenderer
-                lineRendererComponent.material = CreateLineMaterial(skill.skillColor);
-                lineRendererComponent.startWidth = 0.1f;
-                lineRendererComponent.endWidth = 0.05f;
-                lineRendererComponent.positionCount = 2;
-                lineRendererComponent.useWorldSpace = true;
+                currentProjectileDirectionLine.AddComponent<PixelAimLine>();
             }
 
-            var lineRenderer = currentProjectileDirectionLine.GetComponent<LineRenderer>();
-            if (lineRenderer != null)
-            {
-                Vector3 startPos = new Vector3(playerPosition.x, playerPosition.y, 0);
-                Vector3 endPos = startPos + (Vector3)(direction * skill.range);
-                
-                lineRenderer.SetPosition(0, startPos);
-                lineRenderer.SetPosition(1, endPos);
-                lineRenderer.material.color = skill.skillColor;
-            }
+            var aimLine = currentProjectileDirectionLine.GetComponent<PixelAimLine>();
+            if (aimLine != null) aimLine.SetLine(playerPosition, playerPosition + direction * skill.range, skill.skillColor);
         }
 
         currentProjectileDirectionLine.SetActive(true);
@@ -1000,16 +947,8 @@ public class ModularSkillManager : MonoBehaviour
                     }
                     else
                     {
-                        // C?p nh?t LineRenderer fallback
-                        var lineRenderer = currentProjectileDirectionLine.GetComponent<LineRenderer>();
-                        if (lineRenderer != null)
-                        {
-                            Vector3 startPos = new Vector3(playerPosition.x, playerPosition.y, 0);
-                            Vector3 endPos = startPos + (Vector3)(direction * skill.range);
-                            
-                            lineRenderer.SetPosition(0, startPos);
-                            lineRenderer.SetPosition(1, endPos);
-                        }
+                        var aimLine = currentProjectileDirectionLine.GetComponent<PixelAimLine>();
+                        if (aimLine != null) aimLine.SetLine(playerPosition, playerPosition + direction * skill.range, skill.skillColor);
                     }
                 }
                 break;
