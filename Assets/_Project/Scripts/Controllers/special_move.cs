@@ -159,9 +159,11 @@ public class special_move : MonoBehaviour
         var ignoredColliders = new List<Collider2D>();
         if (Unlocked("gio_2") && selfCollider != null)
         {
-            foreach (var enemy in Object.FindObjectsByType<Enemy>(FindObjectsSortMode.None))
+            var all = Character.Active;
+            for (int i = 0; i < all.Count; i++)
             {
-                var col = enemy.GetComponent<Collider2D>();
+                if (!all[i].CompareTag("Enemy")) continue;
+                var col = all[i].GetComponent<Collider2D>();
                 if (col != null) { Physics2D.IgnoreCollision(selfCollider, col, true); ignoredColliders.Add(col); }
             }
         }
@@ -225,7 +227,9 @@ public class special_move : MonoBehaviour
         foreach (var hit in hits)
         {
             if (hit.collider == null || hit.collider.gameObject == gameObject) continue;
+            if (hit.collider.isTrigger) continue;                          // vùng trigger (bẫy, cổng) không chặn
             if (hit.collider.GetComponent<Character>() != null) continue; // địch không chặn
+            if (hit.collider.GetComponent<RuneBarrier>() != null) continue; // Hư Không xuyên rào rune
             var bounds = hit.collider.bounds;
             bool thinWall = Mathf.Max(bounds.extents.x, bounds.extents.y) <= 0.3f;
             if (thinWall && Unlocked("khong_2")) continue; // xuyên qua
@@ -292,6 +296,7 @@ public class special_move : MonoBehaviour
         for (int h = 0; h < hitCount; h++)
         {
             var hitCol = hitBuffer[h];
+            if (hitCol.TryGetComponent<Breakable>(out var breakable)) { breakable.Break(); continue; } // Hỏa Kích phá đá nứt
             if (!hitCol.CompareTag("Enemy")) continue;
             var enemyChar = hitCol.GetComponent<Character>();
             if (enemyChar == null) continue;
@@ -350,6 +355,8 @@ public class special_move : MonoBehaviour
         cooldownTimers["dash"] = 0f; cooldownTimers["teleport"] = 0f; cooldownTimers["charge"] = 0f;
     }
     public bool IsAnySpecialMoveActive() => isDashing || isTeleporting || isCharging;
+    /// <summary>Đang lướt/dịch chuyển: không chạm đất (bay qua khe vực, bẫy sàn).</summary>
+    public bool IsAirborne => isDashing || isTeleporting;
     public bool IsSkillGated(string nodeId) => !Unlocked(nodeId); // test/UI đọc
 
     private void OnDrawGizmosSelected()

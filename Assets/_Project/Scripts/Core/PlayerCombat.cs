@@ -78,10 +78,13 @@ public class PlayerCombat : MonoBehaviour
     }
 
     private static readonly Collider2D[] hitBuffer = new Collider2D[32];
+    private int lastHitCount;
 
     private Character[] QueryEnemies(Vector2 center, float range)
     {
-        int count = Physics2D.OverlapCircleNonAlloc(center, range, hitBuffer);
+        int count = Physics2D.OverlapCircle(center, range,
+            new ContactFilter2D { useTriggers = Physics2D.queriesHitTriggers }, hitBuffer);
+        lastHitCount = count;
         var list = new System.Collections.Generic.List<Character>(count);
         for (int i = 0; i < count; i++)
         {
@@ -142,6 +145,18 @@ public class PlayerCombat : MonoBehaviour
             if (crit) dmg *= character.CriticalMultiplier;
 
             target.TakeDamage(dmg, crit);
+            anyHit = true;
+        }
+
+        // Vật thể thế giới chém được (công tắc, đuốc câu đố...) — IDamageable không phải Character
+        for (int i = 0; i < lastHitCount; i++)
+        {
+            var col = hitBuffer[i];
+            if (col == null || col.GetComponentInParent<Character>() != null) continue;
+            var dmgable = col.GetComponentInParent<IDamageable>();
+            if (dmgable == null || dmgable.IsDead) continue;
+            dmgable.TakeDamage(character.AttackPower);
+            VfxService.Hit(col.bounds.center, aim, HitMaterial.Stone);
             anyHit = true;
         }
 

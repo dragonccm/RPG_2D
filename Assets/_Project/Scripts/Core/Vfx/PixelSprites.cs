@@ -24,6 +24,11 @@ public static class PixelSprites
     /// <summary>Vệt 1×3 pixel, xoay theo hướng bay (tia lửa kim loại).</summary>
     public static Sprite Spark => spark != null ? spark : (spark = Build(1, 3, (x, y) => true, 0.5f, 0.5f));
 
+    private static Sprite dart;
+
+    /// <summary>Phi tiêu 10×2 px hướng +X (bẫy tên khi không có sprite mũi tên).</summary>
+    public static Sprite Dart => dart != null ? dart : (dart = Build(10, 2, (x, y) => true, 0.5f, 0.5f));
+
     /// <summary>
     /// Lưỡi liềm chém hướng +X, pivot ở tâm cung (xoay quanh điểm vung).
     /// lengthUnits = chiều dài cung theo đơn vị thế giới (1 = 1 tile).

@@ -223,7 +223,7 @@ public class PlayerController : MonoBehaviour
             // P1-1: movement đã chuẩn hoá ở Update (|v| ≤ 1) → tốc độ chéo = tốc độ trục.
             // Bỏ SmoothDamp per-axis: nội suy từng trục riêng làm cong quỹ đạo +
             // lệch tốc độ chéo. Di chuyển thẳng theo vector chuẩn hoá.
-            rb.MovePosition(rb.position + movement * (moveSpeed * Time.fixedDeltaTime));
+            rb.MovePosition(rb.position + movement * (moveSpeed * SpeedMultiplier * Time.fixedDeltaTime));
         }
     }
 
@@ -271,6 +271,32 @@ public class PlayerController : MonoBehaviour
     /// <summary>
     /// Check if player is currently busy with actions
     /// </summary>
+    // ── Hệ số tốc độ từ môi trường (bùn, băng...) — nhiều nguồn chồng nhau lấy chậm nhất ──
+    private readonly System.Collections.Generic.Dictionary<UnityEngine.Object, float> speedModifiers =
+        new System.Collections.Generic.Dictionary<UnityEngine.Object, float>();
+
+    /// <summary>Hệ số nhân tốc độ hiện tại (1 = bình thường).</summary>
+    public float SpeedMultiplier { get; private set; } = 1f;
+
+    public void SetSpeedModifier(UnityEngine.Object source, float multiplier)
+    {
+        if (source == null) return;
+        speedModifiers[source] = Mathf.Clamp(multiplier, 0.05f, 3f);
+        RecalculateSpeed();
+    }
+
+    public void RemoveSpeedModifier(UnityEngine.Object source)
+    {
+        if (source != null && speedModifiers.Remove(source)) RecalculateSpeed();
+    }
+
+    private void RecalculateSpeed()
+    {
+        float m = 1f;
+        foreach (var v in speedModifiers.Values) m = Mathf.Min(m, v);
+        SpeedMultiplier = m;
+    }
+
     public bool IsBusy()
     {
         return isBusy;
