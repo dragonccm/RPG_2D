@@ -4,8 +4,8 @@
 > `CORE_PROJECT_GUIDELINES.md` (Mục 3, 6.8). Khi mâu thuẫn, tài liệu này thắng về **bố cục map, nhịp chơi, lore**;
 > GUIDELINES thắng về **quy chuẩn kỹ thuật**.
 
-**Phiên bản:** 0.1 — 29/10/2026
-**Trạng thái hiện tại của world:** 1 scene `World.unity` chứa chung Làng + Rừng (tilemap lớn nhất 84×66 tile, 7 tilemap, 1 Light2D toàn cục). NPC, đống lửa, cổng đều là **hình tròn mềm placeholder** do `WorldBuilder.CreateCircleSprite` vẽ — vi phạm GUIDELINES 2.1, sẽ thay trong đợt dựng lại.
+**Phiên bản:** 0.2 — 29/10/2026
+**Trạng thái:** M1–M4 đã dựng (`Scenes/Maps/`), sinh bằng `MapBuilder` từ `Editor/Maps/MapSpecs.cs`. `World.unity` cũ giữ để đối chiếu, không build. Xem mục 8 cho phần đã làm / còn thiếu.
 
 ---
 
@@ -319,3 +319,23 @@ Tên tilemap hiện tại (`Collisin-low`, `Non-Collision-high`, `Boundiary`, `s
 | **LD4** | Bẫy mới (Slow Zone, Breakable, Rune Barrier, Torch Puzzle) + M3 | M3 hoàn chỉnh, Chìa Khóa Tháp |
 | **LD5** | M4 hai tầng + Dart Trap + Collapsing Floor; sửa phần thưởng Agis | Chơi hết game ~45 phút |
 | **LD6** | M5 optional + đò tắt + polish | — |
+
+---
+
+## 8. TRẠNG THÁI THỰC HIỆN (29/10/2026)
+
+| Hạng mục | Trạng thái | Ghi chú |
+|---|---|---|
+| Thước đo, pipeline 1 map = 1 scene | ✅ | `GameFlow.Travel` mang trạng thái (SaveData) qua cổng; `MapSpawnPoint` |
+| M1 Làng | ✅ | Mai trao Cuộn Lướt Gió sau q1 → mở cổng bắc (flag `gate:village_north`); rương đảo nhỏ qua khe; rương vịnh sau đá nứt |
+| M2 Rừng | ✅ | 4 nhóm + arena mini-boss có rào khoá; **đổi so với 3.2:** câu đố bàn thờ dùng **3 đuốc / 8s** thay vì công tắc theo thứ tự; Thợ Săn Bóng rơi Cuộn Hư Không |
+| M3 Đầm | ✅ | Bùn, hốc rune (Hư Không), đá nứt tắt đường, 3 đuốc / 6s mở rương Chìa Khóa Tháp, công tắc q3 |
+| M4 Tháp | ✅ | Tầng 1 (tượng bắn tên, sàn sụp, rào rune, 2 phòng), cầu thang lên đỉnh, Agis |
+| M5 Hang | ⬜ | Chưa làm (optional) |
+| Đò Lão Câu về làng (`m3_ferry_open`) | ⬜ | NPC có, chưa có tuyến đò |
+| Story flags đổi làng (`q3_started` trời đỏ hơn, dân đóng cửa) | ⬜ | Cần FlagGate cho NPC/ánh sáng làng |
+| Kẻ địch mới (Chuột, Hobgoblin, NightBorne, Necromancer) | ⬜ | Có art, chưa có prefab + animator. Tạm dùng Goblin/Archer/Lancer/Sheep |
+| Ánh sáng URP 2D | ✅ | Trước đây **không gán pipeline** (Built-in RP) nên Light2D vô tác dụng — đã sửa |
+
+**Kiểm tra tự động:** PlayMode `MapSmokeTests` nạp cả 4 map, chuyển map, cổng làng, encounter, khe vực.
+**Chưa kiểm bằng tay:** cảm giác nhịp chơi từng map (thời lượng 45–60s/lộ trình, độ khó) — cần playtest.
