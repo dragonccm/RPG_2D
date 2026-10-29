@@ -12,6 +12,8 @@ public class ScenePortal : MonoBehaviour
     [SerializeField] private Transform destination;
     [SerializeField] private bool autosaveOnEnter = true;
     public string portalName = "portal";
+    [Header("S4 — quest tự bắt đầu khi qua cổng (VD: q2)")]
+    public string startQuestOnEnter = "";
 
     /// <summary>Setter để WorldBuilder/test gán điểm đến lúc dựng map.</summary>
     public Transform destinationRef
@@ -41,6 +43,10 @@ public class ScenePortal : MonoBehaviour
         }
 
         other.transform.position = destination.position;
+
+        // S4 (plan 10 — Q2): vào rừng → tự động bắt đầu quest Q2
+        if (startQuestOnEnter != "" && QuestManager.Instance != null)
+            QuestManager.Instance.StartQuest(startQuestOnEnter);
 
         // Camera snap (tránh lerp bay qua nửa map)
         var cam = Camera.main;

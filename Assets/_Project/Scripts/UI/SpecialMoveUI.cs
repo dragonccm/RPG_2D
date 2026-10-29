@@ -93,7 +93,7 @@ public class SpecialMoveUI : MonoBehaviour
 
         if (chargeAttackKeyText != null)
         {
-            chargeAttackKeyText.text = specialMove.chargeAttackKey.ToString();
+            chargeAttackKeyText.text = specialMove.chargeKey.ToString();
         }
     }
 

@@ -73,6 +73,10 @@ public class PlayerCombat : MonoBehaviour
 
         StartCoroutine(AttackRoutine(comboIndex));
         nextAttackAllowed = Time.time + attackCooldown;
+
+        // S4 (plan 10 — Q1): báo khi tới nhịp finisher trong window (combo trọn)
+        if (withinWindow && comboIndex == comboMultipliers.Length - 1 && QuestManager.Instance != null)
+            QuestManager.Instance.ReportProgress("q1", "q1_combo");
         lastAttackTime = Time.time;
     }
 
@@ -86,9 +90,16 @@ public class PlayerCombat : MonoBehaviour
 
         if (character == null) { playerController.SetBusy(false); yield break; }
 
-        // Tâm quét: trước mặt theo hướng lật
-        float facing = transform.localScale.x >= 0 ? 1f : -1f;
-        Vector2 center = (Vector2)transform.position + Vector2.right * (attackReach * facing);
+        // Tâm quét: hướng về chuột (plan 5.2 "Hướng theo chuột"), không có chuột → theo mặt lật
+        Vector2 aim = Vector2.right;
+        var cam = Camera.main;
+        if (cam != null)
+        {
+            var mouseWorld = cam.ScreenToWorldPoint(Input.mousePosition);
+            Vector2 toMouse = new Vector2(mouseWorld.x - transform.position.x, mouseWorld.y - transform.position.y);
+            if (toMouse.sqrMagnitude > 0.05f) aim = toMouse.normalized;
+        }
+        Vector2 center = (Vector2)transform.position + aim * attackReach;
         var targets = probe.EnemiesInRange(center, attackRange, character);
 
         bool isFinisher = index == comboMultipliers.Length - 1;
@@ -117,7 +128,7 @@ public class PlayerCombat : MonoBehaviour
             }
         }
 
-        yield return new WaitForSeconds(attackCooldown - windup);
+        yield return new WaitForSeconds(Mathf.Max(0.02f, attackCooldown - windup));
         playerController.SetBusy(false);
     }
 

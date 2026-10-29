@@ -26,6 +26,10 @@ public static class SaveSystem
         public List<string> questFlags = new List<string>();
         public string checkpointId = "";
         public string savedAtIso = "";
+        public int skillPoints;
+        public List<string> unlockedSkills = new List<string>();
+        public List<QuestSaveEntry> questEntries = new List<QuestSaveEntry>();
+        public int playerXp;
     }
 
     /// <summary>Override cho unit test (mặc định persistentDataPath).</summary>
@@ -85,7 +89,7 @@ public static class SaveSystem
     {
         var character = player != null ? player.GetComponent<Character>() : null;
         var health = character != null ? character.health : null;
-        return new SaveData
+        var data = new SaveData
         {
             scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name,
             posX = player != null ? player.transform.position.x : 0f,
@@ -98,6 +102,16 @@ public static class SaveSystem
             criticalMultiplier = character != null ? character.CriticalMultiplier : 2f,
             checkpointId = checkpointId ?? "",
         };
+        if (SkillTreeManager.Instance != null)
+        {
+            var (points, nodes) = SkillTreeManager.Instance.ExportSave();
+            data.skillPoints = points;
+            data.unlockedSkills = nodes;
+        }
+        if (QuestManager.Instance != null)
+            data.questEntries = QuestManager.Instance.ExportSave();
+        data.playerXp = LevelSystem.Xp;
+        return data;
     }
 
     /// <summary>Áp SaveData vào game (load).</summary>
@@ -115,6 +129,11 @@ public static class SaveSystem
             character.CriticalMultiplier = Mathf.Max(1f, d.criticalMultiplier);
         }
         if (skill != null && d.level > 0) skill.SetPlayerLevel(d.level);
+        if (SkillTreeManager.Instance != null)
+            SkillTreeManager.Instance.ImportSave(d.skillPoints, d.unlockedSkills);
+        if (QuestManager.Instance != null)
+            QuestManager.Instance.ImportSave(d.questEntries);
+        LevelSystem.Import(d.level, d.playerXp);
         player.transform.position = new Vector3(d.posX, d.posY, 0f);
     }
 }

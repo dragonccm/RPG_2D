@@ -7,6 +7,9 @@ using System.Collections.Generic;
 /// </summary>
 public class EnemySpawner : MonoBehaviour
 {
+    /// <summary>S4: phát khi 1 enemy spawn — QuestManager đăng ký theo dõi kill.</summary>
+    public static event System.Action<GameObject> EnemySpawned;
+
     [Tooltip("Prefab kẻ địch cần spawn")]
     public GameObject enemyPrefab;
 
@@ -60,6 +63,7 @@ public class EnemySpawner : MonoBehaviour
                 Transform spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Length)];
                 GameObject enemy = Instantiate(enemyPrefab, spawnPoint.position, spawnPoint.rotation);
                 spawnedEnemies.Add(enemy);
+                EnemySpawned?.Invoke(enemy); // S4: QuestManager theo dõi kill
 
                 // Gán playerTransform cho các script liên quan nếu có
                 // Enemy.cs sẽ tự động cập nhật EnemyAIController.playerTarget
