@@ -97,13 +97,8 @@ public abstract class SkillExecutorBase : ISkillExecutor
         if (Module.effectPrefab != null)
         {
             // S? d?ng Enhanced Effect Manager ?? t?o effect v?i auto-destroy
-            EnhancedEffectManager.CreateEffectAtPosition(
-                Module.effectPrefab, 
-                position, 
-                Quaternion.identity, 
-                null, 
-                Module.damageAreaDisplayTime // Use skill's display time as lifetime
-            );
+            VfxService.PlayPrefab(Module.effectPrefab, position, Quaternion.identity, 1f,
+                Module.damageAreaDisplayTime > 0f ? Module.damageAreaDisplayTime : -1f);
         }
     }
     
@@ -115,13 +110,8 @@ public abstract class SkillExecutorBase : ISkillExecutor
         if (Module.effectPrefab != null)
         {
             // T?o effect t?i v? tr� va ch?m ch�nh x�c
-            EnhancedEffectManager.CreateImpactEffect(
-                Module.effectPrefab,
-                impactPosition,
-                impactDirection,
-                target,
-                Module.damageAreaDisplayTime
-            );
+            VfxService.PlayPrefabAimed(Module.effectPrefab, impactPosition, impactDirection, 1f,
+                Module.damageAreaDisplayTime > 0f ? Module.damageAreaDisplayTime : -1f);
         }
     }
     
@@ -132,12 +122,8 @@ public abstract class SkillExecutorBase : ISkillExecutor
     {
         if (Module.effectPrefab != null && target != null)
         {
-            EnhancedEffectManager.CreateFollowEffect(
-                Module.effectPrefab,
-                target,
-                offset,
-                Module.damageAreaDisplayTime
-            );
+            VfxService.FollowPrefab(Module.effectPrefab, target, offset, 1f,
+                Module.damageAreaDisplayTime > 0f ? Module.damageAreaDisplayTime : -1f);
         }
     }
     
@@ -324,67 +310,14 @@ public abstract class SkillExecutorBase : ISkillExecutor
         }
     }
 
-    /// <summary>
-    /// Create enhanced damage zone indicator with better visuals
-    /// </summary>
     private GameObject CreateEnhancedDamageZoneIndicator(Vector2 position, float radius, string indicatorName)
     {
-        GameObject indicator = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        indicator.name = $"{indicatorName}_EXACT_{Time.time:F2}";
-        
-        // Set exact position with slight z-offset for visibility
-        indicator.transform.position = new Vector3(position.x, position.y, -0.1f);
-        indicator.transform.localScale = Vector3.one * radius * 2;
-        
-        // Enhanced material setup
-        var renderer = indicator.GetComponent<Renderer>();
-        if (renderer != null)
-        {
-            var material = CreateEnhancedDamageAreaMaterial(Module.damageAreaColor);
-            renderer.material = material;
-        }
-        
-        // Remove collider to avoid interference
-        var collider = indicator.GetComponent<Collider>();
-        if (collider != null)
-        {
-            Object.Destroy(collider);
-        }
-        
-        // Add pulsing effect
-        var pulseEffect = indicator.AddComponent<DamageAreaPulseEffect>();
-        pulseEffect.Initialize(Module.damageAreaColor, Module.damageAreaDisplayTime);
-        
+        var color = Module.damageAreaColor;
+        color.a = Mathf.Clamp(color.a, 0.35f, 0.8f);
+        var indicator = VfxService.Telegraph(new Vector3(position.x, position.y, -0.1f), radius,
+            Mathf.Max(0.2f, Module.damageAreaDisplayTime), color);
+        if (indicator != null) indicator.name = $"{indicatorName}_EXACT_{Time.time:F2}";
         return indicator;
-    }
-
-    /// <summary>
-    /// Create enhanced material for damage area visualization
-    /// </summary>
-    private Material CreateEnhancedDamageAreaMaterial(Color baseColor)
-    {
-        var material = new Material(Shader.Find("Standard"));
-        
-        // Enhanced color with better alpha blending
-        var enhancedColor = baseColor;
-        enhancedColor.a = 0.4f; // More visible alpha
-        material.color = enhancedColor;
-        
-        // Enhanced transparency settings
-        material.SetFloat("_Mode", 3); // Transparent mode
-        material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
-        material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-        material.SetInt("_ZWrite", 0);
-        material.DisableKeyword("_ALPHATEST_ON");
-        material.EnableKeyword("_ALPHABLEND_ON");
-        material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
-        material.renderQueue = 3000;
-        
-        // Add emission for better visibility
-        material.EnableKeyword("_EMISSION");
-        material.SetColor("_EmissionColor", baseColor * 0.3f);
-        
-        return material;
     }
 
     /// <summary>
@@ -1030,8 +963,7 @@ public class SupportSkillExecutor : SkillExecutorBase
         colorOverLifetime.color = gradient;
         
         // Auto destroy v?i enhanced system
-        var autoDestroy = supportEffect.AddComponent<EffectAutoDestroy>();
-        autoDestroy.Initialize(Module.damageAreaDisplayTime, true);
+        Object.Destroy(supportEffect, Module.damageAreaDisplayTime);
     }
 }
 
@@ -1148,8 +1080,7 @@ public class InstantSkillExecutor : SkillExecutorBase
         sizeOverLifetime.size = new ParticleSystem.MinMaxCurve(1f, sizeCurve);
         
         // Auto destroy v?i enhanced system
-        var autoDestroy = instantEffect.AddComponent<EffectAutoDestroy>();
-        autoDestroy.Initialize(2.5f, true);
+        Object.Destroy(instantEffect, 2.5f);
     }
 }
 
@@ -1657,13 +1588,8 @@ public class EnhancedProjectileBehavior : MonoBehaviour
         if (skillModule.effectPrefab != null)
         {
             // S? d?ng Enhanced Effect Manager cho impact effect
-            EnhancedEffectManager.CreateImpactEffect(
-                skillModule.effectPrefab,
-                position,
-                impactDirection,
-                null, // No specific target game object
-                skillModule.damageAreaDisplayTime
-            );
+            VfxService.PlayPrefabAimed(skillModule.effectPrefab, position, impactDirection, 1f,
+                skillModule.damageAreaDisplayTime > 0f ? skillModule.damageAreaDisplayTime : -1f);
         }
         
         // Create individual hit effect with critical differentiation
@@ -1780,8 +1706,7 @@ public class EnhancedProjectileBehavior : MonoBehaviour
         shape.radius = 0.3f;
         
         // Auto destroy with enhanced system
-        var autoDestroy = hitEffect.AddComponent<EffectAutoDestroy>();
-        autoDestroy.Initialize(1.5f, true);
+        Destroy(hitEffect, 1.5f);
     }
 
     private void OnDrawGizmos()

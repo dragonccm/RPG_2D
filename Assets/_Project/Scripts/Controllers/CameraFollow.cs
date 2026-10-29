@@ -6,22 +6,28 @@ public class CameraFollow : MonoBehaviour
     public float followSpeed = 5f; // Tốc độ theo dõi
     public Vector3 offset = new Vector3(0, 0, -10); // Độ lệch giữa camera và đối tượng
 
+    // Vị trí theo dõi (chưa cộng rung). Tách riêng để rung của VfxService không bị
+    // Lerp ăn ngược vào vị trí camera.
+    private Vector3 basePosition;
+    private bool hasBase;
+
     void LateUpdate()
     {
+        if (!hasBase) { basePosition = transform.position; hasBase = true; }
+
         if (target != null)
         {
             Vector3 desiredPosition = target.position + offset;
-            Vector3 smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, followSpeed * Time.deltaTime);
-            transform.position = smoothedPosition;
+            basePosition = Vector3.Lerp(basePosition, desiredPosition, followSpeed * Time.deltaTime);
         }
+        transform.position = basePosition + (Vector3)VfxService.ShakeOffset;
     }
 
     /// <summary>S3 (ScenePortal): đặt camera ngay lập tức tới target — teleport không lerp.</summary>
     public void SnapTo(Vector3 targetPosition)
     {
-        if (target != null)
-            transform.position = target.position + offset;
-        else
-            transform.position = targetPosition + offset;
+        basePosition = target != null ? target.position + offset : targetPosition + offset;
+        hasBase = true;
+        transform.position = basePosition;
     }
 }

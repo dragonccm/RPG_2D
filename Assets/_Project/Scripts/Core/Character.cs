@@ -176,41 +176,29 @@ public class Character : MonoBehaviour, IDamageable
         {
             actualDamage = Mathf.Max(0f, health.currentValue - health.maxValue * 0.3f);
             Debug.Log("🌳 BẤT DIỆT THÂN kích hoạt — sống sót với 30% HP!");
-            CombatEffectsManager.Instance?.ScreenShake(0.3f, 0.3f);
+            VfxService.Shake(ShakeLevel.Boss);
         }
 
         health.Decrease(actualDamage);
         TriggerDamageFlash();
-        
-        // Safe CombatEffectsManager usage
-        var effectsManager = FindCombatEffectsManager();
-        
-        if (showDamageNumbers && effectsManager != null)
+
+        if (showDamageNumbers)
         {
-            Vector3 damagePosition = transform.position + Vector3.up * 1.5f;
-            effectsManager.ShowDamageNumber(damage, damagePosition, isCritical);
+            VfxService.DamageNumber(damage, transform.position + Vector3.up * 1.5f, isCritical);
         }
-        
-        if (enableScreenShake && damage > 10f && effectsManager != null)
+
+        if (enableScreenShake && damage > 10f)
         {
-            float shakeIntensity = Mathf.Clamp(damage * 0.01f, 0.05f, 0.3f);
-            effectsManager.ScreenShake(shakeIntensity, 0.1f);
+            VfxService.Shake(CompareTag("Player") ? ShakeLevel.Hurt : ShakeLevel.Light);
         }
-        
-        if (enableHitStop && isCritical && effectsManager != null)
+
+        if (enableHitStop && isCritical)
         {
-            effectsManager.HitStop(0.1f);
+            VfxService.HitStop(ShakeLevel.Heavy);
         }
-        
-        if (effectsManager != null)
-        {
-            effectsManager.CreateImpactEffect(
-                transform.position, 
-                isCritical ? Color.yellow : Color.red, 
-                isCritical ? 1.5f : 1f
-            );
-        }
-        
+
+        VfxService.Hit(transform.position, Vector2.zero, HitMaterial.Flesh, isCritical);
+
         OnDamageTaken?.Invoke(damage);
         
         if (health.currentValue <= 0)
@@ -237,8 +225,6 @@ public class Character : MonoBehaviour, IDamageable
         float tickInterval = 0.5f; // Damage every half second
         float tickDamage = damagePerSecond * tickInterval;
 
-        var effectsManager = FindCombatEffectsManager();
-
         while (elapsedTime < duration)
         {
             if (health.currentValue <= 0) break;
@@ -246,15 +232,8 @@ public class Character : MonoBehaviour, IDamageable
             // Apply poison damage
             TakeDamage(tickDamage);
 
-            // Visual feedback
-            if (effectsManager != null)
-            {
-                effectsManager.CreateImpactEffect(
-                    transform.position,
-                    new Color(0.5f, 0f, 0.5f), // Purple for poison
-                    0.5f
-                );
-            }
+            // Visual feedback (tím = độc)
+            VfxService.Impact(transform.position, new Color(0.5f, 0f, 0.5f), 0.5f);
 
             elapsedTime += tickInterval;
             yield return new WaitForSeconds(tickInterval);
@@ -390,16 +369,8 @@ public class Character : MonoBehaviour, IDamageable
             StopCoroutine(currentPoisonCoroutine);
         }
         
-        var effectsManager = FindCombatEffectsManager();
-        if (effectsManager != null)
-        {
-            effectsManager.CreateImpactEffect(
-                transform.position, 
-                Color.black, 
-                2f
-            );
-        }
-        
+        VfxService.Impact(transform.position, new Color(0.15f, 0.12f, 0.18f), 2f);
+
         Destroy(gameObject);
     }
 
@@ -412,22 +383,12 @@ public class Character : MonoBehaviour, IDamageable
     {
         health.Increase(amount);
         
-        var effectsManager = FindCombatEffectsManager();
-        
-        if (showDamageNumbers && effectsManager != null)
+        if (showDamageNumbers)
         {
-            Vector3 healPosition = transform.position + Vector3.up * 1.5f;
-            effectsManager.ShowDamageNumber(amount, healPosition, false);
+            VfxService.DamageNumber(amount, transform.position + Vector3.up * 1.5f, false, heal: true);
         }
-        
-        if (effectsManager != null)
-        {
-            effectsManager.CreateImpactEffect(
-                transform.position, 
-                Color.green, 
-                1f
-            );
-        }
+
+        VfxService.Impact(transform.position, Color.green, 1f);
     }
 
     public void RestoreMana(float amount)
@@ -472,22 +433,6 @@ public class Character : MonoBehaviour, IDamageable
         health.currentValue = maxHealth;
         mana.maxValue = maxMana;
         mana.currentValue = maxMana;
-    }
-
-    /// <summary>
-    /// Safe method to find CombatEffectsManager
-    /// </summary>
-    private CombatEffectsManager FindCombatEffectsManager()
-    {
-        try
-        {
-            return CombatEffectsManager.Instance;
-        }
-        catch
-        {
-            // If CombatEffectsManager doesn't exist, find it manually
-            return FindFirstObjectByType<CombatEffectsManager>();
-        }
     }
 
     private void OnDestroy()

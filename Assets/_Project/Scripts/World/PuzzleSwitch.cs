@@ -62,12 +62,8 @@ public class PuzzleSwitch : MonoBehaviour, IDamageable
             QuestManager.Instance.ReportProgress(questId, objectiveId);
         }
 
-        var fx = CombatEffectsManager.Instance;
-        if (fx != null)
-        {
-            fx.CreateImpactEffect(transform.position, onColor, 1.2f);
-            fx.ScreenShake(0.06f, 0.1f);
-        }
+        VfxService.Impact(transform.position, onColor, 1.2f);
+        VfxService.Shake(ShakeLevel.Light);
 
         OnSwitchToggled?.Invoke(this);
         Debug.Log($"🧩 Công tắc [{switchId}] đã được kích hoạt -> Rào cản mở!");

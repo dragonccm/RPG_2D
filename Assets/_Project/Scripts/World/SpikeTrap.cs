@@ -122,12 +122,8 @@ public class SpikeTrap : MonoBehaviour
             victim.TakeDamage(damage);
             if (victim is MonoBehaviour mb)
             {
-                var fx = CombatEffectsManager.Instance;
-                if (fx != null)
-                {
-                    fx.HitStop(0.04f);
-                    fx.CreateImpactEffect(mb.transform.position, Color.red, 0.8f);
-                }
+                VfxService.HitStop(ShakeLevel.Light);
+                VfxService.Hit(mb.transform.position, Vector2.up, HitMaterial.Flesh);
             }
         }
     }

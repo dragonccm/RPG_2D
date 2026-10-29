@@ -59,12 +59,8 @@ public class TreasureChest : MonoBehaviour
             QuestManager.Instance.ReportProgress(questId, objectiveId);
         }
 
-        var fx = CombatEffectsManager.Instance;
-        if (fx != null)
-        {
-            fx.CreateImpactEffect(transform.position + Vector3.up * 0.5f, Color.yellow, 1.5f);
-            fx.ScreenShake(0.05f, 0.1f);
-        }
+        VfxService.Impact(transform.position + Vector3.up * 0.5f, Color.yellow, 1.5f);
+        VfxService.Shake(ShakeLevel.Light);
 
         Debug.Log($"🎁 Mở rương [{chestId}]: Đã nhận {rewardItem?.itemName} x{rewardCount}!");
     }

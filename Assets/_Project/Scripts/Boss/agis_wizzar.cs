@@ -382,13 +382,12 @@ public class agis_wizzar : MonoBehaviour
     {
         if (teleportEffect != null)
         {
-            // SỬ DỤNG 2D EFFECT MANAGER - PHƯƠNG PHÁP ĐÚNG
-            Effect2DManager.CreateEffect2D(teleportEffect, position, Quaternion.identity, 1f, true);
+            VfxService.PlayPrefab(teleportEffect, position, Quaternion.identity, 1f);
         }
         else
         {
             // Fallback: Teleport effect đơn giản
-            Effect2DManager.CreateFallbackEffect2D(position, new Color(0.5f, 0f, 1f, 0.8f), 1.5f, 1f);
+            VfxService.Impact(position, new Color(0.5f, 0f, 1f), 1.5f);
         }
     }
 
@@ -415,9 +414,9 @@ public class agis_wizzar : MonoBehaviour
         
         // TELEGRAPH: Boss chớp vàng và hiện cảnh báo trước khi bắn 0.35s
         if (spriteRenderer != null) spriteRenderer.color = Color.yellow;
-        if (CombatEffectsManager.Instance != null && playerTarget != null)
+        if (playerTarget != null)
         {
-            CombatEffectsManager.Instance.CreateImpactEffect(playerTarget.position, new Color(1f, 0.8f, 0.2f, 0.7f), 0.8f);
+            VfxService.Telegraph(playerTarget.position, 0.6f, 0.35f, new Color(1f, 0.8f, 0.2f, 0.8f));
         }
         yield return new WaitForSeconds(0.35f);
         if (spriteRenderer != null) spriteRenderer.color = isBerserk ? Color.red : Color.white;
@@ -566,8 +565,7 @@ public class agis_wizzar : MonoBehaviour
     {
         if (aoePrefab != null)
         {
-            // SỬ DỤNG 2D EFFECT MANAGER cho AOE prefab
-            GameObject effect = Effect2DManager.CreateEffect2D(aoePrefab, position, Quaternion.identity, 0.1f, false);
+            GameObject effect = VfxService.PlayPrefab(aoePrefab, position, Quaternion.identity, 0.1f, 0f);
             
             // Scale effect từ từ
             if (effect != null)
@@ -582,7 +580,7 @@ public class agis_wizzar : MonoBehaviour
         else
         {
             // Fallback: AOE charge effect đơn giản
-            return Effect2DManager.CreateFallbackEffect2D(position, Color.red, aoeRadius, aoeChargeTime + 1f);
+            return VfxService.Telegraph(position, aoeRadius, aoeChargeTime + 1f, new Color(1f, 0.15f, 0.15f, 0.8f));
         }
     }
 
@@ -745,12 +743,12 @@ public class agis_wizzar : MonoBehaviour
         // Nếu có prefab cho berserk effect, sử dụng nó
         if (teleportEffect != null) // Tạm dùng teleportEffect làm berserk effect
         {
-            Effect2DManager.CreateEffect2D(teleportEffect, position, Quaternion.identity, 1.5f, true);
+            VfxService.PlayPrefab(teleportEffect, position, Quaternion.identity, 1.5f);
         }
         else
         {
             // Fallback: Berserk transform effect
-            Effect2DManager.CreateFallbackEffect2D(position, Color.red, 2f, 1.5f);
+            VfxService.Impact(position, Color.red, 2f);
         }
     }
     
@@ -804,11 +802,8 @@ public class agis_wizzar : MonoBehaviour
         }
 
         // Tác động rung chấn màn hình hoành tráng khi boss gục
-        if (CombatEffectsManager.Instance != null)
-        {
-            CombatEffectsManager.Instance.ScreenShake(0.25f, 0.6f);
-            CombatEffectsManager.Instance.CreateImpactEffect(transform.position, Color.yellow, 2.5f);
-        }
+        VfxService.Shake(ShakeLevel.Boss);
+        VfxService.Impact(transform.position, Color.yellow, 2.5f);
 
         // Thưởng cuộn bí kíp Hư Không cho người chơi
         if (InventoryManager.Instance != null)
@@ -870,12 +865,8 @@ public class agis_wizzar : MonoBehaviour
                 {
                     DialogueUI.Instance.StartDialogue(DialogueDatabase.AgisEndingDestroy);
                 }
-                var fx = CombatEffectsManager.Instance;
-                if (fx != null)
-                {
-                    fx.ScreenShake(0.35f, 0.8f);
-                    fx.CreateImpactEffect(transform.position, Color.red, 3.0f);
-                }
+                VfxService.Shake(ShakeLevel.Boss);
+                VfxService.Impact(transform.position, Color.red, 3.0f);
                 Debug.Log("⚔️ Người chơi chọn [KẾT LIỄU] Agis - Ác mộng Trăng Đỏ bị chém vỡ thành tro bụi.");
                 Destroy(gameObject, 3f);
             }
@@ -1016,7 +1007,6 @@ public class FireballProjectile2D : MonoBehaviour
     
     void CreateExplosionEffect()
     {
-        // SỬ DỤNG 2D EFFECT MANAGER thay vì tạo ParticleSystem
-        Effect2DManager.CreateFallbackEffect2D(transform.position, Color.red, 1.2f, 1f);
+        VfxService.Impact(transform.position, Color.red, 1.2f);
     }
 }

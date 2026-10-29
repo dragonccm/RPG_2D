@@ -78,8 +78,7 @@ public class Campfire : MonoBehaviour
         detail += saved ? "| đã lưu" : "| LƯU THẤT BẠI";
 
         // 3. Feedback
-        var fx = CombatEffectsManager.Instance;
-        if (fx != null) fx.CreateImpactEffect(transform.position, new Color(1f, 0.55f, 0.15f), 1.2f);
+        VfxService.Impact(transform.position, new Color(1f, 0.55f, 0.15f), 1.2f);
 
         Debug.Log($"🔥 Campfire [{checkpointId}]: {detail}");
     }

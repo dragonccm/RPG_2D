@@ -313,7 +313,7 @@ public class EnemyElite : MonoBehaviour
                 character.Heal(healAmount);
 
                 // Visual feedback for lifesteal
-                Effect2DManager.CreateFallbackEffect2D(transform.position, Color.green, 0.8f, 1f);
+                VfxService.Impact(transform.position, Color.green, 0.8f);
             }
         }
     }
@@ -431,10 +431,10 @@ public class EnemyElite : MonoBehaviour
 
     private void CreateEliteEffects()
     {
-        // Tạo hiệu ứng tinh nhuệ - SỬ DỤNG 2D EFFECT MANAGER
+        // Tạo hiệu ứng tinh nhuệ
         if (eliteEffectPrefab != null)
         {
-            eliteEffect = Effect2DManager.CreateFollowEffect2D(eliteEffectPrefab, transform, Vector3.zero, 1f, false);
+            eliteEffect = VfxService.FollowPrefab(eliteEffectPrefab, transform, Vector3.zero, 1f, 0f);
 
             // Đặt màu dựa trên rank
             var spriteRenderer = eliteEffect?.GetComponent<SpriteRenderer>();
@@ -445,16 +445,16 @@ public class EnemyElite : MonoBehaviour
         }
         else
         {
-            // Fallback: Elite effect đơn giản
-            eliteEffect = Effect2DManager.CreateFallbackEffect2D(transform.position, GetEliteColor(), 1.5f, float.MaxValue);
-            eliteEffect.transform.SetParent(transform);
-            eliteEffect.transform.localPosition = Vector3.zero;
+            // Fallback: vòng cảnh báo pixel bám theo elite (huỷ trong DestroyEliteEffects)
+            var aura = GetEliteColor();
+            aura.a = Mathf.Min(aura.a, 0.5f);
+            eliteEffect = VfxService.Telegraph(transform.position, 0.9f, 0f, aura, transform);
         }
 
         // Tạo chỉ báo tinh nhuệ
         if (eliteIndicatorPrefab != null)
         {
-            eliteIndicator = Effect2DManager.CreateFollowEffect2D(eliteIndicatorPrefab, transform, Vector3.up * 2f, 1f, false);
+            eliteIndicator = VfxService.FollowPrefab(eliteIndicatorPrefab, transform, Vector3.up * 2f, 1f, 0f);
         }
 
         // Tạo outline
@@ -484,7 +484,7 @@ public class EnemyElite : MonoBehaviour
         ShowBerserkerEffect();
 
         // Add berserker visual feedback
-        Effect2DManager.CreateFallbackEffect2D(transform.position, Color.red, 2f, 1.5f);
+        VfxService.Impact(transform.position, Color.red, 2f);
     }
 
     private void ActivateEnrage()
@@ -504,7 +504,7 @@ public class EnemyElite : MonoBehaviour
         ShowEnrageEffect();
 
         // Add enrage visual feedback
-        Effect2DManager.CreateFallbackEffect2D(transform.position, new Color(1f, 0.5f, 0f), 2f, 1.5f);
+        VfxService.Impact(transform.position, new Color(1f, 0.5f, 0f), 2f);
     }
 
     private void HandleTeleport()
@@ -615,7 +615,7 @@ public class EnemyElite : MonoBehaviour
                 Debug.Log($"Elite {name} thorns dealt {thornsDamage} damage to {attacker.name}");
 
                 // Visual feedback
-                Effect2DManager.CreateFallbackEffect2D(attacker.transform.position, Color.yellow, 0.8f, 1f);
+                VfxService.Hit(attacker.transform.position, Vector2.zero, HitMaterial.Metal);
             }
         }
     }
@@ -650,12 +650,12 @@ public class EnemyElite : MonoBehaviour
         // Hiển thị hiệu ứng nổ
         if (explosionEffectPrefab != null)
         {
-            Effect2DManager.CreateEffect2D(explosionEffectPrefab, transform.position, Quaternion.identity, 1f, true);
+            VfxService.PlayPrefab(explosionEffectPrefab, transform.position);
         }
         else
         {
             // Fallback: Explosion effect đơn giản
-            Effect2DManager.CreateFallbackEffect2D(transform.position, Color.yellow, 2f, 1.5f);
+            VfxService.Impact(transform.position, Color.yellow, 2f);
         }
 
         // Tìm tất cả mục tiêu trong phạm vi

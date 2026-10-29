@@ -347,9 +347,6 @@ public class ModularSkillManager : MonoBehaviour
             {
                 currentPreviewDamageArea = Object.Instantiate(skill.damageZonePrefab);
                 currentPreviewDamageArea.name = "MeleePreviewArea_Enhanced";
-                
-                // Add enhanced visual effects
-                AddPreviewEnhancements(currentPreviewDamageArea, skill.damageAreaColor);
             }
             
             currentPreviewDamageArea.transform.position = new Vector3(playerPosition.x, playerPosition.y, -0.1f);
@@ -382,8 +379,6 @@ public class ModularSkillManager : MonoBehaviour
             {
                 currentPreviewDamageArea = Object.Instantiate(skill.damageZonePrefab);
                 currentPreviewDamageArea.name = "AreaPreviewArea_Enhanced";
-                
-                AddPreviewEnhancements(currentPreviewDamageArea, skill.damageAreaColor);
             }
             
             currentPreviewDamageArea.transform.position = new Vector3(validPos.x, validPos.y, -0.1f);
@@ -417,7 +412,6 @@ public class ModularSkillManager : MonoBehaviour
                 currentProjectileDirectionLine = Object.Instantiate(skill.damageZonePrefab);
                 currentProjectileDirectionLine.name = "ProjectileDirection_Enhanced";
                 
-                AddPreviewEnhancements(currentProjectileDirectionLine, skill.skillColor);
             }
             
             // Enhanced positioning and rotation
@@ -537,84 +531,14 @@ public class ModularSkillManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Create enhanced preview sphere with better visuals
+    /// Vùng xem trước kỹ năng: telegraph pixel-art tồn tại tới khi người gọi Destroy.
     /// </summary>
     private GameObject CreateEnhancedPreviewSphere(Vector2 position, float radius, Color color, string name)
     {
-        GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        sphere.name = $"{name}_Enhanced_{Time.time:F2}";
-        sphere.transform.position = new Vector3(position.x, position.y, -0.1f);
-        sphere.transform.localScale = Vector3.one * radius * 2;
-        
-        // Remove collider
-        var collider = sphere.GetComponent<Collider>();
-        if (collider != null)
-        {
-            Object.Destroy(collider);
-        }
-        
-        // Enhanced material
-        SetEnhancedPreviewMaterial(sphere, color);
-        AddPreviewEnhancements(sphere, color);
-        
-        return sphere;
-    }
-
-    /// <summary>
-    /// Add visual enhancements to preview objects
-    /// </summary>
-    private void AddPreviewEnhancements(GameObject previewObject, Color baseColor)
-    {
-        // Add pulsing effect
-        var pulseEffect = previewObject.AddComponent<DamageAreaPulseEffect>();
-        pulseEffect.Initialize(baseColor, float.MaxValue); // Infinite duration for preview
-        
-        // Add subtle particle effect
-        var particleSystem = previewObject.AddComponent<ParticleSystem>();
-        var main = particleSystem.main;
-        main.startColor = new Color(baseColor.r, baseColor.g, baseColor.b, 0.3f);
-        main.startLifetime = 1f;
-        main.startSpeed = 0.5f;
-        main.maxParticles = 8;
-        main.startSize = 0.05f;
-        
-        var emission = particleSystem.emission;
-        emission.rateOverTime = 5f;
-        
-        var shape = particleSystem.shape;
-        shape.shapeType = ParticleSystemShapeType.Circle;
-        shape.radius = 0.8f;
-    }
-
-    /// <summary>
-    /// Enhanced preview material setup
-    /// </summary>
-    private void SetEnhancedPreviewMaterial(GameObject previewObject, Color skillColor)
-    {
-        var renderer = previewObject.GetComponent<Renderer>();
-        if (renderer != null)
-        {
-            var material = new Material(Shader.Find("Standard"));
-            var previewColor = skillColor;
-            previewColor.a = 0.25f; // Enhanced alpha for better visibility
-            material.color = previewColor;
-            
-            // Enhanced transparency settings
-            material.SetFloat("_Mode", 3);
-            material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
-            material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-            material.SetInt("_ZWrite", 0);
-            material.DisableKeyword("_ALPHATEST_ON");
-            material.EnableKeyword("_ALPHABLEND_ON");
-            material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
-            material.renderQueue = 3000;
-            
-            // Add emission for glow effect
-            material.EnableKeyword("_EMISSION");
-            material.SetColor("_EmissionColor", skillColor * 0.2f);
-            
-            renderer.material = material;
-        }
+        color.a = Mathf.Clamp(color.a, 0.35f, 0.7f);
+        var preview = VfxService.Telegraph(new Vector3(position.x, position.y, -0.1f), radius, 0f, color);
+        if (preview != null) preview.name = $"{name}_Preview_{Time.time:F2}";
+        return preview;
     }
 
     /// <summary>

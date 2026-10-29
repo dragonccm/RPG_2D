@@ -147,8 +147,7 @@ public class special_move : MonoBehaviour
         Vector2 dir = AimDirection();
         float dist = DashDistanceEff;
 
-        var fx = CombatEffectsManager.Instance;
-        if (fx != null) fx.CreateImpactEffect(transform.position, new Color(0.75f, 0.68f, 0.55f), 0.8f);
+        VfxService.Impact(transform.position, new Color(0.75f, 0.68f, 0.55f), 0.8f);
         if (dashEffect != null) Instantiate(dashEffect, transform.position, Quaternion.identity);
 
         // gio_2: xuyên địch — bỏ qua va chạm với Enemy trong lúc dash
@@ -192,7 +191,7 @@ public class special_move : MonoBehaviour
         rb.MovePosition(target);
 
         if (animator != null) animator.SetTrigger("Dash");
-        if (fx != null) fx.CreateImpactEffect(transform.position, new Color(0.75f, 0.68f, 0.55f), 0.6f);
+        VfxService.Impact(transform.position, new Color(0.75f, 0.68f, 0.55f), 0.6f);
 
         foreach (var col in ignoredColliders)
             if (col != null) Physics2D.IgnoreCollision(selfCollider, col, false);
@@ -270,8 +269,7 @@ public class special_move : MonoBehaviour
         playerController.SetBusy(true, PlayerController.PlayerState.Charge);
         if (animator != null) animator.SetTrigger("ChargeAttack");
         if (chargeAttackEffect != null) Instantiate(chargeAttackEffect, transform.position, Quaternion.identity);
-        var fx = CombatEffectsManager.Instance;
-        if (fx != null) fx.CreateImpactEffect(transform.position, new Color(1f, 0.4f, 0.1f, 0.8f), 1f);
+        VfxService.Impact(transform.position, new Color(1f, 0.4f, 0.1f), 1f);
     }
 
     private void ReleaseCharge()
@@ -296,12 +294,8 @@ public class special_move : MonoBehaviour
             if (Unlocked("lua_2")) StartCoroutine(BurnRoutine(enemyChar, 3f, character.AttackPower * 0.3f));
         }
 
-        var fx = CombatEffectsManager.Instance;
-        if (fx != null)
-        {
-            fx.ScreenShake(0.2f * factor, 0.15f);
-            fx.CreateImpactEffect(transform.position, new Color(1f, 0.45f, 0.1f), 1.2f + factor);
-        }
+        VfxService.Shake(0.12f * factor, 0.15f);
+        VfxService.Impact(transform.position, new Color(1f, 0.45f, 0.1f), 1.2f + factor);
         playerController.SetBusy(false);
     }
 

@@ -124,3 +124,93 @@ Mọi đòn đánh của Player và Enemy phải tuân thủ nghiêm ngặt 3 ph
   - Prefabs môi trường & cạm bẫy: `Assets/_Project/Prefabs/Environment/`
   - Prefabs UI: `Assets/_Project/Prefabs/UI/`
   - Xóa bỏ hoàn toàn folder `__MACOSX` và các file `(1)`, `(2)` trùng lặp.
+
+---
+
+## 6. NGUYÊN TẮC BỔ SUNG (rà soát code 29/10/2026)
+
+### 6.1 VFX có "chủ sở hữu" — hết cảnh gắn chắp vá
+**Hiện trạng:** 4 hệ effect chồng nhau trong `Core/` (`CombatEffectsManager`, `EnhancedEffectManager`, `Effect2DManager`, `VisualEffects`) + 2 file `*Documentation.cs` nằm trong assembly game. `LineRenderer`/`SetPixel` vẫn còn ở `DamageAreaIndicator`, `agis_wizzar`, `CombatEffectsManager`.
+- **1 cổng duy nhất:** gameplay chỉ gọi `VfxService.Play(VfxId, position, direction, tint)`; không script nào tự `Instantiate` effect.
+- **VfxId → VfxDefinition (ScriptableObject):** prefab pixel-art, thời lượng, sorting layer, số hạt, âm thanh đi kèm. Gắn effect sai mục đích = khai báo sai trong 1 bảng, dễ rà.
+- **Quy tắc ghép:** effect gắn vào *sự kiện* (HitLanded, Parried, Died, SkillCast), không gắn vào *đối tượng*. Trúng thịt → tóe máu; trúng khiên/giáp → tia lửa kim loại; trúng đá/đất → bụi.
+- **Hướng & số hạt:** máu/tia lửa văng theo hướng đòn (hướng vung ± 30°), 3–5 hạt, sống ≤ 0.25s, rơi xuống sàn rồi mờ.
+- Gộp 4 manager thành `VfxService`, xóa file documentation khỏi runtime (chuyển sang `docs/`).
+- **Trạng thái 29/10/2026:** ✅ `Core/Vfx/VfxService.cs` + `PixelSprites.cs` đã thay `CombatEffectsManager`, `EnhancedEffectManager`, `Effect2DManager`, `VisualEffects`, `DamageAreaIndicator`, `CameraShake`. Sprite pixel sinh runtime là bản tạm — thay bằng art vẽ tay qua `VfxDefinition` sau. Còn nợ: `LineRenderer` hướng đạn trong `ModularSkillManager`, hạt `ParticleSystem` mượt trong `SkillExecutors` (xử lý khi refactor hệ kỹ năng), `BlobShadow` còn dùng `SetPixel`.
+
+### 6.2 Chuẩn đòn đánh cho Player = Enemy = Boss (một khung duy nhất)
+- Mọi đòn đều là dữ liệu `AttackDef` (SO): `windup`, `active`, `recovery`, `hitShape`, `damage`, `knockback`, `telegraph`, `cancelWindow`, `nextInChain`.
+- Một `AttackRunner` dùng chung chạy 3 pha (mục 1.2); AI/Boss chỉ *chọn* `AttackDef`, không tự viết coroutine đánh riêng.
+- Combo của quái/boss = danh sách `AttackDef` nối nhau + điều kiện chọn (khoảng cách, HP%, cooldown); phase boss = tập `AttackDef` khác.
+- Hitbox bật bằng **Animation Event** hoặc mốc thời gian của `AttackRunner`, không đoán bằng `Invoke`.
+- Telegraph bắt buộc ≥ 0.4s với đòn thường của boss, ≥ 0.8s với đòn diện rộng; không đòn nào "ra ngay" mà không báo hiệu.
+- Test tự động: mỗi `AttackDef` có `windup > 0`, `hitShape` hợp lệ, chuỗi `nextInChain` không vòng lặp.
+
+### 6.3 Animation mượt (bổ sung cho mục 1.1)
+- **Animator chỉ có 1 tham số trạng thái** (`State` hoặc trigger theo `AttackDef`), không dùng chồng `bool` chéo nhau.
+- Transition Idle ↔ Run: `Has Exit Time = off`, duration 0–0.05s (pixel art không blend dài). Attack → Idle: cho exit sau cửa sổ recovery.
+- Kiểm tra bằng **pivot-lock test** (Editor): xuất vị trí chân (world) của từng frame mỗi clip; lệch > 1px so với frame Idle thì báo lỗi, chặn commit.
+- Mọi clip cùng nhân vật dùng cùng kích thước ô (192×192) và cùng PPU; không dùng *Automatic Slice*.
+- Flip bằng `SpriteRenderer.flipX` hoặc scale gốc, không lật từng sprite con lệch pivot.
+
+### 6.4 Rung màn hình & HitStop có ngân sách
+| Sự kiện | Biên độ | Thời gian | HitStop |
+|---|---|---|---|
+| Đòn thường trúng | 0.05 | 0.08s | 40ms |
+| Finisher / chí mạng | 0.12 | 0.15s | 60ms |
+| Nhận sát thương | 0.08 | 0.10s | 0 |
+| Boss slam / nổ | 0.20 | 0.25s | 0 |
+- Rung không cộng dồn: lấy `max` các nguồn, không `sum`. Có hệ số `ShakeIntensity` trong Settings (0–100%, mặc định 100) cho người dễ say.
+- HitStop không đóng băng UI, âm thanh nhạc nền và không dùng `Time.timeScale` toàn cục khi có thể (chỉ dừng animator/body của 2 bên) — hiện `CombatEffectsManager` đang chạm `timeScale`.
+
+### 6.5 Skill: một nguồn sự thật (khớp mục 4.1)
+**Hiện trạng:** `SkillExecutors.cs` 1795 dòng, `ModularSkillManager.cs` 1497 dòng, cộng `UnifiedSkillSystem`, `SkillSlot`, `special_move` — 3 lớp song song. `SkillExecutors.cs` còn gọi bằng reflection.
+- Dữ liệu: `SkillDef` (SO) với `id`, `source` (Scroll/Quest/Boss), `executor`, `cooldown`, `cost`, `icon`.
+- Trạng thái học: `SkillBook` (đã học / đang trang bị) lưu trong `SaveSystem`; **không có kỹ năng nào dùng được nếu chưa `Learn()`** (hiện đã gating qua skill tree — đổi nguồn mở khóa sang cuộn).
+- Skill tree chỉ lưu *nâng cấp* (`SkillUpgrade` trỏ tới `SkillDef` cha); node cha chưa học = node khóa.
+- Tách `SkillExecutors.cs` thành 1 file / 1 executor (≤ 200 dòng), đăng ký qua bảng `executorId → class`, không reflection.
+
+### 6.6 Inventory & Item
+- `ItemDef` (SO, có `id` ổn định, không đổi tên sau khi phát hành save). Lưu bằng `id` + số lượng, không lưu tham chiếu asset.
+- Mọi thao tác túi qua `InventorySystem.TryAdd/TryRemove/Use` (trả `bool` + lý do); UI chỉ đọc sự kiện `InventoryChanged`.
+- Nhặt đồ đầy túi → không biến mất: rơi lại sàn hoặc báo "Túi đầy".
+- Vật phẩm quest không thể vứt/bán; `Use` của cuộn kỹ năng gọi `SkillBook.Learn()` và tiêu hao 1.
+
+### 6.7 Quest, cốt truyện, hội thoại
+- Quest = dữ liệu (`QuestDef`: bước, điều kiện, phần thưởng, cờ mở khóa) nghe `EventBus` (`EnemyKilled`, `ItemPicked`, `DialogueEnded`, `AreaEntered`), không để quest đọc trực tiếp scene.
+- **Story flags** (`bool` theo tên) là nguồn duy nhất cho thay đổi thế giới: cổng mở, NPC đổi lời thoại, boss xuất hiện.
+- Mỗi NPC có hội thoại theo cờ (chưa nhận / đang làm / đã xong). Mỗi quest có chỉ dẫn: dấu `!`/`?` trên đầu NPC, mục tiêu hiển thị ở HUD.
+- Không có quest "chết": quest lỗi thời phải có `failIf`/`expireIf` hoặc luôn hoàn thành được.
+
+### 6.8 Môi trường: quy tắc thêm
+- **Mật độ deco:** mỗi màn hình camera có ≥ 12 chi tiết lớp `Ground_Clutter`, trộn ngẫu nhiên có seed (không lặp theo lưới, không xếp hàng thẳng). Dùng Rule Tile / Random Tile.
+- **Animation môi trường rẻ:** cỏ/hoa dùng Tile animated (2–3 frame, pha lệch ngẫu nhiên) hoặc shader gió; không đặt Animator riêng cho từng bụi.
+- **Chiều sâu:** viền map có tán cây/vách che đậm hơn (vignette nhẹ), nền xa tối hơn nền gần; bóng cây đổ lệch cùng 1 hướng toàn map (hướng "ánh trăng").
+- Light 2D: tối đa ~8 đèn *ảnh hưởng cùng lúc* mỗi màn hình; đèn tĩnh dùng layer/target sorting giới hạn.
+
+### 6.9 Âm thanh & cảm giác
+- Mỗi sự kiện chiến đấu có SFX riêng cho chất liệu (thịt / kim loại / đá), 2–3 biến thể ngẫu nhiên, pitch ± 5%.
+- `AudioService` duy nhất (hiện chưa có manager; `AudioSource` rải trong `PlayerController`, `SkillExecutors`, `agis_wizzar`). Nhạc nền phối theo vùng/boss; HitStop không làm méo âm.
+
+### 6.10 Lưu game, localization, dữ liệu
+- Save: có `version`, migrate được, ghi file tạm rồi đổi tên (đã có backup — giữ). Thêm lưu: kỹ năng đã học, túi đồ, story flags, checkpoint cuối.
+- Chuỗi hiển thị (hiện ~80 chỗ tiếng Việt viết thẳng trong UI/code): đưa vào bảng chuỗi (`LocKey → text`) trước khi dựng thêm nội dung, kể cả khi chỉ có tiếng Việt.
+- `Resources.Load` chỉ cho dữ liệu khởi động nhỏ; prefab nặng dùng Addressables (đã cài) hoặc tham chiếu inspector.
+- Mọi hằng số cân bằng (damage, cooldown, tầm) nằm trong SO, không hard-code trong script.
+
+### 6.11 Code & vận hành
+- `Debug.Log` (hiện ~31 file) bọc bằng `Log.Info/Warn` có cờ bật theo module; build release không in log gameplay.
+- Không `Instantiate/Destroy` trong vòng chiến đấu: dùng `ObjectPool` (đã có) cho đạn, hạt máu, số sát thương, quái spawn.
+- `Update()` của AI/UI phải throttle hoặc event-driven; không `FindObject*` ngoài `Awake/Start`.
+- File > 500 dòng = tín hiệu tách. Mỗi PR/commit: recompile 0 lỗi, EditMode test xanh, thêm test cho logic mới (damage, quest, inventory, save).
+
+---
+
+## 7. DANH SÁCH KIỂM TRA TRƯỚC KHI COMMIT (Definition of Done)
+- [ ] Animation mới qua pivot-lock test, không trượt chân khi vào/ra đòn.
+- [ ] Đòn mới là `AttackDef`, có windup/telegraph, đúng bảng rung/HitStop.
+- [ ] Effect gọi qua `VfxService`, là pixel art, không `LineRenderer` hình tròn.
+- [ ] Không reflection, không `Physics.*` 3D, không `FindObject*` trong gameplay.
+- [ ] Item/skill/quest mới là SO có `id` ổn định và lưu được trong save.
+- [ ] Chuỗi hiển thị dùng `LocKey`; số cân bằng nằm trong SO.
+- [ ] Test EditMode xanh, Play Mode 60s không exception.

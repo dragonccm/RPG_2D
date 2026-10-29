@@ -8,7 +8,7 @@ using UnityEngine;
 /// - Combo window 0.8s: nối tiếp nhịp kế; quá hạn → về nhịp 1.
 /// - Chí mạng: roll theo Character.CriticalChance / CriticalMultiplier.
 /// - Damage + feedback (damage number, impact, hit-stop) đi qua Character.TakeDamage
-///   và CombatEffectsManager — không vẽ trùng hệ thống cũ.
+///   và VfxService — không vẽ trùng hệ thống cũ.
 /// - Tái sử dụng FindEnemiesInRange + CalculateEnhancedDamage của SkillExecutorBase
 ///   (probe nội bộ) để bảo đảm guard "không bắn player".
 /// </summary>
@@ -24,9 +24,6 @@ public class PlayerCombat : MonoBehaviour
     [SerializeField] private float attackReach = 0.7f;    // tâm quét dịch trước mặt bao xa
     [SerializeField] private float attackCooldown = 0.45f;
     [SerializeField] private float windup = 0.25f;        // trễ khớp animation
-
-    [Header("Feedback nhịp 3 (finisher)")]
-    [SerializeField] private float finisherShake = 0.15f;
 
     private PlayerController playerController;
     private Character character;
@@ -148,21 +145,14 @@ public class PlayerCombat : MonoBehaviour
             anyHit = true;
         }
 
-        var fx = CombatEffectsManager.Instance;
-        if (anyHit && fx != null)
+        if (anyHit)
         {
-            if (isFinisher)
-            {
-                fx.ScreenShake(finisherShake, 0.12f);
-                fx.HitStop(0.05f);
-                fx.CreateImpactEffect(center, Color.yellow, 1.4f);
-            }
-            else
-            {
-                fx.ScreenShake(0.04f, 0.08f);
-                fx.HitStop(0.04f);
-                fx.CreateImpactEffect(center, Color.white, 0.9f);
-            }
+            // Máu/tia lửa do Character.TakeDamage của mục tiêu phát; ở đây chỉ vệt chém + rung + hit-stop
+            var level = isFinisher ? ShakeLevel.Heavy : ShakeLevel.Light;
+            VfxService.Slash(transform.position, aim, isFinisher ? new Color(1f, 0.9f, 0.5f) : Color.white,
+                isFinisher ? 1.3f : 1f);
+            VfxService.Shake(level);
+            VfxService.HitStop(level);
         }
 
         yield return new WaitForSeconds(Mathf.Max(0.02f, attackCooldown - windup));
