@@ -80,7 +80,9 @@ TextureImporter:
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
   alphaIsTransparency: 1
+  spriteTessellationMethod: 0
   spriteTessellationDetail: -1
+  spriteGeometrySubdivision: -1
   textureType: 8
   textureShape: 1
   singleChannelComponent: 0
@@ -347,7 +349,16 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      lightning_skill3_frame5_0: -2340259023570967831
+      lightning_skill3_frame5_1: 6544148304714026865
+      lightning_skill3_frame5_2: -5295740806853174337
+      lightning_skill3_frame5_3: 2311208781105336695
+      lightning_skill3_frame5_4: -3419445139607534590
+      lightning_skill3_frame5_5: -580209365416003551
+      lightning_skill3_frame5_6: 387525288421373813
+      lightning_skill3_frame5_7: -8092315183730205592
+      lightning_skill3_frame5_8: -7542083662802508475
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

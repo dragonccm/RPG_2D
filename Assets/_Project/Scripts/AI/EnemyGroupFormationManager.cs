@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.AI;
+using RPGGame.AI;
 
 public enum FormationType { Line, V, Circle, Custom }
 

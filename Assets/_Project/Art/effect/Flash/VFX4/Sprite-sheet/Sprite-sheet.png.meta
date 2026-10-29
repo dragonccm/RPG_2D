@@ -146,7 +146,9 @@ TextureImporter:
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
   alphaIsTransparency: 1
+  spriteTessellationMethod: 0
   spriteTessellationDetail: -1
+  spriteGeometrySubdivision: -1
   textureType: 8
   textureShape: 1
   singleChannelComponent: 0
@@ -897,7 +899,38 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Sprite-sheet_0: -4111964075149863302
+      Sprite-sheet_1: 366455611992627334
+      Sprite-sheet_10: -449174531745403176
+      Sprite-sheet_11: -1976055164900528284
+      Sprite-sheet_12: 3536697169230809542
+      Sprite-sheet_13: -7480305441705886694
+      Sprite-sheet_14: 4668138910544969710
+      Sprite-sheet_15: -7377433617352737959
+      Sprite-sheet_16: 9010246116849253277
+      Sprite-sheet_17: -6264283633984185873
+      Sprite-sheet_18: 5577419662952384840
+      Sprite-sheet_19: 3588548538038055778
+      Sprite-sheet_2: 344307399868531090
+      Sprite-sheet_20: -3199556829062206896
+      Sprite-sheet_21: -2490131379158190268
+      Sprite-sheet_22: -9112483145476011612
+      Sprite-sheet_23: 947083017623757317
+      Sprite-sheet_24: -83577138887708436
+      Sprite-sheet_25: -3281901598677128157
+      Sprite-sheet_26: -3589071548762605847
+      Sprite-sheet_27: 2573758095912365438
+      Sprite-sheet_28: -6080139487840383210
+      Sprite-sheet_29: -5414775173743752216
+      Sprite-sheet_3: -895371444194891223
+      Sprite-sheet_30: -120032519705207931
+      Sprite-sheet_4: 5356298529950203555
+      Sprite-sheet_5: -1303365826495389600
+      Sprite-sheet_6: 4659297610912431009
+      Sprite-sheet_7: -1557653580302763414
+      Sprite-sheet_8: 3867064415208655891
+      Sprite-sheet_9: 7154732059485102050
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -7,6 +7,23 @@ public class Character : MonoBehaviour, IDamageable
     public Resource health;
     public Resource mana;
     
+    [Header("Player Stats")]
+    [SerializeField] private float maxHealth = 100f;
+    [SerializeField] private float maxMana = 50f;
+    [SerializeField] private float healthRegenRate = 0f;
+    [SerializeField] private float manaRegenRate = 5f;
+    [SerializeField] private float defense = 0f;
+    [SerializeField] private float attackPower = 10f;
+    [SerializeField] private float criticalChance = 0.05f;
+    [SerializeField] private float criticalMultiplier = 2f;
+    [SerializeField] private float moveSpeed = 3.5f;
+    [SerializeField] private float attackSpeed = 1f;
+    
+    [Header("God Mode")]
+    [SerializeField] private bool godModeEnabled = false;
+    [SerializeField] private float godModeHealth = 99999f;
+    [SerializeField] private float godModeMana = 99999f;
+    
     [Header("Combat Effects")]
     [SerializeField] private float knockbackResistance = 1f;
     [SerializeField] private float damageFlashDuration = 0.2f;
@@ -41,12 +58,83 @@ public class Character : MonoBehaviour, IDamageable
         set => health.currentValue = value;
     }
 
+    public float MaxMana
+    {
+        get => mana.maxValue;
+        set => mana.maxValue = value;
+    }
+
+    public float CurrentMana
+    {
+        get => mana.currentValue;
+        set => mana.currentValue = value;
+    }
+
+    public bool IsDead => health.currentValue <= 0;
+
+    // Player stats properties
+    public float Defense { get => defense; set => defense = Mathf.Max(0f, value); }
+    public float AttackPower { get => attackPower; set => attackPower = Mathf.Max(1f, value); }
+    public float CriticalChance { get => criticalChance; set => criticalChance = Mathf.Clamp01(value); }
+    public float CriticalMultiplier { get => criticalMultiplier; set => criticalMultiplier = Mathf.Max(1f, value); }
+    public float MoveSpeed { get => moveSpeed; set => moveSpeed = Mathf.Max(0.1f, value); }
+    public float AttackSpeed { get => attackSpeed; set => attackSpeed = Mathf.Max(0.1f, value); }
+    public bool GodModeEnabled { get => godModeEnabled; set => godModeEnabled = value; }
+
+    // Public properties for editor access
+    public float KnockbackResistance 
+    { 
+        get => knockbackResistance; 
+        set => knockbackResistance = Mathf.Max(0.1f, value); 
+    }
+    
+    public float DamageFlashDuration 
+    { 
+        get => damageFlashDuration; 
+        set => damageFlashDuration = Mathf.Max(0.1f, value); 
+    }
+    
+    public Color DamageFlashColor 
+    { 
+        get => damageFlashColor; 
+        set => damageFlashColor = value; 
+    }
+    
+    public bool ShowDamageNumbers 
+    { 
+        get => showDamageNumbers; 
+        set => showDamageNumbers = value; 
+    }
+    
+    public bool EnableScreenShake 
+    { 
+        get => enableScreenShake; 
+        set => enableScreenShake = value; 
+    }
+    
+    public bool EnableHitStop 
+    { 
+        get => enableHitStop; 
+        set => enableHitStop = value; 
+    }
+
     protected virtual void Awake()
     {
         health = gameObject.AddComponent<Resource>();
         mana = gameObject.AddComponent<Resource>();
-        health.Initialize(100f, 0f);
-        mana.Initialize(50f, 5f);
+        
+        if (godModeEnabled)
+        {
+            health.Initialize(godModeHealth, healthRegenRate);
+            mana.Initialize(godModeMana, manaRegenRate);
+            health.currentValue = godModeHealth;
+            mana.currentValue = godModeMana;
+        }
+        else
+        {
+            health.Initialize(maxHealth, healthRegenRate);
+            mana.Initialize(maxMana, manaRegenRate);
+        }
         
         rb = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
@@ -57,6 +145,18 @@ public class Character : MonoBehaviour, IDamageable
         }
     }
 
+    protected virtual void Update()
+    {
+        if (godModeEnabled)
+        {
+            // Ensure health and mana stay at maximum in god mode
+            if (health.currentValue < godModeHealth)
+                health.currentValue = godModeHealth;
+            if (mana.currentValue < godModeMana)
+                mana.currentValue = godModeMana;
+        }
+    }
+
     public void TakeDamage(float damage)
     {
         TakeDamage(damage, false);
@@ -64,9 +164,11 @@ public class Character : MonoBehaviour, IDamageable
 
     public void TakeDamage(float damage, bool isCritical = false)
     {
-        if (isStunned) return;
+        if (isStunned || godModeEnabled) return;
         
-        health.Decrease(damage);
+        // Apply defense reduction
+        float actualDamage = Mathf.Max(1f, damage - defense);
+        health.Decrease(actualDamage);
         TriggerDamageFlash();
         
         // Safe CombatEffectsManager usage
@@ -323,6 +425,42 @@ public class Character : MonoBehaviour, IDamageable
         {
             mana.Increase(amount);
         }
+    }
+
+    public void ToggleGodMode(bool enable)
+    {
+        godModeEnabled = enable;
+        
+        if (enable)
+        {
+            // Store original values
+            maxHealth = health.maxValue;
+            maxMana = mana.maxValue;
+            
+            // Set god mode values
+            health.maxValue = godModeHealth;
+            health.currentValue = godModeHealth;
+            mana.maxValue = godModeMana;
+            mana.currentValue = godModeMana;
+            
+            Debug.Log("God Mode: Enabled - 99999 Health & Mana");
+        }
+        else
+        {
+            // Restore original values
+            health.maxValue = maxHealth;
+            mana.maxValue = maxMana;
+            
+            Debug.Log("God Mode: Disabled - Stats restored");
+        }
+    }
+
+    public void ResetToDefaultStats()
+    {
+        health.maxValue = maxHealth;
+        health.currentValue = maxHealth;
+        mana.maxValue = maxMana;
+        mana.currentValue = maxMana;
     }
 
     /// <summary>

@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3801336f91abb87468f0d8079c0aef75, type: 3}
+  m_Name: Enemy_MagicArrow
+  m_EditorClassIdentifier: 
+  skillName: MagicArrow
+  description: Fast magical arrow that travels in straight line.
+  skillIcon: {fileID: 21300000, guid: 1434dc95856fa30429595f1de8ab3280, type: 3}
+  requiredLevel: 2
+  damage: 20
+  range: 8
+  speed: 12
+  cooldown: 1
+  manaCost: 8
+  stunDuration: 0
+  knockbackForce: 0
+  healAmount: 0
+  areaRadius: 0
+  chargeTime: 0
+  skillColor: {r: 0.6, g: 0.1960784, b: 0.8000001, a: 1}
+  castSound: {fileID: 0}
+  impactSound: {fileID: 0}
+  effectPrefab: {fileID: -2253911629886400664, guid: 148f7304e3b7f4b47a2bf848eff296ba,
+    type: 3}
+  projectilePrefab: {fileID: 6156162653969815475, guid: 002c8e5aa831dd1468372ecfd4b58ad0,
+    type: 3}
+  customEffectLifetime: 0
+  effectPositionOffset: {x: 0, y: 0, z: 0}
+  enableEnhancedEffects: 1
+  animationTrigger: Attack
+  animationLength: 1
+  skillType: 1
+  damageZonePrefab: {fileID: 0}
+  criticalChance: 0.1
+  criticalMultiplier: 2
+  upgrades: []
+  maxLevel: 5
+  currentLevel: 1
+  showDamageArea: 1
+  damageAreaColor: {r: 0.627451, g: 0.1254902, b: 0.9411765, a: 1}
+  damageAreaDisplayTime: 2

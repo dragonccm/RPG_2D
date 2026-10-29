@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using RPGGame.AI;
 
 /// <summary>
 /// Lớp trừu tượng điều khiển AI của kẻ địch. Quản lý state machine, animator, target, và các trạng thái cơ bản.

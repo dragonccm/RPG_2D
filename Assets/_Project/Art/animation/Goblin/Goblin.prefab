@@ -466,13 +466,13 @@ GameObject:
   - component: {fileID: 5136481112827169624}
   - component: {fileID: 1291297705595858072}
   - component: {fileID: 8470991914656668769}
+  - component: {fileID: 850557940171389173}
   - component: {fileID: 6198551524667341501}
   - component: {fileID: 6305661239690016216}
   - component: {fileID: 7455110506165056626}
   - component: {fileID: 3149652930160656903}
   - component: {fileID: 5967497218502263471}
   - component: {fileID: 2060940688001907084}
-  - component: {fileID: 850557940171389173}
   m_Layer: 3
   m_Name: Goblin
   m_TagString: Enemy
@@ -660,6 +660,26 @@ NavMeshAgent:
   m_BaseOffset: 0.6328125
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &850557940171389173
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8047856542747731292}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4353e0a636264549920ab2779050849, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  health: {fileID: 0}
+  mana: {fileID: 0}
+  knockbackResistance: 1
+  damageFlashDuration: 0.2
+  damageFlashColor: {r: 1, g: 0, b: 0, a: 1}
+  showDamageNumbers: 1
+  enableScreenShake: 1
+  enableHitStop: 1
 --- !u!114 &6198551524667341501
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -696,8 +716,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e80e63492ec1d1945bede9d4f647652e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerTarget: {fileID: 0}
-  moveSpeed: 2
+  moveSpeed: 1.5
   rotationSpeed: 10
 --- !u!114 &7455110506165056626
 MonoBehaviour:
@@ -758,23 +777,3 @@ MonoBehaviour:
   skillModules:
   - {fileID: 11400000, guid: 357eab4f901310b479c7047afbb9aec8, type: 2}
   useRandomSkill: 1
---- !u!114 &850557940171389173
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8047856542747731292}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c4353e0a636264549920ab2779050849, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  health: {fileID: 0}
-  mana: {fileID: 0}
-  knockbackResistance: 1
-  damageFlashDuration: 0.2
-  damageFlashColor: {r: 1, g: 0, b: 0, a: 1}
-  showDamageNumbers: 1
-  enableScreenShake: 1
-  enableHitStop: 1

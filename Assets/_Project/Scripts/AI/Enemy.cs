@@ -3,6 +3,7 @@ using UnityEngine.AI;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using RPGGame.AI;
 
 // Explicitly use UnityEngine.Random for Unity-specific random operations
 using Random = UnityEngine.Random;
@@ -866,12 +867,6 @@ public class Enemy : MonoBehaviour
             float distance = Vector3.Distance(transform.position, player.position);
         }
     }
-}
-
-// Interface và classes khác giữ nguyên
-public interface IDamageable
-{
-    void TakeDamage(float damage);
 }
 
 public class PlayerThreatManager { }

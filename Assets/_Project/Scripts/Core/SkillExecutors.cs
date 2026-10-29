@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Linq;
 
 /// <summary>
 /// File: SkillExecutors.cs
@@ -43,7 +44,7 @@ public abstract class SkillExecutorBase : ISkillExecutor
         var animator = user.GetComponent<Animator>();
         if (animator != null)
         {
-            // S? d?ng animationTrigger t? Module thay vì hard-coded
+            // S? d?ng animationTrigger t? Module thay vï¿½ hard-coded
             string trigger = !string.IsNullOrEmpty(Module.animationTrigger) ? 
                             Module.animationTrigger : "Attack";
             animator.SetTrigger(trigger);
@@ -89,7 +90,7 @@ public abstract class SkillExecutorBase : ISkillExecutor
     }
     
     /// <summary>
-    /// Enhanced visual effect creation v?i auto-destroy và collision positioning
+    /// Enhanced visual effect creation v?i auto-destroy vï¿½ collision positioning
     /// </summary>
     protected void CreateVisualEffect(Vector3 position)
     {
@@ -107,13 +108,13 @@ public abstract class SkillExecutorBase : ISkillExecutor
     }
     
     /// <summary>
-    /// T?o effect va ch?m t?i v? trí chính xác v?i direction
+    /// T?o effect va ch?m t?i v? trï¿½ chï¿½nh xï¿½c v?i direction
     /// </summary>
     protected void CreateImpactEffect(Vector3 impactPosition, Vector3 impactDirection, GameObject target = null)
     {
         if (Module.effectPrefab != null)
         {
-            // T?o effect t?i v? trí va ch?m chính xác
+            // T?o effect t?i v? trï¿½ va ch?m chï¿½nh xï¿½c
             EnhancedEffectManager.CreateImpactEffect(
                 Module.effectPrefab,
                 impactPosition,
@@ -125,7 +126,7 @@ public abstract class SkillExecutorBase : ISkillExecutor
     }
     
     /// <summary>
-    /// T?o effect theo dõi target (cho projectile)
+    /// T?o effect theo dï¿½i target (cho projectile)
     /// </summary>
     protected void CreateFollowEffect(Transform target, Vector3 offset = default)
     {
@@ -178,27 +179,55 @@ public abstract class SkillExecutorBase : ISkillExecutor
     /// </summary>
     protected bool IsPlayerCharacter(Character character, Character caster = null)
     {
-        // Method 1: Same as caster
-        if (caster != null && character == caster) return true;
+        // Method 1: Same as caster - CRITICAL for preventing self-damage
+        if (caster != null && character == caster) 
+        {
+            Debug.Log($"??? SELF-DAMAGE PREVENTED: {character.name} == {caster.name}");
+            return true;
+        }
         
         // Method 2: Has PlayerController component
         var playerController = character.GetComponent<MonoBehaviour>();
         if (playerController != null && playerController.GetType().Name == "PlayerController")
+        {
+            Debug.Log($"?? PLAYER DETECTED: {character.name} has PlayerController");
             return true;
+        }
         
         // Method 3: Check AttackableCharacter component
         var attackable = character.GetComponent<AttackableCharacter>();
         if (attackable != null && !attackable.CanBeAttacked())
+        {
+            Debug.Log($"??? NON-ATTACKABLE: {character.name} cannot be attacked");
             return true;
+        }
         
         // Method 4: Check GameObject name patterns
         string objName = character.gameObject.name.ToLower();
         if (objName.Contains("player") || objName.Contains("hero") || objName.Contains("character"))
+        {
+            Debug.Log($"??? PLAYER NAME PATTERN: {character.name} matches player naming");
             return true;
+        }
             
         // Method 5: Check tag
         if (character.gameObject.CompareTag("Player"))
+        {
+            Debug.Log($"??? PLAYER TAG: {character.name} has Player tag");
             return true;
+        }
+        
+        // Method 6: Check for CoreEnemy component (enemies shouldn't target other enemies)
+        var coreEnemy = character.GetComponent<CoreEnemy>();
+        if (coreEnemy != null && caster != null)
+        {
+            var casterCoreEnemy = caster.GetComponent<CoreEnemy>();
+            if (casterCoreEnemy != null)
+            {
+                Debug.Log($"?? ENEMY-TO-ENEMY PREVENTION: {caster.name} (enemy) won't target {character.name} (enemy)");
+                return true; // Treat as "player" to prevent enemy-to-enemy damage
+            }
+        }
         
         return false;
     }
@@ -246,13 +275,13 @@ public abstract class SkillExecutorBase : ISkillExecutor
     }
     
     /// <summary>
-    /// Enhanced damage area visualization v?i auto-generation và custom prefab support
+    /// Enhanced damage area visualization v?i auto-generation vï¿½ custom prefab support
     /// </summary>
     private GameObject currentMeleeIndicator;
 
     protected void ShowDamageAreaAtExactPosition(Vector2 exactPosition, float radius, string indicatorName = "DamageAreaIndicator")
     {
-        // H?y hi?u ?ng c? n?u còn t?n t?i
+        // H?y hi?u ?ng c? n?u cï¿½n t?n t?i
         if (currentMeleeIndicator != null)
         {
             Object.Destroy(currentMeleeIndicator);
@@ -260,13 +289,13 @@ public abstract class SkillExecutorBase : ISkillExecutor
         }
         GameObject indicator = null;
         
-        // ?u tiên s? d?ng custom prefab t? SkillModule
+        // ?u tiï¿½n s? d?ng custom prefab t? SkillModule
         if (Module.damageZonePrefab != null)
         {
             indicator = Object.Instantiate(Module.damageZonePrefab);
             indicator.name = $"{indicatorName}_Custom_{Time.time:F2}";
             
-            // Set position và scale cho custom prefab
+            // Set position vï¿½ scale cho custom prefab
             indicator.transform.position = new Vector3(exactPosition.x, exactPosition.y, -0.1f); // Slightly in front for visibility
             
             // C? g?ng scale custom prefab theo radius
@@ -500,20 +529,53 @@ public abstract class SkillExecutorBase : ISkillExecutor
     {
         var targets = new System.Collections.Generic.List<Character>();
         var allCharacters = Object.FindObjectsByType<Character>(FindObjectsSortMode.None);
+        
         foreach (var character in allCharacters)
         {
             if (character == null || character == caster) continue;
-            // N?u caster là player thì ch? t?n công enemy
+            
+            // CRITICAL FIX: Use comprehensive enemy/player detection
+            bool isValidTarget = false;
+            
+            // If caster is player, target only enemies
             if (caster.gameObject.CompareTag("Player"))
             {
-                if (!character.gameObject.CompareTag("Enemy")) continue;
+                // Target must be tagged as Enemy and NOT be a player
+                if (character.gameObject.CompareTag("Enemy") && !IsPlayerCharacter(character, caster))
+                {
+                    isValidTarget = true;
+                }
             }
-            // N?u caster là enemy thì ch? t?n công player
+            // If caster is enemy, target only player
             else if (caster.gameObject.CompareTag("Enemy"))
             {
-                if (!character.gameObject.CompareTag("Player")) continue;
+                // Target must be a player (tagged or has PlayerController)
+                if (character.gameObject.CompareTag("Player") || IsPlayerCharacter(character, caster))
+                {
+                    isValidTarget = true;
+                }
             }
-            // Ki?m tra máu
+            // Additional safety: if caster has no tag, use the player detection method
+            else
+            {
+                // Use the comprehensive player detection
+                bool casterIsPlayer = IsPlayerCharacter(caster, null);
+                bool targetIsPlayer = IsPlayerCharacter(character, caster);
+                
+                // Players target enemies, enemies target players
+                if (casterIsPlayer && !targetIsPlayer)
+                {
+                    isValidTarget = true;
+                }
+                else if (!casterIsPlayer && targetIsPlayer)
+                {
+                    isValidTarget = true;
+                }
+            }
+            
+            if (!isValidTarget) continue;
+            
+            // Check if target is alive
             if (character.health != null && character.health.currentValue > 0)
             {
                 float distance = Vector2.Distance(center, character.transform.position);
@@ -523,6 +585,7 @@ public abstract class SkillExecutorBase : ISkillExecutor
                 }
             }
         }
+        
         return targets.ToArray();
     }
 }
@@ -562,6 +625,13 @@ public class MeleeSkillExecutor : SkillExecutorBase
         // FIXED: Pass caster parameter to prevent self-damage
         var enemies = FindSkillTargetsInRange(attackCenter, Module.range, user);
         
+        // DEBUG: Log target detection results
+        Debug.Log($"??? MELEE SKILL: {Module.skillName} by {user.name} (Tag: {user.gameObject.tag}) found {enemies.Length} targets");
+        foreach (var enemy in enemies)
+        {
+            Debug.Log($"  Target: {enemy.name} (Tag: {enemy.gameObject.tag})");
+        }
+        
         // Enhanced feedback for no targets found
         if (enemies.Length == 0)
         {
@@ -586,6 +656,7 @@ public class MeleeSkillExecutor : SkillExecutorBase
             bool isCritical = Random.Range(0f, 1f) < Module.criticalChance;
             
             // Apply damage with enhanced feedback
+            Debug.Log($"?? MELEE HIT: {user.name} deals {finalDamage} damage to {enemy.name}");
             enemy.TakeDamage(finalDamage, isCritical);
             
             // Enhanced knockback with position-based direction
@@ -605,7 +676,7 @@ public class MeleeSkillExecutor : SkillExecutorBase
                 enemy.ApplyStun(Module.stunDuration);
             }
             
-            // Create individual impact effects for each enemy v?i v? trí chính xác
+            // Create individual impact effects for each enemy v?i v? trï¿½ chï¿½nh xï¿½c
             Vector3 impactDirection = (enemy.transform.position - user.transform.position).normalized;
             CreateImpactEffect(enemy.transform.position, impactDirection, enemy.gameObject);
             CreateIndividualHitEffect(enemy.transform.position, isCritical);
@@ -614,7 +685,7 @@ public class MeleeSkillExecutor : SkillExecutorBase
         // Play impact sound
         PlayImpactSound(user);
         
-        // Create main visual effect t?i v? trí user
+        // Create main visual effect t?i v? trï¿½ user
         CreateVisualEffect(user.transform.position);
         
         // Show enhanced damage area ALWAYS at user position for melee
@@ -643,8 +714,8 @@ public class MeleeSkillExecutor : SkillExecutorBase
 
     public override void ShowDamageArea(Vector2 position)
     {
-        // Không t?o damage area trong ShowDamageArea ?? tránh trùng l?p
-        // Damage area s? ???c t?o trong Execute() t?i v? trí player
+        // Khï¿½ng t?o damage area trong ShowDamageArea ?? trï¿½nh trï¿½ng l?p
+        // Damage area s? ???c t?o trong Execute() t?i v? trï¿½ player
     }
 
     public override void UpdateDamageArea(Vector2 position)
@@ -658,7 +729,7 @@ public class MeleeSkillExecutor : SkillExecutorBase
     }
 }
 
-// 2. PROJECTILE SKILL EXECUTOR - Phóng chiêu v?i range indicator
+// 2. PROJECTILE SKILL EXECUTOR - Phï¿½ng chiï¿½u v?i range indicator
 public class ProjectileSkillExecutor : SkillExecutorBase
 {
     public ProjectileSkillExecutor(SkillModule module) : base(module) { }
@@ -667,9 +738,24 @@ public class ProjectileSkillExecutor : SkillExecutorBase
     {
         if (!Module.CanExecute(user)) return;
 
-        // Use RAW mouse position for projectiles
-        Vector2 rawMousePos = GetRawMouseWorldPosition();
-        Vector2 validTarget = GetValidTargetPosition(rawMousePos, user);
+        // ENHANCED: Use targeting system for enemy-specific targeting
+        Vector2 finalTargetPosition;
+        
+        // Check if user has targeting system
+        var targetingSystem = user.GetComponent<TargetingSystem>();
+        if (targetingSystem != null && targetingSystem.currentTarget != null)
+        {
+            // Use targeted enemy position
+            finalTargetPosition = targetingSystem.currentTarget.transform.position;
+            Debug.Log($"?? PROJECTILE TARGETING: Using targeted enemy {targetingSystem.currentTarget.name}");
+        }
+        else
+        {
+            // Fallback to mouse position targeting
+            Vector2 rawMousePos = GetRawMouseWorldPosition();
+            finalTargetPosition = GetValidTargetPosition(rawMousePos, user);
+            Debug.Log($"?? PROJECTILE TARGETING: Using mouse position targeting");
+        }
 
         // Use mana
         if (user.mana != null)
@@ -682,7 +768,7 @@ public class ProjectileSkillExecutor : SkillExecutorBase
         PlayCastSound(user);
 
         // Start projectile creation with delay
-        user.StartCoroutine(CreateProjectileAfterDelay(user, validTarget, 0.2f));
+        user.StartCoroutine(CreateProjectileAfterDelay(user, finalTargetPosition, 0.2f));
     }
 
     private IEnumerator CreateProjectileAfterDelay(Character user, Vector2 targetPosition, float delay)
@@ -725,22 +811,22 @@ public class ProjectileSkillExecutor : SkillExecutorBase
 
     public override void ShowDamageArea(Vector2 position)
     {
-        // Projectile không hi?n th? damage area t?i v? trí b?t ??u
-        // Thay vào ?ó có th? hi?n th? trajectory ho?c không hi?n th? gì
+        // Projectile khï¿½ng hi?n th? damage area t?i v? trï¿½ b?t ??u
+        // Thay vï¿½o ?ï¿½ cï¿½ th? hi?n th? trajectory ho?c khï¿½ng hi?n th? gï¿½
     }
 
     public override void UpdateDamageArea(Vector2 position)
     {
-        // Projectile có th? c?p nh?t trajectory preview
+        // Projectile cï¿½ th? c?p nh?t trajectory preview
     }
 
     public override void HideDamageArea()
     {
-        // ?n trajectory preview n?u có
+        // ?n trajectory preview n?u cï¿½
     }
 }
 
-// 3. AREA SKILL EXECUTOR - AoE v?i vùng sát th??ng chính xác
+// 3. AREA SKILL EXECUTOR - AoE v?i vï¿½ng sï¿½t th??ng chï¿½nh xï¿½c
 public class AreaSkillExecutor : SkillExecutorBase
 {
     public AreaSkillExecutor(SkillModule module) : base(module) { }
@@ -775,14 +861,20 @@ public class AreaSkillExecutor : SkillExecutorBase
         // FIXED: Pass caster parameter to prevent self-damage
         var enemies = FindSkillTargetsInRange(targetPosition, Module.areaRadius, user);
         
-        // Enhanced feedback for area skills
+        // DEBUG: Enhanced feedback for area skills
+        Debug.Log($"?? AREA SKILL: {Module.skillName} by {user.name} (Tag: {user.gameObject.tag}) at {targetPosition}");
+        Debug.Log($"   Found {enemies.Length} targets in radius {Module.areaRadius}");
+        
         if (enemies.Length == 0)
         {
-            Debug.Log($"?? Area skill '{Module.skillName}' found no targets at {targetPosition}");
+            Debug.Log($"?? Area skill '{Module.skillName}' found no valid targets at {targetPosition}");
         }
         else
         {
-            Debug.Log($"?? Area skill '{Module.skillName}' hitting {enemies.Length} enemies in area");
+            foreach (var enemy in enemies)
+            {
+                Debug.Log($"  ?? Target: {enemy.name} (Tag: {enemy.gameObject.tag})");
+            }
         }
         
         foreach (var enemy in enemies)
@@ -796,6 +888,7 @@ public class AreaSkillExecutor : SkillExecutorBase
                 finalDamage *= Module.criticalMultiplier;
             }
             
+            Debug.Log($"?? AREA HIT: {user.name} deals {finalDamage} damage to {enemy.name}");
             enemy.TakeDamage(finalDamage, isCritical);
             
             // Apply stun if specified
@@ -804,7 +897,7 @@ public class AreaSkillExecutor : SkillExecutorBase
                 enemy.ApplyStun(Module.stunDuration);
             }
             
-            // Create individual impact effects t?i v? trí t?ng enemy
+            // Create individual impact effects t?i v? trï¿½ t?ng enemy
             Vector3 impactDirection = (enemy.transform.position - (Vector3)targetPosition).normalized;
             if (impactDirection.magnitude < 0.1f) impactDirection = Vector3.up; // Fallback direction
             
@@ -827,22 +920,22 @@ public class AreaSkillExecutor : SkillExecutorBase
 
     public override void ShowDamageArea(Vector2 position)
     {
-        // Không t?o damage area t?i v? trí chu?t cho Area skill
+        // Khï¿½ng t?o damage area t?i v? trï¿½ chu?t cho Area skill
         // Ch? hi?n th? khi skill ???c execute
     }
 
     public override void UpdateDamageArea(Vector2 position)
     {
-        // C?p nh?t v? trí vùng sát th??ng theo mouse nh?ng trong ph?m vi h?p l?
+        // C?p nh?t v? trï¿½ vï¿½ng sï¿½t th??ng theo mouse nh?ng trong ph?m vi h?p l?
     }
 
     public override void HideDamageArea()
     {
-        // ?n vùng sát th??ng area
+        // ?n vï¿½ng sï¿½t th??ng area
     }
 }
 
-// 4. SUPPORT SKILL EXECUTOR - H? tr? không c?n v? vùng
+// 4. SUPPORT SKILL EXECUTOR - H? tr? khï¿½ng c?n v? vï¿½ng
 public class SupportSkillExecutor : SkillExecutorBase
 {
     public SupportSkillExecutor(SkillModule module) : base(module) { }
@@ -879,7 +972,7 @@ public class SupportSkillExecutor : SkillExecutorBase
         // Apply buff effects (you can extend this)
         // TODO: Add buff system integration here
         
-        // Create enhanced visual effect t?i v? trí user
+        // Create enhanced visual effect t?i v? trï¿½ user
         CreateVisualEffect(user.transform.position);
         
         // Play impact sound
@@ -996,7 +1089,7 @@ public class InstantSkillExecutor : SkillExecutorBase
             Debug.Log($"?? Damage buff applied: {Module.damage} to {user.name}!");
         }
         
-        // Create enhanced visual effect t?i v? trí user
+        // Create enhanced visual effect t?i v? trï¿½ user
         CreateVisualEffect(user.transform.position);
         
         // Play impact sound
@@ -1093,7 +1186,29 @@ public class EnhancedProjectileBehavior : MonoBehaviour
         caster = user;
         startPosition = user.transform.position;
         
-        direction = (targetPosition - startPosition).normalized;
+        // ENHANCED: Enemy projectiles always target player
+        if (IsEnemyCaster(user))
+        {
+            // Find player as target for enemy projectiles
+            var player = FindPlayerTarget();
+            if (player != null)
+            {
+                direction = ((Vector2)player.transform.position - startPosition).normalized;
+                Debug.Log($"?? ENEMY PROJECTILE: {skillModule.skillName} targeting player at {player.transform.position}");
+            }
+            else
+            {
+                // Fallback to original direction if no player found
+                direction = (targetPosition - startPosition).normalized;
+                Debug.LogWarning($"?? ENEMY PROJECTILE: No player found, using fallback direction");
+            }
+        }
+        else
+        {
+            // Player projectiles use normal targeting
+            direction = (targetPosition - startPosition).normalized;
+            Debug.Log($"?? PLAYER PROJECTILE: {skillModule.skillName} using mouse targeting");
+        }
         
         // Calculate max lifetime based on range and speed
         maxLifetime = skillModule.range / Mathf.Max(skillModule.speed, 0.1f);
@@ -1104,6 +1219,8 @@ public class EnhancedProjectileBehavior : MonoBehaviour
             float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
             transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
         }
+        
+        Debug.Log($"?? PROJECTILE CREATED: {skillModule.skillName} by {caster.name} (Tag: {caster.gameObject.tag}) -> direction: {direction}");
     }
 
     private void Update()
@@ -1119,13 +1236,46 @@ public class EnhancedProjectileBehavior : MonoBehaviour
         transform.position += (Vector3)direction * moveDistance;
         travelTime += Time.deltaTime;
 
-        // Enhanced collision detection
-        var enemies = FindEnemiesInCollisionRange();
-        if (enemies.Length > 0)
+        // CRITICAL: Enhanced collision detection to prevent enemy self-damage
+        if (IsEnemyCaster(caster))
         {
-            var targetEnemy = enemies[0]; // Hit first enemy found
-            HitEnemy(targetEnemy);
-            return;
+            // Enemy projectiles only target players
+            var playerTargets = FindPlayerTargetsInRange();
+            if (playerTargets.Length > 0)
+            {
+                var targetPlayer = FindClosestEnemyToTrajectory(playerTargets);
+                if (targetPlayer != null && targetPlayer != caster)
+                {
+                    HitCharacterEnemy(targetPlayer);
+                    return;
+                }
+            }
+        }
+        else
+        {
+            // Player projectiles target enemies
+            var characterEnemies = FindEnemiesInCollisionRange();
+            if (characterEnemies.Length > 0)
+            {
+                var targetEnemy = FindClosestEnemyToTrajectory(characterEnemies);
+                if (targetEnemy != null && targetEnemy != caster)
+                {
+                    HitCharacterEnemy(targetEnemy);
+                    return;
+                }
+            }
+            
+            // Check IDamageable components without Character for player projectiles
+            var damageableTargets = FindIDamageableTargetsInRange();
+            if (damageableTargets.Length > 0)
+            {
+                var targetDamageable = FindClosestDamageableToTrajectory(damageableTargets);
+                if (targetDamageable != null)
+                {
+                    HitIDamageableTarget(targetDamageable);
+                    return;
+                }
+            }
         }
 
         // Check if projectile has exceeded its range
@@ -1138,15 +1288,65 @@ public class EnhancedProjectileBehavior : MonoBehaviour
     
     private Character[] FindEnemiesInCollisionRange()
     {
-        var allCharacters = Object.FindObjectsByType<Character>(FindObjectsSortMode.None);
         var enemiesInRange = new System.Collections.Generic.List<Character>();
         
-        foreach (var character in allCharacters)
+        // ENHANCED: For enemy projectiles, only target players
+        if (IsEnemyCaster(caster))
         {
-            // CRITICAL FIX: Use bulletproof player detection
+            // Find all Character components and only target players
+            var allCharacters = Object.FindObjectsByType<Character>(FindObjectsSortMode.None);
+            foreach (var character in allCharacters)
+            {
+                // CRITICAL: Skip the caster to prevent self-damage
+                if (character.gameObject == caster.gameObject) 
+                {
+                    Debug.Log($"??? ENEMY PROJECTILE SELF-DAMAGE PREVENTED: {character.name} == {caster.name}");
+                    continue;
+                }
+                
+                // CRITICAL: Skip if same Character instance
+                if (character == caster) 
+                {
+                    Debug.Log($"??? ENEMY PROJECTILE SELF-DAMAGE PREVENTED: Same caster instance");
+                    continue;
+                }
+                
+                // ENHANCED: Only target players for enemy projectiles
+                if (!IsPlayerCharacter(character)) continue;
+                
+                if (character.health == null || character.health.currentValue <= 0) continue;
+                
+                float distance = Vector2.Distance(transform.position, character.transform.position);
+                if (distance <= hitRadius)
+                {
+                    enemiesInRange.Add(character);
+                }
+            }
+            
+            Debug.Log($"?? ENEMY PROJECTILE: Found {enemiesInRange.Count} PLAYER targets in range {hitRadius}");
+            return enemiesInRange.ToArray();
+        }
+        
+        // Original logic for player projectiles - target enemies
+        var playerCharacters = Object.FindObjectsByType<Character>(FindObjectsSortMode.None);
+        foreach (var character in playerCharacters)
+        {
+            // CRITICAL: Skip the caster to prevent self-damage
+            if (character.gameObject == caster.gameObject) 
+            {
+                Debug.Log($"??? PROJECTILE SELF-DAMAGE PREVENTED (Character): {character.name} == {caster.name}");
+                continue;
+            }
+            
+            // Skip if same Character instance
+            if (character == caster) 
+            {
+                Debug.Log($"??? PROJECTILE SELF-DAMAGE PREVENTED (Character instance): Same caster");
+                continue;
+            }
+            
             if (IsPlayerCharacter(character)) continue;
             
-            // Skip if dead
             if (character.health == null || character.health.currentValue <= 0) continue;
             
             float distance = Vector2.Distance(transform.position, character.transform.position);
@@ -1156,40 +1356,231 @@ public class EnhancedProjectileBehavior : MonoBehaviour
             }
         }
         
+        Debug.Log($"?? PROJECTILE COLLISION: Found {enemiesInRange.Count} Character targets in range {hitRadius}");
+        
         return enemiesInRange.ToArray();
     }
     
     /// <summary>
-    /// BULLETPROOF player detection for projectiles
+    /// ENHANCED: Check if the caster is an enemy
+    /// </summary>
+    private bool IsEnemyCaster(Character caster)
+    {
+        if (caster == null) return false;
+        
+        // Check for CoreEnemy component
+        return caster.GetComponent<CoreEnemy>() != null || 
+               caster.gameObject.tag == "Enemy" ||
+               caster.gameObject.layer == LayerMask.NameToLayer("Enemy");
+    }
+    
+    /// <summary>
+    /// ENHANCED: Find the player target for enemy projectiles
+    /// </summary>
+    private Character FindPlayerTarget()
+    {
+        var allCharacters = Object.FindObjectsByType<Character>(FindObjectsSortMode.None);
+        foreach (var character in allCharacters)
+        {
+            if (IsPlayerCharacter(character))
+            {
+                return character;
+            }
+        }
+        return null;
+    }
+    
+    /// <summary>
+    /// ENHANCED: Find only player targets within collision range for enemy projectiles
+    /// </summary>
+    private Character[] FindPlayerTargetsInRange()
+    {
+        var playerTargets = new System.Collections.Generic.List<Character>();
+        
+        var allCharacters = Object.FindObjectsByType<Character>(FindObjectsSortMode.None);
+        foreach (var character in allCharacters)
+        {
+            // CRITICAL: Skip the caster to prevent self-damage
+            if (character.gameObject == caster.gameObject) 
+            {
+                Debug.Log($"??? ENEMY PROJECTILE SELF-DAMAGE PREVENTED: {character.name} == {caster.name}");
+                continue;
+            }
+            
+            // CRITICAL: Skip if same Character instance
+            if (character == caster) 
+            {
+                Debug.Log($"??? ENEMY PROJECTILE SELF-DAMAGE PREVENTED: Same caster instance");
+                continue;
+            }
+            
+            // Only target actual players
+            if (!IsPlayerCharacter(character)) continue;
+            
+            if (character.health == null || character.health.currentValue <= 0) continue;
+            
+            float distance = Vector2.Distance(transform.position, character.transform.position);
+            if (distance <= hitRadius)
+            {
+                playerTargets.Add(character);
+            }
+        }
+        
+        Debug.Log($"?? ENEMY PROJECTILE: Found {playerTargets.Count} PLAYER targets in range {hitRadius}");
+        return playerTargets.ToArray();
+    }
+    
+    /// <summary>
+    /// ENHANCED: Direct IDamageable collision detection - now only targets players for enemy projectiles
+    /// </summary>
+    private IDamageable[] FindIDamageableTargetsInRange()
+    {
+        var targets = new System.Collections.Generic.List<IDamageable>();
+        
+        // ENHANCED: For enemy projectiles, only target players
+        if (IsEnemyCaster(caster))
+        {
+            // Find all Character components (players)
+            var allCharacters = Object.FindObjectsByType<Character>(FindObjectsSortMode.None);
+            foreach (var character in allCharacters)
+            {
+                if (IsPlayerCharacter(character))
+                {
+                    if (character.health == null || character.health.currentValue <= 0) continue;
+                    
+                    float distance = Vector2.Distance(transform.position, character.transform.position);
+                    if (distance <= hitRadius)
+                    {
+                        targets.Add(character);
+                    }
+                }
+            }
+            
+            Debug.Log($"?? ENEMY PROJECTILE: Found {targets.Count} PLAYER targets in range {hitRadius}");
+            return targets.ToArray();
+        }
+        
+        // Original logic for player projectiles
+        var allDamageables = Object.FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None)
+            .Where(mb => mb is IDamageable && mb.GetComponent<Character>() == null)
+            .Cast<IDamageable>()
+            .ToArray();
+        
+        foreach (var damageable in allDamageables)
+        {
+            var damageableComponent = damageable as MonoBehaviour;
+            if (damageableComponent == null) continue;
+            
+            // CRITICAL: Check if this is the caster itself - prevent self-damage
+            if (caster != null && damageableComponent.gameObject == caster.gameObject) 
+            {
+                Debug.Log($"??? PROJECTILE SELF-DAMAGE PREVENTED (IDamageable): {damageableComponent.name} == {caster.name}");
+                continue;
+            }
+            
+            // CRITICAL: Check if this is the caster's Character component
+            if (caster != null && damageableComponent.GetComponent<Character>() == caster)
+            {
+                Debug.Log($"??? PROJECTILE SELF-DAMAGE PREVENTED (Character): Same caster");
+                continue;
+            }
+            
+            // Check if it's a CoreEnemy (enemy shouldn't hit enemy)
+            var coreEnemy = damageableComponent.GetComponent<CoreEnemy>();
+            if (coreEnemy != null && caster != null)
+            {
+                var casterCoreEnemy = caster.GetComponent<CoreEnemy>();
+                if (casterCoreEnemy != null)
+                {
+                    Debug.Log($"?? PROJECTILE ENEMY-TO-ENEMY PREVENTION: {caster.name} projectile won't hit {damageableComponent.name} (both CoreEnemy)");
+                    continue; // Skip enemy-to-enemy damage
+                }
+            }
+            
+            // Skip if target is dead
+            if (damageable.IsDead) continue;
+            
+            float distance = Vector2.Distance(transform.position, damageableComponent.transform.position);
+            if (distance <= hitRadius)
+            {
+                targets.Add(damageable);
+            }
+        }
+        
+        Debug.Log($"?? PROJECTILE COLLISION: Found {targets.Count} IDamageable targets in range {hitRadius}");
+        
+        return targets.ToArray();
+    }
+    
+    /// <summary>
+    /// BULLETPROOF player detection for projectiles - Enhanced to prevent self-damage
     /// </summary>
     private bool IsPlayerCharacter(Character character)
     {
-        // Same as caster
-        if (character == caster) return true;
-        
-        // Has PlayerController
-        var playerController = character.GetComponent<MonoBehaviour>();
-        if (playerController != null && playerController.GetType().Name == "PlayerController")
+        // CRITICAL: Same GameObject as caster - prevent self-damage
+        if (character.gameObject == caster.gameObject) 
+        {
+            Debug.Log($"??? PROJECTILE SELF-DAMAGE PREVENTED: {character.name} == {caster.name}");
             return true;
+        }
         
-        // AttackableCharacter check
-        var attackable = character.GetComponent<AttackableCharacter>();
-        if (attackable != null && !attackable.CanBeAttacked())
+        // CRITICAL: Same Character instance as caster - prevent self-damage
+        if (character == caster) 
+        {
+            Debug.Log($"??? PROJECTILE SELF-DAMAGE PREVENTED: Same Character instance {character.name}");
             return true;
+        }
         
-        // Name patterns
-        string objName = character.gameObject.name.ToLower();
-        if (objName.Contains("player") || objName.Contains("hero") || objName.Contains("character"))
+        // ENHANCED: Check if this is an enemy - enemies should NOT be treated as players
+        var coreEnemy = character.GetComponent<CoreEnemy>();
+        if (coreEnemy != null)
+        {
+            Debug.Log($"?? PROJECTILE ENEMY DETECTED: {character.name} is an enemy (CoreEnemy)");
+            return false; // This is an enemy, not a player
+        }
+        
+        // Check for enemy tag
+        if (character.gameObject.CompareTag("Enemy"))
+        {
+            Debug.Log($"?? PROJECTILE ENEMY TAG: {character.name} has Enemy tag");
+            return false; // This is an enemy, not a player
+        }
+        
+        // Check for enemy layer
+        if (character.gameObject.layer == LayerMask.NameToLayer("Enemy"))
+        {
+            Debug.Log($"?? PROJECTILE ENEMY LAYER: {character.name} on Enemy layer");
+            return false; // This is an enemy, not a player
+        }
+        
+        // Has PlayerController - use proper type checking
+        var playerController = character.GetComponent<PlayerController>();
+        if (playerController != null)
+        {
+            Debug.Log($"?? PROJECTILE PLAYER DETECTED: {character.name} has PlayerController");
             return true;
-            
-        // Tag check
+        }
+        
+        // Player tag check - most reliable
         if (character.gameObject.CompareTag("Player"))
+        {
+            Debug.Log($"?? PROJECTILE PLAYER TAG: {character.name} has Player tag");
             return true;
+        }
         
+        // Player layer check (Layer 6 = Player)
+        if (character.gameObject.layer == 6)
+        {
+            Debug.Log($"?? PROJECTILE PLAYER LAYER: {character.name} on Player layer");
+            return true;
+        }
+        
+        // Default: if not explicitly identified as player or enemy, assume it's not a player
+        Debug.Log($"?? PROJECTILE CHARACTER TYPE: {character.name} is neither player nor enemy");
         return false;
     }
     
-    private void HitEnemy(Character enemy)
+    private void HitCharacterEnemy(Character enemy)
     {
         // Calculate damage
         float finalDamage = skillModule.damage;
@@ -1199,6 +1590,7 @@ public class EnhancedProjectileBehavior : MonoBehaviour
             finalDamage *= skillModule.criticalMultiplier;
         }
         
+        Debug.Log($"?? PROJECTILE HIT CHARACTER: {caster.name} projectile hits {enemy.name} for {finalDamage} damage");
         enemy.TakeDamage(finalDamage, isCritical);
         
         // Apply knockback v?i direction c?a projectile
@@ -1207,6 +1599,48 @@ public class EnhancedProjectileBehavior : MonoBehaviour
             enemy.ApplyKnockback(skillModule.knockbackForce, direction);
         }
         
+        PlayImpactSoundAndEffects(enemy.transform.position, isCritical);
+        Destroy(gameObject);
+    }
+    
+    /// <summary>
+    /// ENHANCED: Hit IDamageable target (like CoreEnemy)
+    /// </summary>
+    private void HitIDamageableTarget(IDamageable target)
+    {
+        var targetComponent = target as MonoBehaviour;
+        if (targetComponent == null) return;
+        
+        // Calculate damage
+        float finalDamage = skillModule.damage;
+        bool isCritical = Random.Range(0f, 1f) < skillModule.criticalChance;
+        if (isCritical)
+        {
+            finalDamage *= skillModule.criticalMultiplier;
+        }
+        
+        Debug.Log($"?? PROJECTILE HIT IDAMAGEABLE: {caster.name} projectile hits {targetComponent.name} for {finalDamage} damage");
+        target.TakeDamage(finalDamage);
+        
+        // Apply knockback if target has Rigidbody2D
+        if (skillModule.knockbackForce > 0)
+        {
+            var rb2d = targetComponent.GetComponent<Rigidbody2D>();
+            if (rb2d != null)
+            {
+                rb2d.AddForce(direction * skillModule.knockbackForce, ForceMode2D.Impulse);
+            }
+        }
+        
+        PlayImpactSoundAndEffects(targetComponent.transform.position, isCritical);
+        Destroy(gameObject);
+    }
+    
+    /// <summary>
+    /// Consolidated method for playing impact sound and effects
+    /// </summary>
+    private void PlayImpactSoundAndEffects(Vector3 position, bool isCritical)
+    {
         // Play impact sound
         if (skillModule.impactSound != null && caster != null)
         {
@@ -1217,8 +1651,7 @@ public class EnhancedProjectileBehavior : MonoBehaviour
             }
         }
         
-        // Create enhanced impact effect t?i v? trí va ch?m chính xác
-        Vector3 impactPosition = transform.position;
+        // Create enhanced impact effect t?i v? trï¿½ va ch?m chï¿½nh xï¿½c
         Vector3 impactDirection = direction;
         
         if (skillModule.effectPrefab != null)
@@ -1226,19 +1659,98 @@ public class EnhancedProjectileBehavior : MonoBehaviour
             // S? d?ng Enhanced Effect Manager cho impact effect
             EnhancedEffectManager.CreateImpactEffect(
                 skillModule.effectPrefab,
-                impactPosition,
+                position,
                 impactDirection,
-                enemy.gameObject,
+                null, // No specific target game object
                 skillModule.damageAreaDisplayTime
             );
         }
         
         // Create individual hit effect with critical differentiation
-        CreateProjectileHitEffect(impactPosition, isCritical);
-        
-        Destroy(gameObject);
+        CreateProjectileHitEffect(position, isCritical);
     }
     
+    /// <summary>
+    /// Find the enemy closest to the projectile's trajectory line
+    /// </summary>
+    private Character FindClosestEnemyToTrajectory(Character[] enemies)
+    {
+        if (enemies == null || enemies.Length == 0) return null;
+
+        Character closestEnemy = null;
+        float minDistanceToTrajectory = float.MaxValue;
+
+        foreach (var enemy in enemies)
+        {
+            if (enemy == null) continue;
+
+            // Calculate distance from enemy to the trajectory line
+            Vector2 enemyPos = enemy.transform.position;
+            Vector2 projectilePos = transform.position;
+            
+            // Distance from point to line (startPosition + t * direction)
+            float distanceToLine = Vector2.Distance(enemyPos, 
+                startPosition + Vector2.Dot(enemyPos - startPosition, direction) * direction);
+
+            // Also consider actual distance to current projectile position
+            float distanceToProjectile = Vector2.Distance(enemyPos, projectilePos);
+
+            // Combine both distances for better targeting
+            float totalDistance = distanceToLine + distanceToProjectile * 0.5f;
+
+            if (totalDistance < minDistanceToTrajectory)
+            {
+                minDistanceToTrajectory = totalDistance;
+                closestEnemy = enemy;
+            }
+        }
+
+        Debug.Log($"?? PROJECTILE TARGETING: Closest enemy to trajectory is {closestEnemy?.name} at distance {minDistanceToTrajectory}");
+        return closestEnemy;
+    }
+
+    /// <summary>
+    /// Find the IDamageable closest to the projectile's trajectory line
+    /// </summary>
+    private IDamageable FindClosestDamageableToTrajectory(IDamageable[] targets)
+    {
+        if (targets == null || targets.Length == 0) return null;
+
+        IDamageable closestTarget = null;
+        float minDistanceToTrajectory = float.MaxValue;
+
+        foreach (var target in targets)
+        {
+            if (target == null) continue;
+            
+            var targetComponent = target as MonoBehaviour;
+            if (targetComponent == null) continue;
+
+            // Calculate distance from target to the trajectory line
+            Vector2 targetPos = targetComponent.transform.position;
+            Vector2 projectilePos = transform.position;
+            
+            // Distance from point to line (startPosition + t * direction)
+            float distanceToLine = Vector2.Distance(targetPos, 
+                startPosition + Vector2.Dot(targetPos - startPosition, direction) * direction);
+
+            // Also consider actual distance to current projectile position
+            float distanceToProjectile = Vector2.Distance(targetPos, projectilePos);
+
+            // Combine both distances for better targeting
+            float totalDistance = distanceToLine + distanceToProjectile * 0.5f;
+
+            if (totalDistance < minDistanceToTrajectory)
+            {
+                minDistanceToTrajectory = totalDistance;
+                closestTarget = target;
+            }
+        }
+
+        Debug.Log($"?? PROJECTILE TARGETING: Closest IDamageable to trajectory is {(closestTarget as MonoBehaviour)?.name} at distance {minDistanceToTrajectory}");
+        return closestTarget;
+    }
+
     /// <summary>
     /// T?o hit effect ??c bi?t cho projectile
     /// </summary>

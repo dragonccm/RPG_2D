@@ -128,7 +128,7 @@ public class SkillSlotUIElement : MonoBehaviour, IPointerClickHandler
             return;
         }
 
-        if (!slot.isUnlocked)
+        if (slot.IsLocked)
         {
             SetLockedState();
         }

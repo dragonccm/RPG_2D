@@ -1,7 +1,7 @@
 # RPG Game Current
 
-![Unity](https://img.shields.io/badge/engine-Unity-blue)
-![.NET Framework](https://img.shields.io/badge/.NET-4.7.1-blue)
+![Unity 6000.6.7f1](https://img.shields.io/badge/engine-Unity%206000.6.7f1-blue)
+![URP 17.6](https://img.shields.io/badge/pipeline-URP%2017.6-blue)
 
 ## Giới thiệu
 
@@ -39,72 +39,35 @@ Dưới đây là cấu trúc thư mục chính của dự án, được tổ ch
 
 ```
 /RPG_Game_Current
-├── 📂 Assets/                               # Chứa tất cả tài nguyên của dự án Unity
-│   ├── 📂 AddressableAssetsData/           # Dữ liệu cấu hình cho hệ thống Addressable Assets
-│   ├── 📂 Editor/                          # Các script chỉ chạy trong môi trường Editor của Unity
-│   │   └── 📄 BuildCommand.cs              # Script hỗ trợ quá trình build dự án
-│   ├── 📂 Fantasy Wooden GUI  Free/       # Tài nguyên UI miễn phí theo phong cách gỗ
-│   ├── 📂 NavMeshPlus-master/             # Thư viện NavMeshPlus cho điều hướng 2D
-│   │   ├── 📄 LICENSE                      # Giấy phép của thư viện NavMeshPlus
-│   │   ├── 📄 README.md                    # README của thư viện NavMeshPlus
-│   │   └── 📄 package.json                 # Thông tin gói của NavMeshPlus
-│   ├── 📂 Scenes/                          # Các cảnh (scene) trong game
-│   │   └── 📄 SampleScene.unity            # Cảnh mẫu của dự án
-│   ├── 📂 SkymonIconPackFree/             # Gói icon miễn phí
-│   ├── 📂 Tests/                          # Các script kiểm thử (EditMode và PlayMode)
-│   ├── 📂 TextMesh Pro/                   # Tài nguyên và cấu hình của TextMesh Pro
-│   └── 📂 _Project/                       # Thư mục chính chứa mã nguồn và tài nguyên game
-│       ├── 📂 Art/                        # Tài nguyên đồ họa (sprites, animations, v.v.)
-│       ├── 📂 Audio/                      # Tài nguyên âm thanh và nhạc nền
-│       ├── 📂 Data/                       # Các ScriptableObject và dữ liệu game
-│       ├── 📂 Prefabs/                    # Các Prefab của game (nhân vật, vật phẩm, hiệu ứng)
-│       ├── 📄 README_EnhancedSkillSystem.md # README chi tiết về hệ thống kỹ năng nâng cao
-│       ├── 📄 README_SkillSystem.md       # README chi tiết về hệ thống kỹ năng
-│       ├── 📂 Resources/                  # Tài nguyên được tải động (Resources folder)
-│       ├── 📂 SETUP_SUMMARY.md            # Tóm tắt các bước cài đặt ban đầu
-│       ├── 📂 Scenes/                     # Các cảnh game tùy chỉnh của dự án
-│       ├── 📂 Scripts/                    # Toàn bộ mã nguồn C# của game
-│       │   ├── 📂 AI/                    # Các script liên quan đến Trí tuệ nhân tạo của kẻ địch
-│       │   │   ├── 📂 States/            # Các trạng thái AI (Idle, Attack, Chase, Reposition)
-│       │   │   │   ├── 📄 AttackState.cs  # Trạng thái tấn công của kẻ địch
-│       │   │   │   ├── 📄 ChaseState.cs   # Trạng thái truy đuổi của kẻ địch
-│       │   │   │   ├── 📄 IdleState.cs    # Trạng thái chờ của kẻ địch
-│       │   │   │   ├── 📄 PatrolState.cs  # Trạng thái tuần tra của kẻ địch
-│       │   │   │   └── 📄 RepositionState.cs # Trạng thái di chuyển lại vị trí của kẻ địch
-│       │   │   ├── 📄 EnemyAIController.cs # Điều khiển AI chung cho kẻ địch
-│       │   │   ├── 📄 Enemy.cs            # Lớp cơ sở cho kẻ địch
-│       │   │   ├── 📄 RangedEnemyAI.cs    # AI cụ thể cho kẻ địch tầm xa
-│       │   │   └── 📄 StateMachine.cs     # Hệ thống máy trạng thái cho AI
-│       │   ├── 📂 Controllers/            # Các script điều khiển (nhân vật, camera, v.v.)
-│       │   │   ├── 📄 EnemyAttackController.cs # Điều khiển tấn công của kẻ địch
-│       │   │   ├── 📄 EnemyMovementController.cs # Điều khiển di chuyển của kẻ địch
-│       │   │   ├── 📄 PlayerController.cs # Điều khiển nhân vật người chơi
-│       │   │   └── 📄 PlayerMovementController.cs # Điều khiển di chuyển của người chơi
-│       │   ├── 📂 Core/                   # Các script cốt lõi của game
-│       │   │   ├── 📄 GameState.cs        # Quản lý trạng thái game
-│       │   │   ├── 📄 Health.cs           # Hệ thống máu và sát thương
-│       │   │   └── 📄 State.cs            # Lớp cơ sở cho các trạng thái AI
-│       │   ├── 📂 Data/                   # Các script định nghĩa dữ liệu (ScriptableObjects)
-│       │   ├── 📂 Debug/                  # Các công cụ và script hỗ trợ debug
-│       │   ├── 📂 Deprecated/             # Mã nguồn cũ hoặc không còn sử dụng
-│       │   ├── 📂 Managers/               # Các script quản lý hệ thống (âm thanh, UI, game)
-│       │   │   └── 📄 GameManager.cs      # Quản lý tổng thể game, tải cảnh, skill
-│       │   ├── 📂 Systems/                # Các hệ thống game (skill, inventory, quest)
-│       │   ├── 📂 Tools/                  # Các công cụ tiện ích
-│       │   ├── 📂 Tutorial/               # Các script hướng dẫn
-│       │   ├── 📂 UI/                     # Các script liên quan đến giao diện người dùng
-│       │   └── 📂 Utils/                  # Các hàm tiện ích chung
-│       └── 📂 Settings/                   # Các file cài đặt dự án tùy chỉnh
-├── 📂 Packages/                           # Các gói Unity được quản lý bởi Package Manager
-│   ├── 📄 manifest.json                   # Danh sách các gói phụ thuộc của dự án
-│   └── 📄 packages-lock.json              # Khóa phiên bản các gói phụ thuộc
-├── 📂 ProjectSettings/                    # Các file cài đặt của dự án Unity
-├── 📄 .gitignore                          # Các file và thư mục bị bỏ qua bởi Git
-├── 📄 .vsconfig                           # Cấu hình Visual Studio
-├── 📄 ProjectAnalysisReport.md            # Báo cáo phân tích dự án
-├── 📄 README.md                           # File README của dự án này
-├── 📄 ScriptCleanupReport.md              # Báo cáo dọn dẹp script
-└── 📄 build.bat                           # Script build dự án (nếu có)
+├── 📂 Assets/
+│   ├── 📂 AddressableAssetsData/       # Cấu hình Addressables
+│   ├── 📂 NavMeshPlus-master/          # Thư viện NavMesh 2D (đã vá Unity 6)
+│   ├── 📂 Scripts/                     # NavMesh components editor
+│   ├── 📂 Fantasy Wooden GUI  Free/    # Asset UI gỗ
+│   ├── 📂 SkymonIconPackFree/          # Gói icon
+│   ├── 📂 TextMesh Pro/                # Tài nguyên TMP
+│   ├── 📂 Tests/                       # EditMode + PlayMode tests
+│   └── 📂 _Project/                    # NỘI DUNG GAME CHÍNH
+│       ├── 📂 Art/                     # Sprites, tilemap, hiệu ứng
+│       ├── 📂 Audio/                   # Nhạc + SFX
+│       ├── 📂 Data/                    # ScriptableObject (SkillModule...)
+│       ├── 📂 Prefabs/ + 📂 Resources/ # Prefab game
+│       ├── 📂 Scenes/                  # World.unity (chính), MainMenu, Battle
+│       ├── 📂 Settings/                # URP settings
+│       └── 📂 Scripts/                 # 97 script:
+│           ├── 📂 AI/                  # Enemy + StateMachine + 4 loại AI
+│           ├── 📂 Boss/NewSystem/      # BossEntity + 4 executor (Agis)
+│           ├── 📂 Controllers/         # PlayerController, special_move, Camera
+│           ├── 📂 Core/                # Character, skill system, effects, EventBus
+│           ├── 📂 Interfaces/ + 📂 Data/
+│           ├── 📂 Editor/              # Editor tools (CharacterEditor...)
+│           ├── 📂 Tools/               # SampleSkillCreator
+│           ├── 📂 UI/                  # 14 script UI
+│           ├── 📂 World/               # Elevation triggers
+│           └── 📂 Documentation/       # Tài liệu hệ thống
+├── 📂 docs/                            # GAME_MASTER_PLAN.md + docs khác
+├── 📂 Packages/ + 📂 ProjectSettings/
+├── 📄 README.md · ProjectAnalysisReport.md · ScriptCleanupReport.md
 ```
 
 ## Luồng xử lý của hệ thống
@@ -145,7 +108,7 @@ Luồng xử lý chính của game RPG này tuân theo mô hình game Unity truy
 ### Yêu cầu tiên quyết
 
 -   **Unity Hub**: Đảm bảo bạn đã cài đặt Unity Hub.
--   **Unity Editor**: Phiên bản Unity Editor 2021.3.x (hoặc phiên bản tương thích với .NET Framework 4.7.1). Bạn có thể kiểm tra phiên bản Unity được sử dụng trong dự án bằng cách mở file `ProjectVersion.txt` trong thư mục `ProjectSettings`.
+-   **Unity Editor 6000.6.7f1** (khớp `ProjectSettings/ProjectVersion.txt`; URP 17.6.0, NavMeshPlus đã vá cho Unity 6).
 -   **Visual Studio** (hoặc IDE tương thích): Để chỉnh sửa mã C#.
 
 ### Cài đặt
@@ -173,7 +136,7 @@ Luồng xử lý chính của game RPG này tuân theo mô hình game Unity truy
 
 ### Chạy dự án
 
-1.  **Mở cảnh chính**: Trong Unity Editor, điều hướng đến thư mục `Assets/_Project/Scenes/` và mở cảnh `SampleScene.unity` (hoặc cảnh chính của game nếu có).
+1.  **Mở cảnh chính**: `Assets/_Project/Scenes/World.unity` (scene chơi chính; `MainMenu.unity` = menu, `Battle.unity` = arena test).
 2.  **Chạy game**: Nhấn nút `Play` (biểu tượng tam giác) trên thanh công cụ của Unity Editor để bắt đầu chơi game.
 
 ### Chạy kiểm thử

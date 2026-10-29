@@ -14,6 +14,11 @@ public class SkillSlot
     public KeyCode hotkey;
     public bool isUnlocked;
     
+    /// <summary>
+    /// Property for backward compatibility with UI systems
+    /// </summary>
+    public bool IsLocked => !isUnlocked;
+    
     [Header("Slot Status")]
     [SerializeField] private float lastUsedTime;
     [SerializeField] private bool isOnCooldown;
