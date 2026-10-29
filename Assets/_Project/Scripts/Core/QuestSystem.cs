@@ -170,6 +170,7 @@ public class QuestManager : MonoBehaviour
         if (GetState(questId) != QuestState.Locked) return;
         states[questId] = QuestState.Active;
         counters[questId] = new Dictionary<string, int>();
+        WorldFlags.Set($"quest:{questId}:started"); // thế giới đổi theo tiến trình (FlagAmbience, FlagGate)
         Debug.Log($"📜 Quest bắt đầu: {questId}");
         OnQuestStarted?.Invoke(questId);
     }
@@ -203,6 +204,7 @@ public class QuestManager : MonoBehaviour
         if (GetState(questId) != QuestState.Complete) return false;
         var def = FindDef(questId);
         states[questId] = QuestState.Done;
+        WorldFlags.Set($"quest:{questId}:done");
         if (def != null)
         {
             LevelSystem.AddXP(def.rewardXp);

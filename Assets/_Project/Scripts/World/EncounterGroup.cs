@@ -18,6 +18,8 @@ public class EncounterGroup : MonoBehaviour
         public bool elite;
         public string eliteName = "";
         public string rewardItemId = "";
+        public Color tint = Color.white;
+        public float scale = 1f;
     }
 
     [SerializeField] private string encounterId = "e1";
@@ -80,6 +82,8 @@ public class EncounterGroup : MonoBehaviour
             }
             // Prefab địch gốc nằm ở sorting layer Default — y-sort cùng player/vật thể để không bị nền che
             if (go.GetComponent<YSort>() == null) go.AddComponent<YSort>();
+            if (s.tint != Color.white) foreach (var sr in go.GetComponentsInChildren<SpriteRenderer>()) sr.color = s.tint;
+            if (!Mathf.Approximately(s.scale, 1f)) go.transform.localScale *= s.scale;
             EnemySpawner.NotifySpawned(go);
             var ch = go.GetComponent<Character>();
             if (ch == null) continue;

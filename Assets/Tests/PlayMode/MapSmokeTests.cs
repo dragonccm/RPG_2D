@@ -51,7 +51,7 @@ public class MapSmokeTests
     }
 
     [UnityTest]
-    public IEnumerator Maps_LoadAndRun_WithoutErrors([Values("M1_Village", "M2_Forest", "M3_Marsh", "M4_Tower")] string scene)
+    public IEnumerator Maps_LoadAndRun_WithoutErrors([Values("M1_Village", "M2_Forest", "M3_Marsh", "M4_Tower", "M5_Cave")] string scene)
     {
         yield return Load(scene);
         var player = Object.FindAnyObjectByType<PlayerController>();
@@ -128,6 +128,50 @@ public class MapSmokeTests
         Assert.IsFalse(bounds.Contains(new Vector3(player.transform.position.x, player.transform.position.y, bounds.center.z)),
             "không còn đứng trong khe");
         Assert.Less(character.health.currentValue, hp, "rơi mất máu");
+    }
+
+    [UnityTest]
+    public IEnumerator RatSquad_UsesRatPrefab_AndSmallSprite()
+    {
+        WorldFlags.Import(null);
+        yield return Load("M5_Cave");
+        var enc = Object.FindObjectsByType<EncounterGroup>().First(e => e.name == "Encounter_cave_rats_w");
+        enc.Activate();
+        yield return new WaitForSeconds(0.3f);
+        var rats = Object.FindObjectsByType<Character>().Where(c => c.name.StartsWith("Enemy_Rat")).ToList();
+        Assert.AreEqual(4, rats.Count, "4 chuột");
+        var sr = rats[0].GetComponentInChildren<SpriteRenderer>();
+        Assert.Less(sr.bounds.size.x, 1f, "chuột nhỏ hơn 1 tile (đúng mật độ pixel 64 PPU)");
+        Assert.IsEmpty(errors, string.Join("\n", errors));
+    }
+
+    [UnityTest]
+    public IEnumerator FerryAndCave_PortalsGateOnFlags()
+    {
+        WorldFlags.Import(null);
+        yield return Load("M1_Village");
+        var dock = Object.FindObjectsByType<MapPortal>().First(p => p.targetScene == "M3_Marsh");
+        Assert.IsFalse(dock.CanPass(out _), "bến đò đóng khi chưa hạ thủ lĩnh đầm");
+        WorldFlags.Set("clear:marsh_boss");
+        Assert.IsTrue(dock.CanPass(out _));
+        Assert.IsNotNull(Object.FindObjectsByType<MapPortal>().FirstOrDefault(p => p.targetScene == "M5_Cave"), "có cổng hang");
+    }
+
+    [UnityTest]
+    public IEnumerator VillageAtmosphere_ShiftsWhenQ3Starts_AndOngTeLeaves()
+    {
+        WorldFlags.Import(null);
+        yield return Load("M1_Village");
+        var ongTe = GameObject.Find("NPC_Ong_Te");
+        Assert.IsNotNull(ongTe);
+        var light = Object.FindObjectsByType<UnityEngine.Rendering.Universal.Light2D>()
+            .First(l => l.lightType == UnityEngine.Rendering.Universal.Light2D.LightType.Global);
+        float before = light.color.r;
+        QuestManager.Instance.StartQuest("q3");
+        yield return new WaitForSeconds(5f);
+        Assert.IsTrue(WorldFlags.Has("quest:q3:started"));
+        Assert.Less(light.color.b, 0.4f, "ánh sáng ngả đỏ");
+        Assert.IsFalse(ongTe.GetComponentsInChildren<Renderer>().Any(r => r.enabled), "Ông Tễ rời đi");
     }
 
     [UnityTest]

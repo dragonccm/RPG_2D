@@ -29,6 +29,7 @@ public static class MapBuilder
         { "Archer", "Assets/_Project/Art/animation/Archer/Archer.prefab" },
         { "Lancer", "Assets/_Project/Art/animation/Lancer/Lancer.prefab" },
         { "Sheep", "Assets/_Project/Prefabs/Enemy_Sheep.prefab" },
+        { "Rat", "Assets/_Project/Prefabs/Enemy_Rat.prefab" },
     };
 
     // Thứ tự vẽ trong sorting layer "Ground"
@@ -41,6 +42,7 @@ public static class MapBuilder
         MapArt.Reset();
         MapArt.EnsureFolder(MapFolder);
         RenderSetup.EnsureAll();
+        EnemyPrefabBuilder.BuildAll();
         var built = new List<string>();
         foreach (var spec in MapSpecs.All())
         {
@@ -117,7 +119,7 @@ public static class MapBuilder
 
         public Ctx(MapSpec s) { spec = s; rng = new System.Random(s.seed); }
 
-        public bool Tower => spec.theme == MapSpec.Theme.Tower;
+        public bool Tower => spec.theme == MapSpec.Theme.Tower || spec.theme == MapSpec.Theme.Cave; // nền đá nổi trên vực
         public char At(int x, int y) => x < 0 || y < 0 || x >= W || y >= H ? '~' : c[x, y];
         public bool In(bool[,] m, int x, int y) => x >= 0 && y >= 0 && x < W && y < H && m[x, y];
         public Vector3 Center(int x, int y) => new Vector3(x + 0.5f, y + 0.5f, 0f);
@@ -575,6 +577,16 @@ public static class MapBuilder
                     case 'p': Sprite(props, "Pumpkin", MapArt.Deco(12 + ctx.rng.Next(2)), baseP); ctx.propCount++; break;
                     case 'k': { var go = Sprite(props, "SkullSign", MapArt.Deco(16), baseP); Solid(go, 0.2f); ctx.propCount++; break; }
                     case 'g': BuildSign(ctx, props, baseP); break;
+                    case 'u':
+                    {
+                        var go = Sprite(props, "GlowShroom", MapArt.Deco(3), baseP);
+                        go.transform.localScale = new Vector3(1.4f, 1.4f, 1f);
+                        go.GetComponent<SpriteRenderer>().color = new Color(0.6f, 1f, 0.8f);
+                        RuntimeMaterials.MakeUnlit(go.GetComponent<SpriteRenderer>());
+                        PointLight(go.transform, baseP + new Vector3(0f, 0.3f, 0f), new Color(0.35f, 1f, 0.7f), 0.9f, 3.2f);
+                        ctx.propCount++;
+                        break;
+                    }
                     case 'L':
                     {
                         var go = Sprite(props, "Lantern", MapArt.Generated("lantern_post"), baseP);
@@ -844,6 +856,12 @@ public static class MapBuilder
             fg.flag = def.showWhenFlag;
             fg.showWhenFlag = true;
         }
+        else if (!string.IsNullOrEmpty(def.hideWhenFlag))
+        {
+            var fg = go.AddComponent<FlagGate>();
+            fg.flag = def.hideWhenFlag;
+            fg.showWhenFlag = false;
+        }
         // Đèn nhỏ quanh NPC: luôn tìm thấy người nói chuyện trong đêm
         PointLight(go.transform, pos + new Vector3(0f, 0.6f, 0f), new Color(1f, 0.85f, 0.6f), 0.6f, 2f);
     }
@@ -910,6 +928,8 @@ public static class MapBuilder
                 elite = e.elite,
                 eliteName = e.eliteName,
                 rewardItemId = e.rewardItemId,
+                tint = e.tint,
+                scale = e.scale,
             });
         }
         enc.Configure(def.id, def.radius, slots, new GameObject[0], "", def.reportClear);
@@ -928,6 +948,7 @@ public static class MapBuilder
             case MapSpec.Theme.Forest: flat.AddRange(new[] { 10, 11, 1, 2, 3, 4, 5, 6, 14 }); tall.AddRange(new[] { "bush", "bush", "smalltree" }); break;
             case MapSpec.Theme.Marsh: flat.AddRange(new[] { 10, 11, 4, 5, 14, 15, 1 }); tall.Add("bush"); break;
             case MapSpec.Theme.Tower: flat.AddRange(new[] { 14, 15, 4, 5 }); break;
+            case MapSpec.Theme.Cave: flat.AddRange(new[] { 4, 5, 6, 14, 15, 1, 2 }); break;
         }
         var parent = new GameObject("Clutter").transform;
         parent.SetParent(props, false);
@@ -947,7 +968,7 @@ public static class MapBuilder
                     for (int dy = -1; dy <= 1; dy++)
                     {
                         char n = ctx.At(x + dx, y + dy);
-                        if ("SFC^POD%RGAZNXYB123456789".IndexOf(n) >= 0) nearMarker = true;
+                        if ("SFC^POD%RGAZNXYBu123456789".IndexOf(n) >= 0) nearMarker = true;
                     }
                 if (nearMarker) continue;
 
@@ -991,6 +1012,14 @@ public static class MapBuilder
             l.intensity = spec.globalIntensity;
             TargetAllLayersSerialized(l);
             EditorUtility.SetDirty(l);
+        }
+        foreach (var shift in spec.ambienceShifts)
+        {
+            var go = new GameObject("Shift_" + shift.flag);
+            var fa = go.AddComponent<FlagAmbience>();
+            fa.flag = shift.flag;
+            fa.color = shift.color;
+            fa.intensity = shift.intensity;
         }
         if (spec.motes.Count == 0) return;
         var amb = new GameObject("Ambience").transform;

@@ -322,20 +322,20 @@ Tên tilemap hiện tại (`Collisin-low`, `Non-Collision-high`, `Boundiary`, `s
 
 ---
 
-## 8. TRẠNG THÁI THỰC HIỆN (29/10/2026)
+## 8. TRẠNG THÁI THỰC HIỆN (30/10/2026)
 
 | Hạng mục | Trạng thái | Ghi chú |
 |---|---|---|
 | Thước đo, pipeline 1 map = 1 scene | ✅ | `GameFlow.Travel` mang trạng thái (SaveData) qua cổng; `MapSpawnPoint` |
-| M1 Làng | ✅ | Mai trao Cuộn Lướt Gió sau q1 → mở cổng bắc (flag `gate:village_north`); rương đảo nhỏ qua khe; rương vịnh sau đá nứt |
-| M2 Rừng | ✅ | 4 nhóm + arena mini-boss có rào khoá; **đổi so với 3.2:** câu đố bàn thờ dùng **3 đuốc / 8s** thay vì công tắc theo thứ tự; Thợ Săn Bóng rơi Cuộn Hư Không |
-| M3 Đầm | ✅ | Bùn, hốc rune (Hư Không), đá nứt tắt đường, 3 đuốc / 6s mở rương Chìa Khóa Tháp, công tắc q3 |
+| M1 Làng | ✅ | Mai trao Cuộn Lướt Gió sau q1 → mở cổng bắc (`gate:village_north`); rương đảo nhỏ qua khe; hang dưới làng sau đá nứt; bến đò |
+| M2 Rừng | ✅ | 4 nhóm + arena mini-boss có rào khoá; **đổi so với 3.2:** câu đố bàn thờ dùng **3 đuốc / 8s**; Thợ Săn Bóng rơi Cuộn Hư Không |
+| M3 Đầm | ✅ | Bùn, hốc rune (Hư Không), đá nứt, 3 đuốc / 6s mở rương Chìa Khóa Tháp, công tắc q3, **bầy chuột**, đò Lão Câu |
 | M4 Tháp | ✅ | Tầng 1 (tượng bắn tên, sàn sụp, rào rune, 2 phòng), cầu thang lên đỉnh, Agis |
-| M5 Hang | ⬜ | Chưa làm (optional) |
-| Đò Lão Câu về làng (`m3_ferry_open`) | ⬜ | NPC có, chưa có tuyến đò |
-| Story flags đổi làng (`q3_started` trời đỏ hơn, dân đóng cửa) | ⬜ | Cần FlagGate cho NPC/ánh sáng làng |
-| Kẻ địch mới (Chuột, Hobgoblin, NightBorne, Necromancer) | ⬜ | Có art, chưa có prefab + animator. Tạm dùng Goblin/Archer/Lancer/Sheep |
+| M5 Hang | ✅ | Vào từ M1 bằng Hỏa Kích phá đá nứt; chuột, elite Đá Gộp, rương 5 bình, 2 bích họa (flag `lore:cave_shadow`: hook DLC "ai đã dẫn Lam đi") |
+| Đò Lão Câu | ✅ | Cổng 2 chiều M1↔M3, chỉ mở sau `clear:marsh_boss` |
+| Làng đổi theo cốt truyện | ✅ | `quest:q3:started` → trời đỏ dần + Ông Tễ rời đi; `boss:agis` → ánh sáng trắng (làng sau ending). `QuestManager` bật flag `quest:<id>:started/done` |
+| Kẻ địch mới | 🟡 | **Chuột Đầm**: prefab mới từ art Rat (32 px vẽ ở 64 PPU → ~0.5 tile, đúng mật độ pixel). **Kỵ Sĩ Bóng Đêm / Đá Gộp**: Lancer nhuộm màu + to hơn (biến thể). **Chưa:** Hobgoblin (16 px), NightBorne (80 px, nhân vật ~35 px) và Necromancer — mật độ pixel lệch Tiny Swords, cần vẽ lại hoặc chấp nhận lệch |
 | Ánh sáng URP 2D | ✅ | Trước đây **không gán pipeline** (Built-in RP) nên Light2D vô tác dụng — đã sửa |
 
-**Kiểm tra tự động:** PlayMode `MapSmokeTests` nạp cả 4 map, chuyển map, cổng làng, encounter, khe vực.
+**Kiểm tra tự động:** PlayMode `MapSmokeTests` 12/12 — nạp cả 5 map, chuyển map, cổng làng, encounter, khe vực, bầy chuột, bến đò theo flag, làng đổi ánh sáng khi q3 bắt đầu.
 **Chưa kiểm bằng tay:** cảm giác nhịp chơi từng map (thời lượng 45–60s/lộ trình, độ khó) — cần playtest.

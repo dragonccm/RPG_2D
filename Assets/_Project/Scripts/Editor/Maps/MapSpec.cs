@@ -8,6 +8,7 @@ using UnityEngine;
 ///           'v' khe vực (FallHazard — Lướt Gió bay qua) · 'm' bùn (SlowZone)
 /// Vật thể:  'T' cây lớn · 't' cây nhỏ · 'b' bụi · 'r' đá · 'H' nhà · 'W' tháp canh · 's' bù nhìn
 ///           'p' bí ngô · 'g' bảng gỗ (đọc được) · 'k' bảng đầu lâu · 'L' cột đèn
+/// Hang:     'u' nấm phát sáng (đèn xanh lục)
 /// Gameplay: 'S' điểm bắt đầu · 'F' đống lửa · 'C' rương · '^' bẫy gai · 'P' cần gạt · 'O' đuốc câu đố
 ///           'D' tượng bắn tên · '%' đá nứt · 'R' rào rune · 'G' rào gỗ theo flag · 'A' rào khoá arena
 ///           'Z' sàn sụp · 'N' NPC · 'X' cổng sang map khác · 'Y' cầu thang trong map · '1'..'9' nhóm địch
@@ -16,7 +17,7 @@ using UnityEngine;
 /// </summary>
 public class MapSpec
 {
-    public enum Theme { Village, Forest, Marsh, Tower }
+    public enum Theme { Village, Forest, Marsh, Tower, Cave }
 
     public string sceneName;
     public string displayName;
@@ -45,6 +46,7 @@ public class MapSpec
     public string runeDissolveFlag = "";
     public string arenaLockEncounter = "";                     // 'A' khoá theo encounter này
     public string agisEncounterFlag = "";
+    public List<AmbienceShift> ambienceShifts = new List<AmbienceShift>();
 
     public int Width => rows[0].Length;
     public int Height => rows.Length;
@@ -71,6 +73,7 @@ public class NpcDef
     public DialogueBlock first, quest, repeat, reward;
     public string rewardAfterQuest = "";
     public string showWhenFlag = "";
+    public string hideWhenFlag = "";   // NPC rời đi khi flag bật (dân làng đóng cửa)
 }
 
 public class PortalDef
@@ -106,6 +109,8 @@ public class EnemyDef
     public Vector2 offset;
     public bool elite;
     public string eliteName = "", rewardItemId = "";
+    public Color tint = Color.white;   // biến thể: nhuộm màu để phân biệt (vd Kỵ Sĩ Bóng Đêm)
+    public float scale = 1f;
     public EnemyDef(string p, float x, float y) { prefab = p; offset = new Vector2(x, y); }
 }
 
@@ -120,4 +125,11 @@ public class TorchDef
     public float window = 6f;
     public string questId = "", objectiveId = "";
     public string revealChestId = ""; // rương hiện ra khi giải xong
+}
+
+public class AmbienceShift
+{
+    public string flag;
+    public Color color;
+    public float intensity;
 }

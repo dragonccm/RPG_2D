@@ -13,6 +13,81 @@ public static class MapSpecs
         yield return Forest();
         yield return Marsh();
         yield return Tower();
+        yield return Cave();
+    }
+
+    // ───────────────────────── M5 — HANG DƯỚI LÀNG (tuỳ chọn) ─────────────────────────
+    public static MapSpec Cave()
+    {
+        var s = new MapSpec
+        {
+            sceneName = "M5_Cave",
+            displayName = "Hang Dưới Làng",
+            theme = MapSpec.Theme.Cave,
+            seed = 53,
+            clutterDensity = 0.06f,
+            background = new Color(0.04f, 0.05f, 0.07f),
+            globalLight = new Color(0.2f, 0.26f, 0.3f),
+            globalIntensity = 0.55f,
+            startSpawnId = "from_village",
+            rows = new[]
+            {
+                "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+                "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+                "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+                "~~~~~~~~~......................~~~~~~~~~",
+                "~~~~~~~~~....u......C.....u....~~~~~~~~~",
+                "~~~~~~~~~...#..............#...~~~~~~~~~",
+                "~~~~~~~~~..........2...........~~~~~~~~~",
+                "~~~~~~~~~......................~~~~~~~~~",
+                "~~~~~~~~~...#..............#...~~~~~~~~~",
+                "~~~~~~~~~.u..................u.~~~~~~~~~",
+                "~~~~~~~~~......................~~~~~~~~~",
+                "~~~~~~~~~~~~~~~~~~....~~~~~~~~~~~~~~~~~~",
+                "~~~~~~~~~~~~~~~~~~u...~~~~~~~~~~~~~~~~~~",
+                "~~~~~~~~~~~~~~~~~~....~~~~~~~~~~~~~~~~~~",
+                "~~~..................................~~~",
+                "~~~.u...........u......u.............~~~",
+                "~~~..g...##..................##...g..~~~",
+                "~~~...........1.....F................~~~",
+                "~~~......................3...........~~~",
+                "~~~......##..................##......~~~",
+                "~~~...u............................u.~~~",
+                "~~~........u................u........~~~",
+                "~~~~~~~~~~~~~~~~~~....~~~~~~~~~~~~~~~~~~",
+                "~~~~~~~~~~~~~~~~~~...u~~~~~~~~~~~~~~~~~~",
+                "~~~~~~~~~~~~~~~~~~....~~~~~~~~~~~~~~~~~~",
+                "~~~~~~~~~~~~................~~~~~~~~~~~~",
+                "~~~~~~~~~~~~..u.....X....u..~~~~~~~~~~~~",
+                "~~~~~~~~~~~~................~~~~~~~~~~~~",
+                "~~~~~~~~~~~~...u....S...u...~~~~~~~~~~~~",
+                "~~~~~~~~~~~~................~~~~~~~~~~~~",
+                "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+                "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+            },
+        };
+        s.motes.Add(new MoteDef(AmbientMotes.Kind.Dust, 14, new Color(0.8f, 1f, 0.9f, 0.3f)));
+        s.motes.Add(new MoteDef(AmbientMotes.Kind.Fireflies, 10, new Color(0.45f, 1f, 0.75f)));
+        s.portals.Add(new PortalDef
+        {
+            targetScene = "M1_Village", targetSpawnId = "from_cave", arrivalSpawnId = "from_village_cave",
+            arrivalOffset = Vector2.up * 1.2f,
+        });
+        s.signs.Add(new SignDef { text = DialogueDatabase.CaveMuralLeft });
+        s.signs.Add(new SignDef { text = DialogueDatabase.CaveMuralRight });
+        s.chests.Add(new ChestDef { id = "cave_hoard", itemId = "potion_hp", count = 5 });
+        s.encounters['1'] = new EncounterDef { id = "cave_rats_w", radius = 6f, enemies = { new EnemyDef("Rat", -1f, 0f), new EnemyDef("Rat", 1f, 0.6f), new EnemyDef("Rat", 0f, -1f), new EnemyDef("Rat", 1.4f, -0.7f) } };
+        s.encounters['3'] = new EncounterDef { id = "cave_rats_e", radius = 6f, enemies = { new EnemyDef("Rat", -1f, 0f), new EnemyDef("Rat", 1f, 0.6f), new EnemyDef("Rat", 0f, -1f) } };
+        s.encounters['2'] = new EncounterDef
+        {
+            id = "cave_elite", radius = 7f,
+            enemies =
+            {
+                new EnemyDef("Lancer", 0f, 0f) { elite = true, eliteName = "Đá Gộp", tint = new Color(0.62f, 0.66f, 0.62f), scale = 1.3f },
+                new EnemyDef("Rat", -2.5f, 1f), new EnemyDef("Rat", 2.5f, 1f),
+            },
+        };
+        return s;
     }
 
     // ───────────────────────── M1 — LÀNG PHONG NGUYỆT ─────────────────────────
@@ -54,13 +129,13 @@ public static class MapSpecs
                 "~~~~~~~..L....,,,,,,,,,,,,,,,,,,,,,,,,,...ss..~~~~~~~~",
                 "~~~~~~~T.......,,,,,,,,,,,,,,,,,,,,,,.....s...~~~~~~~~",
                 "~~~~~~~...H.....H.....,,,,,.....W.....H.......~~~~~~~~",
-                "~~~~~~~...............,,,,,...................~~~~~~~~",
+                "~~~~~~~...............,,,,,..................X~~~~~~~~",
                 "~~~~~~~T..b...........,,,,,......L.........T..~~~~~~~~",
                 "~~~~~~~~..............,,,,,..................~~~~~~~~~",
                 "~~~~~~~~T..####.......,,,,,.............b....~~~~~~~~~",
                 "~~~~~~~~...####.......,,,,,..............T..~~~~~~~~~~",
                 "~~~~~~~~~~%~~~~T......,,S,,.........T.....~~~~~~~~~~~~",
-                "~~~~~~~~,,C,~~~~~T....,,,,,......T.....~~~~~~~~~~~~~~~",
+                "~~~~~~~~,,X,~~~~~T....,,,,,......T.....~~~~~~~~~~~~~~~",
                 "~~~~~~~~~,,~~~~~~~~T..,,,,,..T....~~~~~~~~~~~~~~~~~~~~",
                 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
             },
@@ -75,6 +150,17 @@ public static class MapSpecs
             arrivalOffset = Vector2.down, requiredFlag = gate, startQuest = "q2",
             lockedMessage = "Cổng bắc đóng — hãy gặp trưởng làng Mai.",
         });
+        s.portals.Add(new PortalDef   // bến đò: Lão Câu chở về sau khi hạ thủ lĩnh đầm
+        {
+            targetScene = "M3_Marsh", targetSpawnId = "from_ferry", arrivalSpawnId = "from_marsh_ferry",
+            arrivalOffset = Vector2.left, requiredFlag = "clear:marsh_boss",
+            lockedMessage = "Bến đò vắng — chưa có ai chèo qua đầm.",
+        });
+        s.portals.Add(new PortalDef   // hang dưới làng (mở bằng Hỏa Kích phá đá nứt)
+        {
+            targetScene = "M5_Cave", targetSpawnId = "from_village", arrivalSpawnId = "from_cave",
+            arrivalOffset = Vector2.up * 1.2f,
+        });
         s.npcs.Add(new NpcDef
         {
             name = "Mai", pawnColor = "Purple",
@@ -85,9 +171,11 @@ public static class MapSpecs
         {
             name = "Ong_Te", pawnColor = "Red",
             quest = DialogueDatabase.OngTeQuest, repeat = DialogueDatabase.OngTeRepeat,
+            hideWhenFlag = "quest:q3:started",   // dân làng đóng cửa khi trăng đỏ lan tới
         });
+        s.ambienceShifts.Add(new AmbienceShift { flag = "quest:q3:started", color = new Color(0.52f, 0.22f, 0.3f), intensity = 0.7f });
+        s.ambienceShifts.Add(new AmbienceShift { flag = "boss:agis", color = new Color(0.7f, 0.72f, 0.85f), intensity = 0.95f });
         s.chests.Add(new ChestDef { id = "village_islet", itemId = "potion_hp", count = 2 });   // qua khe bằng Lướt Gió
-        s.chests.Add(new ChestDef { id = "village_cove", itemId = "potion_hp", count = 3 });    // sau đá nứt (Hỏa Kích)
         s.encounters['1'] = new EncounterDef
         {
             id = "village_sheep", radius = 7f,
@@ -243,7 +331,7 @@ public static class MapSpecs
                 "~~~~~~~~..,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,..b...~~~~~~~~~",
                 "~~~~~~~~..,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,......~~~~~~~~~",
                 "~~~~~~~~t..b....mmmmm.....4.......mmmm.........t.....~~~~~~~~~",
-                "~~~~~~~~~......mmmmmmmm.....r....mmmmmm...N..........~~~~~~~~~",
+                "~~~~~~~~~......mmmmmmmm.....r....mmmmmm...N..X.......~~~~~~~~~",
                 "~~~~~~~~~~..t....mmmm~~~~~~~%~~~~~~mm~~~~~~~...t....~~~~~~~~~~",
                 "~~~~~~~~~~.......~~~~~~~~~~,,,~~~~~~~~~~~~~~.......~~~~~~~~~~~",
                 "~~~~~~~~~~..3...~~~~~t~~~~,,,,,~~~~~~t~~~~~~..2....~~~~~~~~~~~",
@@ -261,6 +349,12 @@ public static class MapSpecs
             targetScene = "M4_Tower", targetSpawnId = "from_marsh", arrivalSpawnId = "from_tower",
             arrivalOffset = Vector2.down, requiredItemId = "key_tower",
             lockedMessage = "Cổng tháp khoá kín — cần Chìa Khóa Tháp Trăng Đỏ.",
+        });
+        s.portals.Add(new PortalDef   // đò Lão Câu về làng — mở sau khi hạ thủ lĩnh đầm
+        {
+            targetScene = "M1_Village", targetSpawnId = "from_marsh_ferry", arrivalSpawnId = "from_ferry",
+            arrivalOffset = Vector2.left, requiredFlag = "clear:marsh_boss",
+            lockedMessage = "Lão Câu: \"Hạ thằng cầm đầu trên đảo rồi lão chở về.\"",
         });
         s.portals.Add(new PortalDef
         {
@@ -280,10 +374,10 @@ public static class MapSpecs
         });
         s.switches.Add(new SwitchDef { id = "marsh_old_switch", questId = "q3", objectiveId = "q3_switch" });
         s.torches = new TorchDef { id = "marsh_lights", window = 6f };
-        s.encounters['1'] = new EncounterDef { id = "marsh_e1", enemies = { new EnemyDef("Goblin", -1f, 0f), new EnemyDef("Goblin", 1f, 0.5f), new EnemyDef("Goblin", 0f, -1f) } };
+        s.encounters['1'] = new EncounterDef { id = "marsh_e1", enemies = { new EnemyDef("Rat", -1f, 0f), new EnemyDef("Rat", 1f, 0.5f), new EnemyDef("Rat", 0f, -1f), new EnemyDef("Rat", 1.2f, -0.8f), new EnemyDef("Rat", -1.2f, 0.9f) } };
         s.encounters['2'] = new EncounterDef { id = "marsh_e2", enemies = { new EnemyDef("Archer", 0f, 1f), new EnemyDef("Lancer", -1.5f, -0.5f) } };
         s.encounters['3'] = new EncounterDef { id = "marsh_e3", enemies = { new EnemyDef("Archer", 0f, 0f), new EnemyDef("Goblin", 1.5f, 1f) } };
-        s.encounters['4'] = new EncounterDef { id = "marsh_e4", enemies = { new EnemyDef("Lancer", -1f, 0f), new EnemyDef("Goblin", 1.5f, 0.5f), new EnemyDef("Goblin", 1f, -1f) } };
+        s.encounters['4'] = new EncounterDef { id = "marsh_e4", enemies = { new EnemyDef("Lancer", -1f, 0f), new EnemyDef("Rat", 1.5f, 0.5f), new EnemyDef("Rat", 1f, -1f), new EnemyDef("Rat", -0.5f, 1.2f) } };
         s.encounters['5'] = new EncounterDef { id = "marsh_e5", enemies = { new EnemyDef("Lancer", 0f, 0f), new EnemyDef("Archer", 2f, 1f) } };
         s.encounters['6'] = new EncounterDef
         {
@@ -363,12 +457,12 @@ public static class MapSpecs
         s.signs.Add(new SignDef { text = DialogueDatabase.TowerInscription });
         s.chests.Add(new ChestDef { id = "tower_rune", itemId = "potion_hp", count = 3 });
         s.dartDirections.AddRange(new[] { Vector2.down, Vector2.down, Vector2.right, Vector2.left });
-        s.encounters['7'] = new EncounterDef { id = "tower_hall_w", radius = 5f, enemies = { new EnemyDef("Lancer", 0f, 0f), new EnemyDef("Goblin", 1.5f, 0.5f) } };
+        s.encounters['7'] = new EncounterDef { id = "tower_hall_w", radius = 5f, enemies = { new EnemyDef("Lancer", 0f, 0f) { tint = new Color(0.55f, 0.45f, 0.7f) }, new EnemyDef("Goblin", 1.5f, 0.5f) } };
         s.encounters['9'] = new EncounterDef { id = "tower_hall_e", radius = 5f, enemies = { new EnemyDef("Lancer", 0f, 0f), new EnemyDef("Archer", 0f, 1.5f) } };
         s.encounters['8'] = new EncounterDef
         {
             id = "tower_candles", radius = 7f,
-            enemies = { new EnemyDef("Lancer", 0f, 0f) { elite = true, eliteName = "Kỵ Sĩ Bóng Đêm" }, new EnemyDef("Archer", -3f, 1f), new EnemyDef("Archer", 3f, 1f) },
+            enemies = { new EnemyDef("Lancer", 0f, 0f) { elite = true, eliteName = "Kỵ Sĩ Bóng Đêm", tint = new Color(0.42f, 0.32f, 0.55f), scale = 1.15f }, new EnemyDef("Archer", -3f, 1f), new EnemyDef("Archer", 3f, 1f) },
         };
         return s;
     }

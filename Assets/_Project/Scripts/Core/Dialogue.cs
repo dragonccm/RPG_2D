@@ -106,6 +106,18 @@ public static class DialogueDatabase
         "laocau_repeat",
         new DialogueLine("Lão Câu", "Bùn ở phía bắc sâu lắm. Đi chậm thì chết, đi nhanh thì... lướt qua."));
 
+    // M5 — bích họa trong hang (lore Lễ Cúng Trăng 3 năm trước; móc DLC)
+    public static readonly DialogueBlock CaveMuralLeft = new DialogueBlock(
+        "cave_mural_left",
+        new DialogueLine("Bích họa", "Một vòng người áo trắng quỳ quanh tháp. Trăng trắng treo giữa trời. Một cô bé cầm mặt nạ đứng giữa."),
+        new DialogueLine("Kiền", "Lam... đây là lễ cúng trăng ba năm trước."));
+
+    public static readonly DialogueBlock CaveMuralRight = new DialogueBlock(
+        "cave_mural_right",
+        new DialogueLine("Bích họa", "Phía sau cô bé có một bóng đen không mặt, tay đặt lên vai. Agis đứng cách đó rất xa, quay lưng."),
+        new DialogueLine("Kiền", "Không phải Agis... vậy ai đã dẫn Lam đi?"))
+    { setFlagOnEnd = "lore:cave_shadow" };
+
     // M4 — bia trước cầu thang tầng 2
     public static readonly DialogueBlock TowerInscription = new DialogueBlock(
         "tower_inscription",

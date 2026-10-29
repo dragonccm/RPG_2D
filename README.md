@@ -17,7 +17,7 @@ Game 2D top-down action RPG. Một lính canh làng rời Làng Phong Nguyệt t
 
 1. Mở bằng Unity **6000.6.7f1** (URP 2D — pipeline gán tại `Assets/_Project/Settings/UniversalRP.asset`).
 2. Mở `Assets/_Project/Scenes/MainMenu.unity` → Play → **Chơi mới** (hoặc mở thẳng một map trong `Scenes/Maps/`).
-3. Build Settings: MainMenu → M1_Village → M2_Forest → M3_Marsh → M4_Tower (`World.unity` là scene cũ, không build).
+3. Build Settings: MainMenu → M1_Village → M2_Forest → M3_Marsh → M4_Tower → M5_Cave (`World.unity` là scene cũ, không build).
 
 **Điều khiển:** WASD di chuyển · chuột trái hoặc J đánh (combo 3 nhịp, hướng theo chuột) · Shift Lướt Gió · Q Hư Không · giữ/thả E Hỏa Kích · F tương tác · Tab cây kỹ năng · I túi đồ.
 Kỹ năng đặc biệt **chỉ học từ cuộn bí kíp**; cây kỹ năng chỉ cường hoá.
@@ -44,7 +44,7 @@ RPG_SNAP_DIR=/tmp/play unity test --mode PlayMode
 ```
 
 - **EditMode:** combat, inventory, save, quest/skill, bẫy & câu đố, trạng thái thế giới.
-- **PlayMode** (`Assets/Tests/PlayMode/MapSmokeTests.cs`): nạp cả 4 map không lỗi, chuyển map giữ trạng thái, cổng/encounter/khe vực hoạt động, chụp màn hình thật nếu đặt `RPG_SNAP_DIR`.
+- **PlayMode** (`Assets/Tests/PlayMode/MapSmokeTests.cs`): nạp cả 5 map không lỗi, chuyển map giữ trạng thái, cổng/encounter/khe vực hoạt động, chụp màn hình thật nếu đặt `RPG_SNAP_DIR`.
 
 ## Cấu trúc mã (`Assets/_Project/Scripts`)
 
