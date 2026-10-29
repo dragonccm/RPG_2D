@@ -33,8 +33,11 @@ public class WorldTrapTests
     [Test]
     public void FallHazard_RespawnPoint_IsOutsideFromEntry()
     {
-        var p = FallHazard.RespawnPoint(new Vector2(0f, 2f), Vector2.zero, 0.6f);
-        Assert.AreEqual(2.6f, p.y, 0.001f, "lùi ra xa tâm vực");
+        var gap = new Rect(0f, 0f, 2f, 3f);
+        var walkedIn = FallHazard.RespawnPoint(new Vector2(0.2f, 1.5f), gap, 0.6f);
+        Assert.AreEqual(-0.6f, walkedIn.x, 0.001f, "bước vào từ mép trái → về bên trái");
+        var teleportedIn = FallHazard.RespawnPoint(new Vector2(1f, 1.5f), gap, 0.6f);
+        Assert.IsFalse(gap.Contains(teleportedIn), "đứng giữa khe vẫn được đẩy ra ngoài");
         Assert.IsTrue(FallHazard.ShouldFall(false));
         Assert.IsFalse(FallHazard.ShouldFall(true), "dash/teleport bay qua");
     }

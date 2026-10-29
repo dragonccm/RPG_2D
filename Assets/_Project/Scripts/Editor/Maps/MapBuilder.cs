@@ -1012,6 +1012,13 @@ public static class MapBuilder
         {
             player.transform.position = ctx.start;
             ctx.player = player.transform;
+            // Scene mẫu còn bật god mode debug → map thật phải tắt (GAME_MASTER_PLAN 5.3: HP 100)
+            var ch = player.GetComponent<Character>();
+            if (ch != null)
+            {
+                Set(ch, "godModeEnabled", false);
+                Set(ch, "maxHealth", 100f);
+            }
         }
         var cam = Camera.main != null ? Camera.main : Object.FindAnyObjectByType<Camera>();
         if (cam != null)

@@ -183,7 +183,7 @@ public class Character : MonoBehaviour, IDamageable
         float actualDamage = Mathf.Max(1f, damage - defense);
 
         // S4 (plan 7 — than_4 "BẤT DIỆT THÂN"): đòn chí mạng → sống sót 1 lần/60s, còn 30% HP
-        if (health.currentValue - actualDamage <= 0f && SkillTreeManager.Instance != null
+        if (health.currentValue - actualDamage <= 0f && CompareTag("Player") && SkillTreeManager.Instance != null
             && SkillTreeManager.Instance.IsUnlocked("than_4")
             && SkillTreeManager.Instance.TryTriggerDeathDefiance())
         {

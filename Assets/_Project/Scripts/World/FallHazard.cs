@@ -22,12 +22,20 @@ public class FallHazard : MonoBehaviour
         GetComponent<Collider2D>().isTrigger = true;
     }
 
-    /// <summary>Điểm đặt lại: lùi từ điểm vào ra xa tâm vực.</summary>
-    public static Vector2 RespawnPoint(Vector2 entry, Vector2 hazardCenter, float backoff)
+    /// <summary>
+    /// Điểm đặt lại: đẩy từ điểm vào ra cạnh GẦN NHẤT của vùng vực rồi lùi thêm backoff.
+    /// Kể cả khi điểm vào nằm giữa khe (dịch chuyển thẳng vào) vẫn ra được đất, không rơi lặp.
+    /// </summary>
+    public static Vector2 RespawnPoint(Vector2 entry, Rect hazard, float backoff)
     {
-        Vector2 outward = entry - hazardCenter;
-        if (outward.sqrMagnitude < 0.0001f) outward = Vector2.down;
-        return entry + outward.normalized * backoff;
+        float toLeft = entry.x - hazard.xMin, toRight = hazard.xMax - entry.x;
+        float toBottom = entry.y - hazard.yMin, toTop = hazard.yMax - entry.y;
+        float min = Mathf.Min(Mathf.Min(toLeft, toRight), Mathf.Min(toBottom, toTop));
+        if (min < 0f) return entry; // đã ở ngoài vùng
+        if (min == toLeft) return new Vector2(hazard.xMin - backoff, entry.y);
+        if (min == toRight) return new Vector2(hazard.xMax + backoff, entry.y);
+        if (min == toBottom) return new Vector2(entry.x, hazard.yMin - backoff);
+        return new Vector2(entry.x, hazard.yMax + backoff);
     }
 
     public static bool ShouldFall(bool airborne) => !airborne;
@@ -64,8 +72,9 @@ public class FallHazard : MonoBehaviour
         if (character != null && character.health != null)
             character.TakeDamage(character.health.maxValue * damagePercent);
 
-        Vector2 center = GetComponent<Collider2D>().bounds.center;
-        Vector2 dest = RespawnPoint(hasEntry ? entryPoint : fallPos, center, respawnBackoff);
+        var b = GetComponent<Collider2D>().bounds;
+        var rect = new Rect(b.min.x, b.min.y, b.size.x, b.size.y);
+        Vector2 dest = RespawnPoint(hasEntry ? entryPoint : fallPos, rect, respawnBackoff);
         var rb = player.GetComponent<Rigidbody2D>();
         player.transform.position = dest;
         if (rb != null) { rb.position = dest; rb.linearVelocity = Vector2.zero; }

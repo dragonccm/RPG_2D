@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -59,8 +60,74 @@ public class MapSmokeTests
         Assert.IsNotNull(SkillTreeManager.Instance, "SkillTreeManager");
         Assert.IsNotNull(InventoryManager.Instance, "InventoryManager");
         Assert.Greater(SpriteLoopSystem.Count, 0, "animation môi trường chạy");
+        Assert.IsFalse(player.GetComponent<Character>().GodModeEnabled, "không bật god mode trong map thật");
         Snap(scene + "_play");
         Assert.IsEmpty(errors, string.Join("\n", errors));
+    }
+
+    [UnityTest]
+    public IEnumerator VillageGate_OpensWhenFlagSet()
+    {
+        WorldFlags.Import(null);
+        yield return Load("M1_Village");
+        var gates = Object.FindObjectsByType<FlagGate>().Where(g => g.flag == "gate:village_north").ToList();
+        Assert.AreEqual(5, gates.Count, "5 đoạn rào cổng bắc");
+        Assert.IsTrue(gates.All(g => g.GetComponent<Collider2D>().enabled), "đóng trước q1");
+        var portal = Object.FindObjectsByType<MapPortal>().First(p => p.targetScene == "M2_Forest");
+        Assert.IsFalse(portal.CanPass(out _));
+
+        WorldFlags.Set("gate:village_north");
+        yield return null;
+        Assert.IsTrue(gates.All(g => !g.GetComponent<Collider2D>().enabled), "mở sau khi Mai trao cuộn");
+        Assert.IsTrue(portal.CanPass(out _));
+        Assert.IsEmpty(errors, string.Join("\n", errors));
+    }
+
+    [UnityTest]
+    public IEnumerator Encounter_SpawnsSquad_AndClearsFlagWhenAllDie()
+    {
+        WorldFlags.Import(null);
+        yield return Load("M2_Forest");
+        var enc = Object.FindObjectsByType<EncounterGroup>().First(e => e.name == "Encounter_forest_e2");
+        enc.Activate();
+        yield return null;
+        Assert.Greater(enc.Alive, 0, "sinh quái");
+        var spawned = Object.FindObjectsByType<Character>()
+            .Where(c => c.GetComponent<PlayerController>() == null
+                        && Vector2.Distance(c.transform.position, enc.transform.position) < 4f).ToList();
+        Assert.AreEqual(enc.Alive, spawned.Select(c => c.gameObject).Distinct().Count(), "đúng đội hình");
+        Assert.IsTrue(spawned.All(c => c.GetComponent<YSort>() != null), "quái được y-sort");
+        foreach (var c in spawned) if (c != null) c.TakeDamage(99999f);
+        yield return null;
+        foreach (var c in spawned) if (c != null) c.TakeDamage(99999f); // prefab có 2 Character (Archer)
+        yield return new WaitForSeconds(0.5f);
+        Assert.IsTrue(enc.IsCleared,
+            $"alive={enc.Alive} spawned={spawned.Count} left={spawned.Count(c => c != null)} errors={string.Join(" | ", errors)}");
+        Assert.IsTrue(WorldFlags.Has(enc.Flag), "lưu trạng thái đã dọn");
+    }
+
+    [UnityTest]
+    public IEnumerator Gap_WalkingIn_FallsBackToEdge()
+    {
+        yield return Load("M1_Village");
+        var gap = Object.FindObjectsByType<FallHazard>().First();
+        var player = Object.FindAnyObjectByType<PlayerController>();
+        var character = player.GetComponent<Character>();
+        float hp = character.health.currentValue;
+        var bounds = gap.GetComponent<Collider2D>().bounds;
+
+        // Đi bộ vào từ mép trái khe
+        var rb = player.GetComponent<Rigidbody2D>();
+        Vector2 edge = new Vector2(bounds.min.x - 0.6f, bounds.center.y);
+        player.transform.position = edge; rb.position = edge;
+        yield return new WaitForFixedUpdate();
+        rb.position = new Vector2(bounds.center.x, bounds.center.y);
+        player.transform.position = rb.position;
+        yield return new WaitForSeconds(0.3f);
+
+        Assert.IsFalse(bounds.Contains(new Vector3(player.transform.position.x, player.transform.position.y, bounds.center.z)),
+            "không còn đứng trong khe");
+        Assert.Less(character.health.currentValue, hp, "rơi mất máu");
     }
 
     [UnityTest]
