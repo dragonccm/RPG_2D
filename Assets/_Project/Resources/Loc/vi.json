@@ -91,6 +91,14 @@
   {
    "key": "portal.locked.north",
    "text": "Cổng bắc đóng — hãy gặp trưởng làng Mai."
+  },
+  {
+   "key": "menu.sfx",
+   "text": "Âm thanh"
+  },
+  {
+   "key": "menu.music",
+   "text": "Nhạc nền"
   }
  ]
 }

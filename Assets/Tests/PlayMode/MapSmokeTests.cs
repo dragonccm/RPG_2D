@@ -426,7 +426,8 @@ public class AttackRunnerPlayTests
 
         CollectionAssert.AreEqual(new[] { 0, 1, 2 }, phases, "đúng chuỗi 3 nhịp");
         float lost = 1000f - ch.health.currentValue;
-        Assert.AreEqual(atk * (1f + 1f + 1.5f), lost, atk * 0.6f, "tổng sát thương ≈ 1×+1×+1.5× AttackPower (trừ chí mạng)");
+        Assert.GreaterOrEqual(lost, atk * 3.5f - 0.5f, "tối thiểu 1×+1×+1.5× AttackPower");
+        Assert.LessOrEqual(lost, atk * 3.5f * 2f + 0.5f, "tối đa nếu cả 3 đòn chí mạng (×2)");
         Object.Destroy(dummy);
     }
 }

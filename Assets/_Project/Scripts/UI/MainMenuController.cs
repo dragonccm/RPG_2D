@@ -34,6 +34,9 @@ public class MainMenuController : MonoBehaviour
         Button(canvasGo.transform, Loc.T("menu.new"), y, GameFlow.NewGame);
         if (SaveSystem.HasSave) Button(canvasGo.transform, Loc.T("menu.continue"), y -= 0.1f, GameFlow.Continue);
         Button(canvasGo.transform, Loc.T("menu.quit"), y - 0.1f, Application.Quit);
+
+        Slider(canvasGo.transform, Loc.T("menu.sfx"), 0.2f, AudioService.SfxVolume, v => { AudioService.SfxVolume = v; AudioService.Play(SfxId.SwordHit); });
+        Slider(canvasGo.transform, Loc.T("menu.music"), 0.12f, AudioService.MusicVolume, v => AudioService.MusicVolume = v);
     }
 
     private RectTransform MakeRect(string name, Transform parent, Vector2 min, Vector2 max)
@@ -56,6 +59,23 @@ public class MainMenuController : MonoBehaviour
         t.fontSize = size;
         t.color = color;
         t.alignment = TextAnchor.MiddleCenter;
+    }
+
+    private void Slider(Transform parent, string text, float y, float value, UnityEngine.Events.UnityAction<float> onChange)
+    {
+        Label(parent, text, 18, new Color(0.8f, 0.78f, 0.72f), y + 0.035f);
+        var rt = MakeRect("Slider_" + text, parent, new Vector2(0.4f, y - 0.015f), new Vector2(0.6f, y + 0.015f));
+        var bg = rt.gameObject.AddComponent<Image>();
+        bg.color = new Color(0.25f, 0.18f, 0.14f);
+        var fillArea = MakeRect("Fill", rt, Vector2.zero, Vector2.one);
+        var fill = fillArea.gameObject.AddComponent<Image>();
+        fill.color = new Color(0.75f, 0.35f, 0.2f);
+        var s = rt.gameObject.AddComponent<UnityEngine.UI.Slider>();
+        s.fillRect = fillArea;
+        s.targetGraphic = bg;
+        s.direction = UnityEngine.UI.Slider.Direction.LeftToRight;
+        s.minValue = 0f; s.maxValue = 1f; s.value = value;
+        s.onValueChanged.AddListener(onChange);
     }
 
     private void Button(Transform parent, string text, float y, UnityEngine.Events.UnityAction onClick)

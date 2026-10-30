@@ -124,7 +124,7 @@ GameObject:
   - component: {fileID: 1954196316648329661}
   - component: {fileID: 267565324889056900}
   - component: {fileID: 5115119156874229816}
-  - component: {fileID: 5113736508694098992}
+  - component: {fileID: 8992156038891458365}
   m_Layer: 3
   m_Name: Enemy_Rat
   m_TagString: Enemy
@@ -440,7 +440,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a6305de1344665ea580c3a057a5bb8ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: RPG.Game::AttackRunner
---- !u!114 &5113736508694098992
+--- !u!114 &8992156038891458365
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

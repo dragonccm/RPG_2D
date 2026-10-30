@@ -87,6 +87,14 @@
   {
    "key": "skilltree.points",
    "text": "SKILL TREE — points left: {0}  (Tab to close)"
+  },
+  {
+   "key": "menu.sfx",
+   "text": "Sound effects"
+  },
+  {
+   "key": "menu.music",
+   "text": "Music"
   }
  ]
 }
