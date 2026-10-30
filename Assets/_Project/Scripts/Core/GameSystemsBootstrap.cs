@@ -12,6 +12,8 @@ public static class GameSystemsBootstrap
     private static void Init()
     {
         // Manager không DontDestroyOnLoad → dựng lại mỗi lần đổi map; trạng thái đi theo GameFlow (SaveData)
+        // Đồng bộ màn hình: tránh khung hình không đều (vật lý 50Hz + render tự do gây cảm giác lag)
+        QualitySettings.vSyncCount = 1;
         UnityEngine.SceneManagement.SceneManager.sceneLoaded -= OnSceneLoaded;
         UnityEngine.SceneManagement.SceneManager.sceneLoaded += OnSceneLoaded;
         EnsureSystems();

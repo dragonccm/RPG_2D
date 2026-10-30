@@ -58,10 +58,14 @@ public class GlobalCursorManager : MonoBehaviour
     
     #region Update Loop
     
+    private float nextHoverCheck;
+
     void Update()
     {
-        if (!isAiming)
+        // Quét con trỏ 20 lần/giây là đủ — không cần mỗi frame
+        if (!isAiming && Time.unscaledTime >= nextHoverCheck)
         {
+            nextHoverCheck = Time.unscaledTime + 0.05f;
             HandleHoverDetection();
         }
     }
@@ -99,50 +103,29 @@ public class GlobalCursorManager : MonoBehaviour
     private bool IsHoveringAttackableTarget()
     {
         Vector2 mousePos = GetMouseWorldPosition();
-        
-        // Method 1: Check IAttackable objects
-        var attackableObjects = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
-        foreach (var obj in attackableObjects)
+        float rangeSqr = detectionRadius * detectionRadius;
+
+        // Duyệt danh sách Character đang hoạt động (trước đây quét MỌI MonoBehaviour của scene mỗi frame — nguyên nhân lag)
+        var all = Character.Active;
+        for (int i = 0; i < all.Count; i++)
         {
-            if (obj is IAttackable attackable && attackable.CanBeAttacked())
-            {
-                float distance = Vector2.Distance(mousePos, attackable.GetPosition());
-                if (distance <= detectionRadius)
-                {
-                    if (showDebugInfo)
-                        Debug.Log($"?? Found IAttackable: {attackable.GetName()} at distance {distance:F2}");
-                    return true;
-                }
-            }
+            var c = all[i];
+            if (c.CompareTag("Player") || !c.IsAlive) continue;
+            if (((Vector2)c.transform.position - mousePos).sqrMagnitude <= rangeSqr) return true;
         }
-        
-        // Method 2: Check objects in Enemy layer
+
+        // Vật thể thuộc layer Enemy có collider (ví dụ rương, công tắc) — truy vấn điểm, không cấp phát
         Collider2D hitCollider = Physics2D.OverlapPoint(mousePos, enemyLayerMask);
         if (hitCollider != null)
         {
-            var character = hitCollider.GetComponent<Character>();
-            if (character != null)
-            {
-                // Check if it's not a player by looking for PlayerController component
-                var playerController = character.GetComponent<MonoBehaviour>();
-                bool isPlayer = false;
-                if (playerController != null && playerController.GetType().Name == "PlayerController")
-                {
-                    isPlayer = true;
-                }
-                
-                if (!isPlayer && (character.health == null || character.health.currentValue > 0))
-                {
-                    if (showDebugInfo)
-                        Debug.Log($"?? Found enemy in layer: {character.name}");
-                    return true;
-                }
-            }
+            var character = hitCollider.GetComponentInParent<Character>();
+            if (character != null && !character.CompareTag("Player") && character.GetComponent<PlayerController>() == null
+                && (character.health == null || character.health.currentValue > 0))
+                return true;
         }
-        
         return false;
     }
-    
+
     #endregion
     
     #region Cursor Management

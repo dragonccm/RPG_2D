@@ -8,7 +8,7 @@ public class PlayerController : MonoBehaviour
     /// <summary>S2 (GAME_MASTER_PLAN 5.4): trạng thái nhân vật thay cờ bool rải rác.</summary>
     public enum PlayerState { Normal, Attack, Dash, Charge, Stunned, Dead }
 
-    public float moveSpeed = 3.5f;
+    public float moveSpeed = 2.8f; // tile/giây (3.5 → 2.8: vừa tầm mắt 17.8×10 tile, dễ canh telegraph)
     public float smoothMoveTime = 0.2f; // Thời gian làm mượt di chuyển
     public float flipSmoothTime = 0.08f; // Thời gian làm mượt lật
 

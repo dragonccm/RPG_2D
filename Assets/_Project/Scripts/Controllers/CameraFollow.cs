@@ -3,7 +3,7 @@
 public class CameraFollow : MonoBehaviour
 {
     public Transform target; // Đối tượng cần theo dõi (ví dụ: nhân vật)
-    public float followSpeed = 5f; // Tốc độ theo dõi
+    public float followSpeed = 9f; // Tốc độ theo dõi
     public Vector3 offset = new Vector3(0, 0, -10); // Độ lệch giữa camera và đối tượng
 
     // Vị trí theo dõi (chưa cộng rung). Tách riêng để rung của VfxService không bị
@@ -18,7 +18,8 @@ public class CameraFollow : MonoBehaviour
         if (target != null)
         {
             Vector3 desiredPosition = target.position + offset;
-            basePosition = Vector3.Lerp(basePosition, desiredPosition, followSpeed * Time.deltaTime);
+            // Làm mượt độc lập tốc độ khung hình (Lerp(speed*dt) giật khi dt đổi)
+            basePosition = Vector3.Lerp(basePosition, desiredPosition, 1f - Mathf.Exp(-followSpeed * Time.deltaTime));
         }
         transform.position = SnapToPixel(basePosition + (Vector3)VfxService.ShakeOffset);
     }
