@@ -1,6 +1,26 @@
 {
  "entries": [
   {
+   "key": "item.type.other",
+   "text": "Khác"
+  },
+  {
+   "key": "item.type.material",
+   "text": "Nguyên liệu"
+  },
+  {
+   "key": "item.type.key",
+   "text": "Vật phẩm nhiệm vụ"
+  },
+  {
+   "key": "item.type.scroll",
+   "text": "Bí kíp võ công"
+  },
+  {
+   "key": "item.type.consumable",
+   "text": "Tiêu hao"
+  },
+  {
    "key": "menu.title",
    "text": "TRĂNG ĐỎ"
   },
@@ -53,26 +73,6 @@
    "text": "{0}\n\n[Loại]: {1}\n[Số lượng]: {2}"
   },
   {
-   "key": "item.type.consumable",
-   "text": "Tiêu hao"
-  },
-  {
-   "key": "item.type.scroll",
-   "text": "Bí kíp võ công"
-  },
-  {
-   "key": "item.type.key",
-   "text": "Vật phẩm nhiệm vụ"
-  },
-  {
-   "key": "item.type.material",
-   "text": "Nguyên liệu"
-  },
-  {
-   "key": "item.type.other",
-   "text": "Khác"
-  },
-  {
    "key": "inv.learned.already",
    "text": "Bạn đã lĩnh ngộ {0} trước đó rồi!"
   },
@@ -99,6 +99,594 @@
   {
    "key": "menu.music",
    "text": "Nhạc nền"
+  },
+  {
+   "key": "dlg.agis_ending_destroy.0.text",
+   "text": "Ác mộng của ông... chấm dứt tại đây."
+  },
+  {
+   "key": "dlg.agis_ending_destroy.1.text",
+   "text": "Vầng trăng vỡ tan rồi... Nhưng ký ức này... ngươi sẽ phải mang theo suốt đời..."
+  },
+  {
+   "key": "dlg.agis_ending_forgive.0.text",
+   "text": "Ta... ta đã lạc lối sao? Lam... con vẫn ở đây ư?"
+  },
+  {
+   "key": "dlg.agis_ending_forgive.1.text",
+   "text": "Hãy nắm lấy tay con bé. Làng Phong Nguyệt vẫn luôn mở rộng cửa đón ông trở về."
+  },
+  {
+   "key": "dlg.agis_ending_forgive.2.text",
+   "text": "Cảm ơn ngươi... Vầng trăng đỏ... cuối cùng cũng đã tắt."
+  },
+  {
+   "key": "dlg.agis_pre_boss.0.text",
+   "text": "Ngươi cũng đến cướp vầng trăng à? Được... Nhưng trăng đêm nay là của con gái ta!"
+  },
+  {
+   "key": "dlg.agis_pre_boss.1.text",
+   "text": "Tôi đến để đưa ông và con bé trở về làng — chứ không phải để cướp nó."
+  },
+  {
+   "key": "dlg.agis_pre_boss.2.text",
+   "text": "Đã quá muộn rồi... Sức mạnh của Trăng Đỏ không thể đảo ngược!"
+  },
+  {
+   "key": "dlg.altar_forest.0.text",
+   "text": "\"Ba ngọn lửa canh ba phía. Thắp cùng lúc, đá sẽ nhường đường.\""
+  },
+  {
+   "key": "dlg.cave_mural_left.0.text",
+   "text": "Một vòng người áo trắng quỳ quanh tháp. Trăng trắng treo giữa trời. Một cô bé cầm mặt nạ đứng giữa."
+  },
+  {
+   "key": "dlg.cave_mural_left.1.text",
+   "text": "Lam... đây là lễ cúng trăng ba năm trước."
+  },
+  {
+   "key": "dlg.cave_mural_right.0.text",
+   "text": "Phía sau cô bé có một bóng đen không mặt, tay đặt lên vai. Agis đứng cách đó rất xa, quay lưng."
+  },
+  {
+   "key": "dlg.cave_mural_right.1.text",
+   "text": "Không phải Agis... vậy ai đã dẫn Lam đi?"
+  },
+  {
+   "key": "dlg.laocau_first.0.text",
+   "text": "Hừm, người làng Phong Nguyệt hả? Đầm này ba năm nay không ai dám qua."
+  },
+  {
+   "key": "dlg.laocau_first.1.text",
+   "text": "Bọn mặc áo cúng đóng trại trên đảo giữa đầm. Chúng giữ Chìa Khóa Tháp."
+  },
+  {
+   "key": "dlg.laocau_first.2.text",
+   "text": "Hạ được kẻ cầm đầu thì quay lại đây — lão chở ngươi về làng bằng đò."
+  },
+  {
+   "key": "dlg.laocau_repeat.0.text",
+   "text": "Bùn ở phía bắc sâu lắm. Đi chậm thì chết, đi nhanh thì... lướt qua."
+  },
+  {
+   "key": "dlg.mai_after.0.text",
+   "text": "Nhớ: chỗ nào có lửa ấm thì trăng đỏ yếu đi. Nghỉ ở đống lửa khi cần."
+  },
+  {
+   "key": "dlg.mai_first.0.text",
+   "text": "Kiền... trăng hôm nay đỏ lắm. Ông vẫn nhớ 3 năm trước chứ?"
+  },
+  {
+   "key": "dlg.mai_first.1.text",
+   "text": "Nhớ. Nghi thức bị bỏ dở — và những gì ở ngoài rừng đêm qua không phải sói thường."
+  },
+  {
+   "key": "dlg.mai_first.2.text",
+   "text": "Ra gặp Ông Tễ trước đi. Rồi... con quyết định. Làng này không đợi nổi một ai khác."
+  },
+  {
+   "key": "dlg.mai_repeat.0.text",
+   "text": "Ông Tễ ở đầu làng. Đừng để ông chờ lâu — ông già rồi nhưng vẫn càu nhàu lắm."
+  },
+  {
+   "key": "dlg.mai_reward.0.text",
+   "text": "Ông Tễ bảo tay kiếm con đã vững. Cầm lấy — cuộn này là của cha con để lại."
+  },
+  {
+   "key": "dlg.mai_reward.1.text",
+   "text": "Lướt Gió: chạy như gió qua khe nước, qua hố đất. Không có nó, rừng sẽ nuốt con."
+  },
+  {
+   "key": "dlg.mai_reward.2.text",
+   "text": "Cổng bắc...?"
+  },
+  {
+   "key": "dlg.mai_reward.3.text",
+   "text": "Ta đã cho mở. Đi đi — trước khi trăng lên tới đỉnh."
+  },
+  {
+   "key": "dlg.na_first.0.text",
+   "text": "Anh Kiền! Em... em chạy theo con cừu rồi lạc mất đường về."
+  },
+  {
+   "key": "dlg.na_first.1.text",
+   "text": "Chị Lam ngày xưa hay dẫn em ra đây hát bài cúng trăng. Chị bảo trăng trắng là trăng hiền."
+  },
+  {
+   "key": "dlg.na_first.2.text",
+   "text": "Cầm cái này đi — mẹ dặn em đưa cho người canh làng."
+  },
+  {
+   "key": "dlg.na_repeat.0.text",
+   "text": "Em sẽ chờ ở đây tới khi anh dọn đường. Đừng để bọn mắt đỏ lại gần nhé..."
+  },
+  {
+   "key": "dlg.ongte_quest.0.text",
+   "text": "Ồ, Kiền đấy à. Vũ khí của ngươi đã sẵn sàng — ta vừa mài lại lưỡi đêm qua."
+  },
+  {
+   "key": "dlg.ongte_quest.1.text",
+   "text": "Đi thử một lượt combo trên sân cho chắc tay. Rồi theo dấu mà vào rừng."
+  },
+  {
+   "key": "dlg.ongte_repeat.0.text",
+   "text": "Rừng Thảm Vàng đêm nay đỏ rực. Cẩn thận — bóng ở đó không phải bóng người."
+  },
+  {
+   "key": "dlg.sign_north.0.text",
+   "text": "↑ Rừng Thảm Vàng. Cổng đóng từ khi trăng đỏ mọc — theo lệnh trưởng làng Mai."
+  },
+  {
+   "key": "dlg.speaker.Agis",
+   "text": "Agis"
+  },
+  {
+   "key": "dlg.speaker.Bảng gỗ",
+   "text": "Bảng gỗ"
+  },
+  {
+   "key": "dlg.speaker.Bé Na",
+   "text": "Bé Na"
+  },
+  {
+   "key": "dlg.speaker.Bia đá",
+   "text": "Bia đá"
+  },
+  {
+   "key": "dlg.speaker.Bia khắc",
+   "text": "Bia khắc"
+  },
+  {
+   "key": "dlg.speaker.Bích họa",
+   "text": "Bích họa"
+  },
+  {
+   "key": "dlg.speaker.Kiền",
+   "text": "Kiền"
+  },
+  {
+   "key": "dlg.speaker.Lão Câu",
+   "text": "Lão Câu"
+  },
+  {
+   "key": "dlg.speaker.Mai",
+   "text": "Mai"
+  },
+  {
+   "key": "dlg.speaker.Ông Tễ",
+   "text": "Ông Tễ"
+  },
+  {
+   "key": "dlg.tower_inscription.0.text",
+   "text": "\"Kẻ đổi trăng lấy người — trăng sẽ đòi lại gấp đôi.\""
+  },
+  {
+   "key": "dlg.tower_inscription.1.text",
+   "text": "Agis... ông biết điều này mà vẫn làm."
+  },
+  {
+   "key": "item.key_tower.desc",
+   "text": "Chìa khóa cổ chạm khắc hình vầng trăng khuyết, dùng để mở phong ấn cổng tầng 1 Tháp Trăng Đỏ."
+  },
+  {
+   "key": "item.key_tower.name",
+   "text": "Chìa Khóa Tháp Trăng Đỏ"
+  },
+  {
+   "key": "item.potion_hp.desc",
+   "text": "Chiết xuất từ hoa dại và thảo mộc vùng sương. Hồi ngay 40 sinh lực khi sử dụng."
+  },
+  {
+   "key": "item.potion_hp.name",
+   "text": "Bình Dược Thảo Hồi Máu"
+  },
+  {
+   "key": "item.scroll_charge.desc",
+   "text": "Bí kíp tích lực chém lửa. Nhấn giữ phím [E] để tích năng lượng rồi thả để vung đòn chém sát thương cực đại và đẩy lùi kẻ thù."
+  },
+  {
+   "key": "item.scroll_charge.name",
+   "text": "Cuộn Bí Kíp: Hỏa Kích"
+  },
+  {
+   "key": "item.scroll_dash.desc",
+   "text": "Lĩnh ngộ thân pháp Lướt Gió của làng Phong Nguyệt. Nhấn chuột phải hoặc bấm Dùng để mở khóa phím [Left Shift] lướt nhanh né đòn."
+  },
+  {
+   "key": "item.scroll_dash.name",
+   "text": "Cuộn Bí Kíp: Lướt Gió"
+  },
+  {
+   "key": "item.scroll_skill_fireball.desc",
+   "text": "Dùng để lĩnh ngộ Hỏa Cầu. Kỹ năng được gắn vào ô kỹ năng trống đầu tiên."
+  },
+  {
+   "key": "item.scroll_skill_fireball.name",
+   "text": "Cuộn Bí Kíp: Hỏa Cầu"
+  },
+  {
+   "key": "item.scroll_skill_heal.desc",
+   "text": "Dùng để lĩnh ngộ Hồi Phục. Kỹ năng được gắn vào ô kỹ năng trống đầu tiên."
+  },
+  {
+   "key": "item.scroll_skill_heal.name",
+   "text": "Cuộn Bí Kíp: Hồi Phục"
+  },
+  {
+   "key": "item.scroll_skill_ice_blast.desc",
+   "text": "Dùng để lĩnh ngộ Băng Tiễn. Kỹ năng được gắn vào ô kỹ năng trống đầu tiên."
+  },
+  {
+   "key": "item.scroll_skill_ice_blast.name",
+   "text": "Cuộn Bí Kíp: Băng Tiễn"
+  },
+  {
+   "key": "item.scroll_skill_magic_arrow.desc",
+   "text": "Dùng để lĩnh ngộ Phép Tiễn. Kỹ năng được gắn vào ô kỹ năng trống đầu tiên."
+  },
+  {
+   "key": "item.scroll_skill_magic_arrow.name",
+   "text": "Cuộn Bí Kíp: Phép Tiễn"
+  },
+  {
+   "key": "item.scroll_skill_stun_wave.desc",
+   "text": "Dùng để lĩnh ngộ Chấn Động. Kỹ năng được gắn vào ô kỹ năng trống đầu tiên."
+  },
+  {
+   "key": "item.scroll_skill_stun_wave.name",
+   "text": "Cuộn Bí Kíp: Chấn Động"
+  },
+  {
+   "key": "item.scroll_skill_thunder_strike.desc",
+   "text": "Dùng để lĩnh ngộ Lôi Kích. Kỹ năng được gắn vào ô kỹ năng trống đầu tiên."
+  },
+  {
+   "key": "item.scroll_skill_thunder_strike.name",
+   "text": "Cuộn Bí Kíp: Lôi Kích"
+  },
+  {
+   "key": "item.scroll_teleport.desc",
+   "text": "Tàn thuật bí truyền. Nhấn phím [Q] để dịch chuyển tức thời đến vị trí con trỏ chuột trong nháy mắt."
+  },
+  {
+   "key": "item.scroll_teleport.name",
+   "text": "Cuộn Bí Kíp: Hư Không"
+  },
+  {
+   "key": "quest.q1.desc",
+   "text": "Gặp Ông Tễ trong làng, rồi luyện trọn 1 combo 3 nhịp trong sân."
+  },
+  {
+   "key": "quest.q1.obj.q1_combo",
+   "text": "Luyện 1 combo trọn 3 nhịp"
+  },
+  {
+   "key": "quest.q1.obj.talk_ongte",
+   "text": "Gặp Ông Tễ"
+  },
+  {
+   "key": "quest.q1.title",
+   "text": "Gươm của người canh giữ"
+  },
+  {
+   "key": "quest.q2.desc",
+   "text": "Dõi theo dấu vết vào Rừng Thảm Vàng: diệt 3 kẻ địch và hạ Thợ Săn Bóng."
+  },
+  {
+   "key": "quest.q2.obj.q2_kill",
+   "text": "Diệt kẻ địch trong rừng"
+  },
+  {
+   "key": "quest.q2.obj.q2_miniboss",
+   "text": "Hạ Thợ Săn Bóng"
+  },
+  {
+   "key": "quest.q2.title",
+   "text": "Bóng trong rừng"
+  },
+  {
+   "key": "quest.q3.desc",
+   "text": "Giải câu đố công tắc đá tại đầm sương và thu thập Chìa Khóa Tháp Cổ."
+  },
+  {
+   "key": "quest.q3.obj.q3_key",
+   "text": "Thu thập Chìa Khóa Tháp"
+  },
+  {
+   "key": "quest.q3.obj.q3_switch",
+   "text": "Kích hoạt công tắc cổ"
+  },
+  {
+   "key": "quest.q3.title",
+   "text": "Phong ấn Tháp Cổ"
+  },
+  {
+   "key": "quest.q4.desc",
+   "text": "Tiến vào đỉnh tháp đối mặt với Pháp sư Agis và kết thúc đêm trăng đỏ."
+  },
+  {
+   "key": "quest.q4.obj.q4_agis",
+   "text": "Đánh bại Pháp sư Agis"
+  },
+  {
+   "key": "quest.q4.title",
+   "text": "Đỉnh Tháp Trăng Đỏ"
+  },
+  {
+   "key": "skill.Enemy_MagicArrow.desc",
+   "text": "Fast magical arrow that travels in straight line."
+  },
+  {
+   "key": "skill.Enemy_MagicArrow.name",
+   "text": "MagicArrow"
+  },
+  {
+   "key": "skill.Explosion.desc",
+   "text": "Creates a massive explosion that damages all enemies in the area."
+  },
+  {
+   "key": "skill.Explosion.name",
+   "text": "Explosion"
+  },
+  {
+   "key": "skill.fireball.desc",
+   "text": "Explosive fireball projectile with high damage."
+  },
+  {
+   "key": "skill.fireball.name",
+   "text": "Fireball"
+  },
+  {
+   "key": "skill.heal.desc",
+   "text": "Instantly restore health to the caster."
+  },
+  {
+   "key": "skill.heal.name",
+   "text": "Heal"
+  },
+  {
+   "key": "skill.ice_blast.desc",
+   "text": "Freezing projectile that slows and damages enemies."
+  },
+  {
+   "key": "skill.ice_blast.name",
+   "text": "Ice Blast"
+  },
+  {
+   "key": "skill.magic_arrow.desc",
+   "text": "Fast magical arrow that travels in straight line."
+  },
+  {
+   "key": "skill.magic_arrow.name",
+   "text": "MagicArrow"
+  },
+  {
+   "key": "skill.Shield.desc",
+   "text": "Temporary damage reduction and knockback immunity."
+  },
+  {
+   "key": "skill.Shield.name",
+   "text": "Shield"
+  },
+  {
+   "key": "skill.stun_wave.desc",
+   "text": "Area stun attack"
+  },
+  {
+   "key": "skill.stun_wave.name",
+   "text": "Stun Wave"
+  },
+  {
+   "key": "skill.SwordSlash.desc",
+   "text": "Basic sword attack with high damage. Uses existing Attack animation."
+  },
+  {
+   "key": "skill.SwordSlash.name",
+   "text": "Sword Slash"
+  },
+  {
+   "key": "skill.SwordStrike.desc",
+   "text": "Basic sword strike dealing moderate damage to nearby enemies."
+  },
+  {
+   "key": "skill.SwordStrike.name",
+   "text": "SwordStrike"
+  },
+  {
+   "key": "skill.SwordStrike_enemy.desc",
+   "text": "Basic sword strike dealing moderate damage to nearby enemies."
+  },
+  {
+   "key": "skill.SwordStrike_enemy.name",
+   "text": "SwordStrike"
+  },
+  {
+   "key": "skill.thunder_strike.desc",
+   "text": "Calls down lightning to strike all nearby enemies."
+  },
+  {
+   "key": "skill.thunder_strike.name",
+   "text": "Thunder Strike"
+  },
+  {
+   "key": "skill.ThunderBolt.desc",
+   "text": "Area lightning attack with stun effect."
+  },
+  {
+   "key": "skill.ThunderBolt.name",
+   "text": "Thunder Bolt"
+  },
+  {
+   "key": "skillnode.gio_1.desc",
+   "text": "Học từ Cuộn Lướt Gió — mở Dash"
+  },
+  {
+   "key": "skillnode.gio_1.name",
+   "text": "Gió Lạnh"
+  },
+  {
+   "key": "skillnode.gio_2.desc",
+   "text": "Dash xuyên địch"
+  },
+  {
+   "key": "skillnode.gio_2.name",
+   "text": "Lướt Xuyên"
+  },
+  {
+   "key": "skillnode.gio_3.desc",
+   "text": "Dash gây 20 dmg"
+  },
+  {
+   "key": "skillnode.gio_3.name",
+   "text": "Kích Ứng"
+  },
+  {
+   "key": "skillnode.gio_4.desc",
+   "text": "Đại kỹ: dash không hồi 5s"
+  },
+  {
+   "key": "skillnode.gio_4.name",
+   "text": "CUỒNG GIÓ"
+  },
+  {
+   "key": "skillnode.khong_1.desc",
+   "text": "Học từ Cuộn Hư Không — mở Teleport"
+  },
+  {
+   "key": "skillnode.khong_1.name",
+   "text": "Bước Ngắn"
+  },
+  {
+   "key": "skillnode.khong_2.desc",
+   "text": "Teleport qua tường mỏng"
+  },
+  {
+   "key": "skillnode.khong_2.name",
+   "text": "Đổi Vị"
+  },
+  {
+   "key": "skillnode.khong_3.desc",
+   "text": "Tạo bản sao dụ địch 2s"
+  },
+  {
+   "key": "skillnode.khong_3.name",
+   "text": "Phân Thân"
+  },
+  {
+   "key": "skillnode.khong_4.desc",
+   "text": "Đại kỹ: teleport 3 điểm liên tiếp"
+  },
+  {
+   "key": "skillnode.khong_4.name",
+   "text": "HOÁ BÓNG ẤM"
+  },
+  {
+   "key": "skillnode.lua_1.desc",
+   "text": "Học từ Cuộn Hỏa Kích — mở Charge"
+  },
+  {
+   "key": "skillnode.lua_1.name",
+   "text": "Sốc Nhiệt"
+  },
+  {
+   "key": "skillnode.lua_2.desc",
+   "text": "Charge gây burn 3s"
+  },
+  {
+   "key": "skillnode.lua_2.name",
+   "text": "Cháy Lan"
+  },
+  {
+   "key": "skillnode.lua_3.desc",
+   "text": "Charge stun 1s"
+  },
+  {
+   "key": "skillnode.lua_3.name",
+   "text": "Trấn Áp"
+  },
+  {
+   "key": "skillnode.lua_4.desc",
+   "text": "Đại kỹ: charge nổ diện rộng"
+  },
+  {
+   "key": "skillnode.lua_4.name",
+   "text": "THIÊN PHỤC"
+  },
+  {
+   "key": "skillnode.root.desc",
+   "text": "Mở cây kỹ năng (Tab)"
+  },
+  {
+   "key": "skillnode.root.name",
+   "text": "Kiến Thức Tỉnh"
+  },
+  {
+   "key": "skillnode.than_1.desc",
+   "text": "+25 HP tối đa"
+  },
+  {
+   "key": "skillnode.than_1.name",
+   "text": "Thể Lực"
+  },
+  {
+   "key": "skillnode.than_2a.desc",
+   "text": "+1.5 sát thương"
+  },
+  {
+   "key": "skillnode.than_2a.name",
+   "text": "Cường Kích"
+  },
+  {
+   "key": "skillnode.than_2b.desc",
+   "text": "+5% chí mạng"
+  },
+  {
+   "key": "skillnode.than_2b.name",
+   "text": "Mũi Nhọn"
+  },
+  {
+   "key": "skillnode.than_3a.desc",
+   "text": "Dash hồi nhanh −0.15s"
+  },
+  {
+   "key": "skillnode.than_3a.name",
+   "text": "Bóng Nhẹ"
+  },
+  {
+   "key": "skillnode.than_3b.desc",
+   "text": "I-frame khi hồi máu"
+  },
+  {
+   "key": "skillnode.than_3b.name",
+   "text": "Dự Bị"
+  },
+  {
+   "key": "skillnode.than_4.desc",
+   "text": "Đại kỹ: 5s không chết + hồi 30% HP"
+  },
+  {
+   "key": "skillnode.than_4.name",
+   "text": "BẤT DIỆT THÂN"
   }
  ]
 }

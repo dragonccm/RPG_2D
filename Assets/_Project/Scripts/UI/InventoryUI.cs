@@ -285,8 +285,8 @@ public class InventoryUI : MonoBehaviour
             return;
         }
 
-        detailNameText.text = slot.item.itemName;
-        detailDescText.text = Loc.T("inv.detail", slot.item.description, GetTypeName(slot.item.itemType), slot.quantity);
+        detailNameText.text = Loc.TOr("item." + slot.item.itemId + ".name", slot.item.itemName);
+        detailDescText.text = Loc.T("inv.detail", Loc.TOr("item." + slot.item.itemId + ".desc", slot.item.description), GetTypeName(slot.item.itemType), slot.quantity);
 
         if (slot.item.isUsable)
         {

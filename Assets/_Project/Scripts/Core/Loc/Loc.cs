@@ -39,6 +39,9 @@ public static class Loc
         catch (FormatException) { return fmt; }
     }
 
+    /// <summary>Có bản dịch thì dùng, không thì giữ chuỗi gốc trong dữ liệu (hội thoại, tên vật phẩm...).</summary>
+    public static string TOr(string key, string original) => Has(key) ? T(key) : original;
+
     public static bool Has(string key) { Ensure(); return current.ContainsKey(key) || fallback.ContainsKey(key); }
 
     /// <summary>Nạp từ JSON (test hoặc ngôn ngữ tải ngoài).</summary>

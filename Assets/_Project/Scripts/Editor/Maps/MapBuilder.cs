@@ -50,6 +50,7 @@ public static class MapBuilder
         SkillScrollBuilder.BuildAll();
         AttackDefBuilder.BuildAll();
         AudioBankBuilder.Build();
+        LocExport.Export();
         EnemyPrefabBuilder.BuildAll();
         var built = new List<string>();
         foreach (var spec in MapSpecs.All())

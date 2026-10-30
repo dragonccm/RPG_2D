@@ -16,6 +16,9 @@ public static class SkillScrollBuilder
         ("IceBlast", "ice_blast", "Băng Tiễn"),
         ("Heal", "heal", "Hồi Phục"),
         ("ThunderStrike", "thunder_strike", "Lôi Kích"),
+        ("MagicArrow", "magic_arrow", "Phép Tiễn"),     // thưởng hạ Nhà Chiến Thuật Kích (đầm)
+        ("StunWave", "stun_wave", "Chấn Động"),         // thưởng hạ Đá Gộp (hang)
+        ("Fireball", "fireball", "Hỏa Cầu"),            // thưởng hạ Kỵ Sĩ Bóng Đêm (tháp)
     };
 
     public static void BuildAll()

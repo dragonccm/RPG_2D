@@ -95,11 +95,11 @@ public class DialogueUI : MonoBehaviour
     private void ShowLine()
     {
         var line = current.lines[lineIndex];
-        speakerText.text = line.speaker;
+        speakerText.text = Loc.TOr(DialogueLoc.SpeakerKey(line.speaker), line.speaker);
         bodyText.text = "";
         typingDone = false;
         if (typing != null) StopCoroutine(typing);
-        typing = StartCoroutine(TypeLine(line.text));
+        typing = StartCoroutine(TypeLine(DialogueLoc.Text(current, lineIndex)));
     }
 
     private IEnumerator TypeLine(string text)
@@ -124,7 +124,7 @@ public class DialogueUI : MonoBehaviour
             {
                 // skip typing: hiện nguyên dòng
                 if (typing != null) StopCoroutine(typing);
-                bodyText.text = current.lines[lineIndex].text;
+                bodyText.text = DialogueLoc.Text(current, lineIndex);
                 typingDone = true;
             }
             else Advance();

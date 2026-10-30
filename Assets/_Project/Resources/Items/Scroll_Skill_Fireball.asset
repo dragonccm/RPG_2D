@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05dd9048bc59d5eafbc05017523dd2db, type: 3}
+  m_Name: Scroll_Skill_Fireball
+  m_EditorClassIdentifier: RPG.Game::ItemData
+  itemId: scroll_skill_fireball
+  itemName: "Cu\u1ED9n B\xED K\xEDp: H\u1ECFa C\u1EA7u"
+  description: "D\xF9ng \u0111\u1EC3 l\u0129nh ng\u1ED9 H\u1ECFa C\u1EA7u. K\u1EF9 n\u0103ng \u0111\u01B0\u1EE3c g\u1EAFn v\xE0o \xF4 k\u1EF9 n\u0103ng tr\u1ED1ng \u0111\u1EA7u ti\xEAn."
+  icon: {fileID: 0}
+  itemType: 1
+  maxStack: 1
+  isUsable: 1
+  healAmount: 0
+  manaAmount: 0
+  unlockSkillId: 
+  learnSkill: {fileID: 11400000, guid: 8c5b83b957bee7a4986ae07ebea808be, type: 2}

@@ -83,7 +83,7 @@ public static class MapSpecs
             id = "cave_elite", radius = 7f,
             enemies =
             {
-                new EnemyDef("Lancer", 0f, 0f) { elite = true, eliteName = "Đá Gộp", tint = new Color(0.62f, 0.66f, 0.62f), scale = 1.3f },
+                new EnemyDef("Lancer", 0f, 0f) { elite = true, eliteName = "Đá Gộp", rewardItemId = "scroll_skill_stun_wave", tint = new Color(0.62f, 0.66f, 0.62f), scale = 1.3f },
                 new EnemyDef("Rat", -2.5f, 1f), new EnemyDef("Rat", 2.5f, 1f),
             },
         };
@@ -384,7 +384,7 @@ public static class MapSpecs
             id = "marsh_boss", radius = 6f,
             enemies =
             {
-                new EnemyDef("Lancer", 0f, 0f) { elite = true, eliteName = "Nhà Chiến Thuật Kích" },
+                new EnemyDef("Lancer", 0f, 0f) { elite = true, eliteName = "Nhà Chiến Thuật Kích", rewardItemId = "scroll_skill_magic_arrow" },
                 new EnemyDef("Archer", -2.5f, 1.5f), new EnemyDef("Archer", 2.5f, 1.5f),
             },
         };
@@ -462,7 +462,7 @@ public static class MapSpecs
         s.encounters['8'] = new EncounterDef
         {
             id = "tower_candles", radius = 7f,
-            enemies = { new EnemyDef("Lancer", 0f, 0f) { elite = true, eliteName = "Kỵ Sĩ Bóng Đêm", tint = new Color(0.42f, 0.32f, 0.55f), scale = 1.15f }, new EnemyDef("Archer", -3f, 1f), new EnemyDef("Archer", 3f, 1f) },
+            enemies = { new EnemyDef("Lancer", 0f, 0f) { elite = true, eliteName = "Kỵ Sĩ Bóng Đêm", rewardItemId = "scroll_skill_fireball", tint = new Color(0.42f, 0.32f, 0.55f), scale = 1.15f }, new EnemyDef("Archer", -3f, 1f), new EnemyDef("Archer", 3f, 1f) },
         };
         return s;
     }

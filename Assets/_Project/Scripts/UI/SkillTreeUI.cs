@@ -110,7 +110,7 @@ public class SkillTreeUI : MonoBehaviour
             rowText.alignment = TextAnchor.UpperLeft;
             rowText.color = unlocked ? new Color(0.5f, 1f, 0.55f)
                 : (can == SkillTreeManager.UnlockResult.Ok ? Color.white : new Color(1f, 1f, 1f, 0.45f));
-            rowText.text = $"{state}  T{node.tier} {node.name} — {node.desc}";
+            rowText.text = $"{state}  T{node.tier} {Loc.TOr("skillnode." + node.id + ".name", node.name)} — {Loc.TOr("skillnode." + node.id + ".desc", node.desc)}";
             if (can == SkillTreeManager.UnlockResult.Ok && !unlocked)
             {
                 var btn = row.AddComponent<Button>();

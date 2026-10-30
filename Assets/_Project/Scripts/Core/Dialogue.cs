@@ -147,3 +147,12 @@ public static class DialogueDatabase
         new DialogueLine("Agis", "Vầng trăng vỡ tan rồi... Nhưng ký ức này... ngươi sẽ phải mang theo suốt đời..."))
     { claimQuestOnEnd = "q4" };
 }
+
+/// <summary>Khoá bảng chuỗi cho hội thoại: dlg.&lt;blockId&gt;.&lt;dòng&gt;.text và dlg.speaker.&lt;tên&gt;. Thiếu bản dịch → dùng chữ gốc trong DialogueDatabase.</summary>
+public static class DialogueLoc
+{
+    public static string SpeakerKey(string speaker) => "dlg.speaker." + speaker;
+    public static string TextKey(string blockId, int index) => $"dlg.{blockId}.{index}.text";
+    public static string Text(DialogueBlock block, int index) =>
+        Loc.TOr(TextKey(block.blockId, index), block.lines[index].text);
+}
