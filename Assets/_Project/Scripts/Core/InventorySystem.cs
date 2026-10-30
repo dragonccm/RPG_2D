@@ -178,13 +178,14 @@ public class InventoryManager : MonoBehaviour
             {
                 if (SkillBook.Has(item.learnSkill))
                 {
-                    OnNotificationMessage?.Invoke($"Bạn đã lĩnh ngộ {item.learnSkill.skillName} trước đó rồi!");
+                    OnNotificationMessage?.Invoke(Loc.T("inv.learned.already", item.learnSkill.skillName));
                     return false;
                 }
                 SkillBook.Learn(item.learnSkill);
+                AudioService.Play(SfxId.ScrollLearn);
                 slot.quantity--;
                 if (slot.quantity <= 0) slot.Clear();
-                OnNotificationMessage?.Invoke($"Lĩnh ngộ thành công: {item.learnSkill.skillName}!");
+                OnNotificationMessage?.Invoke(Loc.T("inv.learned.ok", item.learnSkill.skillName));
                 OnInventoryChanged?.Invoke();
                 return true;
             }
@@ -196,17 +197,18 @@ public class InventoryManager : MonoBehaviour
             {
                 if (SkillTreeManager.Instance.IsUnlocked(item.unlockSkillId))
                 {
-                    OnNotificationMessage?.Invoke($"Bạn đã lĩnh ngộ {item.itemName} trước đó rồi!");
+                    OnNotificationMessage?.Invoke(Loc.T("inv.learned.already", item.itemName));
                     return false;
                 }
 
                 bool unlocked = SkillTreeManager.Instance.Unlock(item.unlockSkillId, bypassCost: true);
                 if (unlocked)
                 {
+                    AudioService.Play(SfxId.ScrollLearn);
                     slot.quantity--;
                     if (slot.quantity <= 0) slot.Clear();
 
-                    OnNotificationMessage?.Invoke($"Lĩnh ngộ thành công: {item.itemName}!");
+                    OnNotificationMessage?.Invoke(Loc.T("inv.learned.ok", item.itemName));
                     OnInventoryChanged?.Invoke();
                     return true;
                 }

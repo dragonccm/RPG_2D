@@ -57,6 +57,7 @@ public static class GameFlow
         var player = Object.FindAnyObjectByType<PlayerController>();
         if (player == null) return;
         LightUtil.EnsurePlayerLight(player.transform);
+        AudioService.PlayMapMusic();
 
         if (carry != null)
         {

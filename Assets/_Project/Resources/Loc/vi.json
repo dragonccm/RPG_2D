@@ -1,0 +1,96 @@
+{
+ "entries": [
+  {
+   "key": "menu.title",
+   "text": "TRĂNG ĐỎ"
+  },
+  {
+   "key": "menu.subtitle",
+   "text": "Làng Phong Nguyệt — đêm trăng thứ ba"
+  },
+  {
+   "key": "menu.new",
+   "text": "Chơi mới"
+  },
+  {
+   "key": "menu.continue",
+   "text": "Tiếp tục"
+  },
+  {
+   "key": "menu.quit",
+   "text": "Thoát"
+  },
+  {
+   "key": "inv.title",
+   "text": "HÀNH TRANG (16 Ô)"
+  },
+  {
+   "key": "inv.pick",
+   "text": "Chọn vật phẩm"
+  },
+  {
+   "key": "inv.pick.hint",
+   "text": "Bấm vào ô đồ để xem thông tin."
+  },
+  {
+   "key": "inv.use",
+   "text": "Sử dụng"
+  },
+  {
+   "key": "inv.learn",
+   "text": "Lĩnh ngộ (Học)"
+  },
+  {
+   "key": "inv.empty",
+   "text": "(Ô trống)"
+  },
+  {
+   "key": "inv.empty.hint",
+   "text": "Ô này chưa có vật phẩm."
+  },
+  {
+   "key": "inv.detail",
+   "text": "{0}\n\n[Loại]: {1}\n[Số lượng]: {2}"
+  },
+  {
+   "key": "item.type.consumable",
+   "text": "Tiêu hao"
+  },
+  {
+   "key": "item.type.scroll",
+   "text": "Bí kíp võ công"
+  },
+  {
+   "key": "item.type.key",
+   "text": "Vật phẩm nhiệm vụ"
+  },
+  {
+   "key": "item.type.material",
+   "text": "Nguyên liệu"
+  },
+  {
+   "key": "item.type.other",
+   "text": "Khác"
+  },
+  {
+   "key": "inv.learned.already",
+   "text": "Bạn đã lĩnh ngộ {0} trước đó rồi!"
+  },
+  {
+   "key": "inv.learned.ok",
+   "text": "Lĩnh ngộ thành công: {0}!"
+  },
+  {
+   "key": "inv.received",
+   "text": "Nhận được: {0}"
+  },
+  {
+   "key": "skilltree.points",
+   "text": "CÂY KỸ NĂNG — điểm còn: {0}  (Tab để đóng)"
+  },
+  {
+   "key": "portal.locked.north",
+   "text": "Cổng bắc đóng — hãy gặp trưởng làng Mai."
+  }
+ ]
+}

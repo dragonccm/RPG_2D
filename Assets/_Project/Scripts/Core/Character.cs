@@ -123,6 +123,8 @@ public class Character : MonoBehaviour, IDamageable
     /// Mọi Character đang active trong scene. Dùng thay FindGameObjectsWithTag trong vòng lặp
     /// (lọc thêm bằng CompareTag khi cần) — không cấp phát, không quét scene.
     /// </summary>
+    private float nextHurtSound;
+
     public static readonly List<Character> Active = new List<Character>(64);
 
     protected virtual void OnEnable() { Active.Add(this); }
@@ -211,6 +213,11 @@ public class Character : MonoBehaviour, IDamageable
         }
 
         VfxService.Hit(transform.position, Vector2.zero, HitMaterial.Flesh, isCritical);
+        if (Time.time >= nextHurtSound)
+        {
+            nextHurtSound = Time.time + 0.12f;
+            AudioService.Play(CompareTag("Player") ? SfxId.PlayerHurt : SfxId.EnemyHurt, transform.position);
+        }
 
         OnDamageTaken?.Invoke(damage);
         
@@ -383,6 +390,7 @@ public class Character : MonoBehaviour, IDamageable
         }
         
         VfxService.Impact(transform.position, new Color(0.15f, 0.12f, 0.18f), 2f);
+        AudioService.Play(CompareTag("Player") ? SfxId.PlayerDeath : SfxId.EnemyDeath, transform.position);
 
         Destroy(gameObject);
     }

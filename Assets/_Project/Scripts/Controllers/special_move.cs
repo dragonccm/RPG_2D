@@ -155,6 +155,7 @@ public class special_move : MonoBehaviour
     private IEnumerator PerformDash()
     {
         isDashing = true;
+        AudioService.Play(SfxId.Dash, transform.position);
         cooldownTimers["dash"] = DashCooldownEff;
         playerController.SetBusy(true, PlayerController.PlayerState.Dash);
 
@@ -221,6 +222,7 @@ public class special_move : MonoBehaviour
     private IEnumerator PerformTeleport()
     {
         isTeleporting = true;
+        AudioService.Play(SfxId.Teleport, transform.position);
         cooldownTimers["teleport"] = TeleportCooldownEff;
         playerController.SetBusy(true, PlayerController.PlayerState.Dash);
 
@@ -339,6 +341,7 @@ public class special_move : MonoBehaviour
         }
 
         VfxService.Shake(0.12f * factor, 0.15f);
+        AudioService.Play(SfxId.Charge, transform.position);
         VfxService.Impact(transform.position, new Color(1f, 0.45f, 0.1f), 1.2f + factor);
         playerController.SetBusy(false);
     }

@@ -91,7 +91,7 @@ public class SkillTreeUI : MonoBehaviour
         foreach (var row in rowCache) Destroy(row);
         rowCache.Clear();
 
-        pointsLabel.text = $"CÂY KỸ NĂNG — điểm còn: {mgr.SkillPoints}  (Tab để đóng)";
+        pointsLabel.text = Loc.T("skilltree.points", mgr.SkillPoints);
         float y = -14f;
         foreach (var node in SkillTreeManager.ALL_NODES)
         {

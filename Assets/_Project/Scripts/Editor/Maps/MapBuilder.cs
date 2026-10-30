@@ -44,6 +44,7 @@ public static class MapBuilder
         RenderSetup.EnsureAll();
         SkillScrollBuilder.BuildAll();
         AttackDefBuilder.BuildAll();
+        AudioBankBuilder.Build();
         EnemyPrefabBuilder.BuildAll();
         var built = new List<string>();
         foreach (var spec in MapSpecs.All())

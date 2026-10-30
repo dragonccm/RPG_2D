@@ -142,6 +142,8 @@ public class AttackRunner : MonoBehaviour
 
         // ── Active ──
         CurrentPhase = Phase.Active;
+        AudioService.Play(def.shape == AttackShape.Projectile ? SfxId.MagicCast
+            : def.team == AttackTeam.Player ? SfxId.SwordSwing : SfxId.EnemySwing, transform.position);
         Vector2 center = fixedCenter ?? AreaCenter(def, aim);
         Strike(def, aim, center, prefab);
         float activeTime = Mathf.Max(def.active, def.lungeDistance > 0f ? 0.12f : 0f);
@@ -242,6 +244,8 @@ public class AttackRunner : MonoBehaviour
         }
 
         if (any && def.team == AttackTeam.Player) PlayerHitFeedback(def, aim);
+        if (any) AudioService.Play(SfxId.SwordHit, transform.position);
+        else if (def.team == AttackTeam.Player) AudioService.Play(SfxId.SwordMiss, transform.position);
     }
 
     // Một Character có nhiều collider → chỉ tính 1 lần trong cùng lượt quét

@@ -201,6 +201,7 @@ public class agis_wizzar : MonoBehaviour
     /// </summary>
     private void OnCharacterDeath()
     {
+        AudioService.Play(SfxId.BossDeath, transform.position);
         Debug.Log("Agis Wizzar defeated through Character system!");
         OnBossDeath();
     }
@@ -555,6 +556,7 @@ public class agis_wizzar : MonoBehaviour
     /// </summary>
     IEnumerator EnterBerserkMode()
     {
+        AudioService.Play(SfxId.BossRoar, transform.position);
         hasBerserkTriggered = true;
         isBerserk = true;
         isSkillActive = true; // Tạm dừng các skill khác

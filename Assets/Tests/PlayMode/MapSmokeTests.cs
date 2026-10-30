@@ -200,6 +200,24 @@ public class MapSmokeTests
     }
 
     [UnityTest]
+    public IEnumerator Music_MapTheme_ThenBattleTheme_OnEliteEncounter()
+    {
+        WorldFlags.Import(null);
+        yield return Load("M2_Forest");
+        var bank = Resources.Load<SfxBank>("Audio/AudioBank");
+        Assert.AreSame(bank.mapMusic, AudioService.CurrentMusic, "nhạc map khi vào màn");
+        Object.FindObjectsByType<EncounterGroup>().First(e => e.name == "Encounter_forest_boss").Activate();
+        yield return null;
+        Assert.AreSame(bank.battleMusic, AudioService.CurrentMusic, "nhạc trận khi mini-boss xuất hiện");
+        foreach (var c in Object.FindObjectsByType<Character>().Where(c => c.GetComponent<PlayerController>() == null).ToList())
+            if (c != null) c.TakeDamage(99999f);
+        yield return new WaitForSeconds(0.5f);
+        Assert.AreSame(bank.mapMusic, AudioService.CurrentMusic, "hạ boss → về nhạc map");
+        AudioService.Play(SfxId.SwordHit); // không lỗi khi phát
+        Assert.IsEmpty(errors, string.Join("\n", errors));
+    }
+
+    [UnityTest]
     public IEnumerator Portal_Travel_CarriesStateAndPlacesAtSpawn()
     {
         yield return Load("M1_Village");

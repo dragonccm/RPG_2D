@@ -56,6 +56,7 @@ public class MapPortal : MonoBehaviour
             QuestManager.Instance.StartQuest(startQuestOnEnter);
 
         VfxService.Impact(player.transform.position, new Color(0.5f, 0.85f, 1f), 1.2f);
+        AudioService.Play(SfxId.DoorOpen, player.transform.position);
         GameFlow.Travel(targetScene, targetSpawnId, player);
     }
 }

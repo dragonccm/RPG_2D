@@ -196,6 +196,8 @@ Mọi đòn đánh của Player và Enemy phải tuân thủ nghiêm ngặt 3 ph
 - Mỗi sự kiện chiến đấu có SFX riêng cho chất liệu (thịt / kim loại / đá), 2–3 biến thể ngẫu nhiên, pitch ± 5%.
 - `AudioService` duy nhất (hiện chưa có manager; `AudioSource` rải trong `PlayerController`, `SkillExecutors`, `agis_wizzar`). Nhạc nền phối theo vùng/boss; HitStop không làm méo âm.
 
+**Trạng thái 30/10/2026 (6.9 + 6.10):** ✅ `AudioService` (Core/Audio): 19 sự kiện `SfxId` trong `Resources/Audio/AudioBank` (sinh bởi `Tools/RPG/Audio/Build Audio Bank` từ bộ SFX có sẵn), 2–4 biến thể, pitch ±5%, nhỏ dần theo khoảng cách camera, pool 12 nguồn; nhạc crossfade map ↔ trận (mini-boss xuất hiện → nhạc trận, hạ xong → về nhạc map). Đã nối: vung/trúng/trượt (AttackRunner), đau/chết (Character), rương, Dash/Teleport/Charge, cổng, học cuộn, gầm/chết của Agis. ✅ `Loc` (Core/Loc): `Loc.T("khoá", args)` đọc `Resources/Loc/vi.json` (+ `en.json` mẫu), thiếu khoá trả về chính khoá, test quét mã nguồn đảm bảo mọi khoá đã dùng đều có trong bảng. Đã chuyển menu chính, túi đồ, cây kỹ năng và thông báo học cuộn. Còn nợ: hội thoại (`DialogueDatabase`), tên/mô tả vật phẩm & kỹ năng, quest, thông báo cổng khoá (`MapSpecs`) vẫn là chuỗi trong code/asset; chưa có cài đặt âm lượng trong UI (đã có `AudioService.SfxVolume/MusicVolume`).
+
 ### 6.10 Lưu game, localization, dữ liệu
 - Save: có `version`, migrate được, ghi file tạm rồi đổi tên (đã có backup — giữ). Thêm lưu: kỹ năng đã học, túi đồ, story flags, checkpoint cuối.
 - Chuỗi hiển thị (hiện ~80 chỗ tiếng Việt viết thẳng trong UI/code): đưa vào bảng chuỗi (`LocKey → text`) trước khi dựng thêm nội dung, kể cả khi chỉ có tiếng Việt.

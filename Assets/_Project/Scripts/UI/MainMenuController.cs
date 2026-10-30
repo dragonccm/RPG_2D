@@ -8,9 +8,7 @@ using UnityEngine.UI;
 /// </summary>
 public class MainMenuController : MonoBehaviour
 {
-    [SerializeField] private string title = "TRĂNG ĐỎ";
-    [SerializeField] private string subtitle = "Làng Phong Nguyệt — đêm trăng thứ ba";
-
+    
     private Font font;
 
     private void Start()
@@ -29,13 +27,13 @@ public class MainMenuController : MonoBehaviour
         var bg = MakeRect("Background", canvasGo.transform, Vector2.zero, Vector2.one);
         bg.gameObject.AddComponent<Image>().color = new Color(0.07f, 0.05f, 0.09f);
 
-        Label(canvasGo.transform, title, 72, new Color(0.85f, 0.2f, 0.22f), 0.72f);
-        Label(canvasGo.transform, subtitle, 22, new Color(0.8f, 0.78f, 0.72f), 0.62f);
+        Label(canvasGo.transform, Loc.T("menu.title"), 72, new Color(0.85f, 0.2f, 0.22f), 0.72f);
+        Label(canvasGo.transform, Loc.T("menu.subtitle"), 22, new Color(0.8f, 0.78f, 0.72f), 0.62f);
 
         float y = 0.46f;
-        Button(canvasGo.transform, "Chơi mới", y, GameFlow.NewGame);
-        if (SaveSystem.HasSave) Button(canvasGo.transform, "Tiếp tục", y -= 0.1f, GameFlow.Continue);
-        Button(canvasGo.transform, "Thoát", y - 0.1f, Application.Quit);
+        Button(canvasGo.transform, Loc.T("menu.new"), y, GameFlow.NewGame);
+        if (SaveSystem.HasSave) Button(canvasGo.transform, Loc.T("menu.continue"), y -= 0.1f, GameFlow.Continue);
+        Button(canvasGo.transform, Loc.T("menu.quit"), y - 0.1f, Application.Quit);
     }
 
     private RectTransform MakeRect(string name, Transform parent, Vector2 min, Vector2 max)

@@ -37,6 +37,7 @@ public class EncounterGroup : MonoBehaviour
     public int Alive => alive;
 
     private int alive;
+    private bool hasElite;
     private Transform player;
     private float nextCheck;
 
@@ -71,6 +72,8 @@ public class EncounterGroup : MonoBehaviour
         if (IsActive || IsCleared) return;
         IsActive = true;
         SetLocks(true);
+        foreach (var s in slots) if (s.elite) { hasElite = true; break; }
+        if (hasElite) AudioService.PlayBattleMusic();
         foreach (var s in slots)
         {
             if (s.prefab == null) continue;
@@ -105,6 +108,7 @@ public class EncounterGroup : MonoBehaviour
     {
         IsActive = false;
         IsCleared = true;
+        if (hasElite) AudioService.PlayMapMusic();
         WorldFlags.Set(Flag);
         SetLocks(false);
         Report(reportClear);

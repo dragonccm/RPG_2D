@@ -60,6 +60,8 @@ public static class VfxService
     {
         var h = Host;
         if (h == null) return;
+        if (material == HitMaterial.Metal) AudioService.Play(SfxId.SwordHit, position);
+        else if (material == HitMaterial.Stone && heavy) AudioService.Play(SfxId.StoneHit, position);
         int count = heavy ? Random.Range(5, 8) : Random.Range(3, 6);
         bool aimed = dir.sqrMagnitude > 0.0001f;
         if (aimed) dir.Normalize();

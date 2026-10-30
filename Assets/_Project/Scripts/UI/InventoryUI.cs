@@ -106,7 +106,7 @@ public class InventoryUI : MonoBehaviour
         titleText.fontStyle = FontStyle.Bold;
         titleText.alignment = TextAnchor.MiddleCenter;
         titleText.color = new Color(1f, 0.85f, 0.4f);
-        titleText.text = "HÀNH TRANG (16 Ô)";
+        titleText.text = Loc.T("inv.title");
 
         // Lưới 16 ô đồ (bên trái)
         var gridGo = new GameObject("Grid", typeof(RectTransform), typeof(GridLayoutGroup));
@@ -143,7 +143,7 @@ public class InventoryUI : MonoBehaviour
         detailNameText.fontStyle = FontStyle.Bold;
         detailNameText.alignment = TextAnchor.MiddleCenter;
         detailNameText.color = Color.white;
-        detailNameText.text = "Chọn vật phẩm";
+        detailNameText.text = Loc.T("inv.pick");
 
         // Mô tả item
         var descGo = new GameObject("ItemDesc", typeof(RectTransform), typeof(Text));
@@ -156,7 +156,7 @@ public class InventoryUI : MonoBehaviour
         detailDescText.fontSize = 12;
         detailDescText.alignment = TextAnchor.UpperLeft;
         detailDescText.color = new Color(0.8f, 0.8f, 0.8f);
-        detailDescText.text = "Bấm vào ô đồ để xem thông tin.";
+        detailDescText.text = Loc.T("inv.pick.hint");
 
         // Nút dùng
         var btnGo = new GameObject("UseButton", typeof(RectTransform), typeof(Image), typeof(Button));
@@ -178,7 +178,7 @@ public class InventoryUI : MonoBehaviour
         useButtonText.fontSize = 13;
         useButtonText.alignment = TextAnchor.MiddleCenter;
         useButtonText.color = Color.white;
-        useButtonText.text = "Sử dụng";
+        useButtonText.text = Loc.T("inv.use");
 
         btnGo.SetActive(false);
     }
@@ -270,8 +270,8 @@ public class InventoryUI : MonoBehaviour
     {
         if (selectedSlotIndex < 0 || selectedSlotIndex >= InventoryManager.TOTAL_SLOTS || InventoryManager.Instance == null)
         {
-            detailNameText.text = "Chọn vật phẩm";
-            detailDescText.text = "Bấm vào ô đồ để xem thông tin.";
+            detailNameText.text = Loc.T("inv.pick");
+            detailDescText.text = Loc.T("inv.pick.hint");
             useButton.gameObject.SetActive(false);
             return;
         }
@@ -279,19 +279,19 @@ public class InventoryUI : MonoBehaviour
         var slot = InventoryManager.Instance.GetSlot(selectedSlotIndex);
         if (slot == null || slot.IsEmpty)
         {
-            detailNameText.text = "(Ô trống)";
-            detailDescText.text = "Ô này chưa có vật phẩm.";
+            detailNameText.text = Loc.T("inv.empty");
+            detailDescText.text = Loc.T("inv.empty.hint");
             useButton.gameObject.SetActive(false);
             return;
         }
 
         detailNameText.text = slot.item.itemName;
-        detailDescText.text = $"{slot.item.description}\n\n[Loại]: {GetTypeName(slot.item.itemType)}\n[Số lượng]: {slot.quantity}";
+        detailDescText.text = Loc.T("inv.detail", slot.item.description, GetTypeName(slot.item.itemType), slot.quantity);
 
         if (slot.item.isUsable)
         {
             useButton.gameObject.SetActive(true);
-            useButtonText.text = slot.item.itemType == ItemType.SkillScroll ? "Lĩnh ngộ (Học)" : "Sử dụng";
+            useButtonText.text = slot.item.itemType == ItemType.SkillScroll ? Loc.T("inv.learn") : Loc.T("inv.use");
         }
         else
         {
@@ -303,11 +303,11 @@ public class InventoryUI : MonoBehaviour
     {
         switch (type)
         {
-            case ItemType.Consumable: return "Tiêu hao";
-            case ItemType.SkillScroll: return "Bí kíp võ công";
-            case ItemType.KeyItem: return "Vật phẩm nhiệm vụ";
-            case ItemType.Material: return "Nguyên liệu";
-            default: return "Khác";
+            case ItemType.Consumable: return Loc.T("item.type.consumable");
+            case ItemType.SkillScroll: return Loc.T("item.type.scroll");
+            case ItemType.KeyItem: return Loc.T("item.type.key");
+            case ItemType.Material: return Loc.T("item.type.material");
+            default: return Loc.T("item.type.other");
         }
     }
 

@@ -80,6 +80,7 @@ public class TreasureChest : MonoBehaviour
 
         VfxService.Impact(transform.position + Vector3.up * 0.5f, Color.yellow, 1.5f);
         VfxService.Shake(ShakeLevel.Light);
+        AudioService.Play(SfxId.ChestOpen, transform.position);
 
         Debug.Log($"🎁 Mở rương [{chestId}]: Đã nhận {rewardItem?.itemName} x{rewardCount}!");
     }

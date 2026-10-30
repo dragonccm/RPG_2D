@@ -158,7 +158,7 @@ public class DialogueUI : MonoBehaviour
         {
             var item = ItemDatabase.Get(block.giveItemOnEnd);
             if (item != null && InventoryManager.Instance.AddItem(item, 1))
-                InventoryManager.Instance.Notify($"Nhận được: {item.itemName}");
+                InventoryManager.Instance.Notify(Loc.T("inv.received", item.itemName));
         }
         if (!string.IsNullOrEmpty(block.setFlagOnEnd))
             WorldFlags.Set(block.setFlagOnEnd);
