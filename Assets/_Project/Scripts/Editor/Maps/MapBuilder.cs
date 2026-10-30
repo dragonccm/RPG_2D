@@ -1117,23 +1117,18 @@ public static class MapBuilder
     }
 
     // ═════════════════════════════════════════ MENU / BUILD SETTINGS / SNAPSHOT ═════════════════════════════════════════
+    /// <summary>Menu chính dựng lại sạch mỗi lần: camera + MainMenuController (scene cũ có prefab GameManager đã mất từ trước).</summary>
     private static void SetupMenuScene()
     {
-        var scene = EditorSceneManager.OpenScene(MenuScene, OpenSceneMode.Single);
-        if (Object.FindAnyObjectByType<MainMenuController>() == null)
-        {
-            new GameObject("MainMenu").AddComponent<MainMenuController>();
-            if (Object.FindAnyObjectByType<Camera>() == null)
-            {
-                var cam = new GameObject("Main Camera").AddComponent<Camera>();
-                cam.tag = "MainCamera";
-                cam.orthographic = true;
-                cam.clearFlags = CameraClearFlags.SolidColor;
-                cam.backgroundColor = new Color(0.07f, 0.05f, 0.09f);
-            }
-            EditorSceneManager.MarkSceneDirty(scene);
-            EditorSceneManager.SaveScene(scene);
-        }
+        var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+        var camGo = new GameObject("Main Camera") { tag = "MainCamera" };
+        var cam = camGo.AddComponent<Camera>();
+        cam.orthographic = true;
+        cam.clearFlags = CameraClearFlags.SolidColor;
+        cam.backgroundColor = new Color(0.07f, 0.05f, 0.09f);
+        camGo.AddComponent<AudioListener>();
+        new GameObject("MainMenu").AddComponent<MainMenuController>();
+        EditorSceneManager.SaveScene(scene, MenuScene);
     }
 
     private static void SetBuildSettings(List<string> maps)
