@@ -166,7 +166,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -185,7 +185,9 @@ TextureImporter:
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
   alphaIsTransparency: 1
+  spriteTessellationMethod: 0
   spriteTessellationDetail: -1
+  spriteGeometrySubdivision: -1
   textureType: 8
   textureShape: 1
   singleChannelComponent: 0
@@ -204,7 +206,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -1222,7 +1224,51 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Dark VFX 2 (48x64)_0: -6742213398491084448
+      Dark VFX 2 (48x64)_1: 1046285156731251181
+      Dark VFX 2 (48x64)_10: -1045567603951156638
+      Dark VFX 2 (48x64)_11: 3043020784070771463
+      Dark VFX 2 (48x64)_12: -4952163481679523252
+      Dark VFX 2 (48x64)_13: -153636820869997659
+      Dark VFX 2 (48x64)_14: -669512247467982665
+      Dark VFX 2 (48x64)_15: -1273624449791177934
+      Dark VFX 2 (48x64)_16: -737231616369892437
+      Dark VFX 2 (48x64)_17: 6739297347769032012
+      Dark VFX 2 (48x64)_18: 6356322240100002854
+      Dark VFX 2 (48x64)_19: -4776270639700858413
+      Dark VFX 2 (48x64)_2: 3916230906069860303
+      Dark VFX 2 (48x64)_20: 7396892264307088417
+      Dark VFX 2 (48x64)_21: -7736025473706838599
+      Dark VFX 2 (48x64)_22: -4461077212844823089
+      Dark VFX 2 (48x64)_23: -4779890997901057570
+      Dark VFX 2 (48x64)_24: -6615620835071872498
+      Dark VFX 2 (48x64)_25: 1605655905527516567
+      Dark VFX 2 (48x64)_26: 5606218370596201145
+      Dark VFX 2 (48x64)_27: 6318627099575125699
+      Dark VFX 2 (48x64)_28: -1530590954123559627
+      Dark VFX 2 (48x64)_29: 3492744290165876298
+      Dark VFX 2 (48x64)_3: -2854110262119684812
+      Dark VFX 2 (48x64)_30: -2497687490315836396
+      Dark VFX 2 (48x64)_31: -487578405648946920
+      Dark VFX 2 (48x64)_32: 7141337700775277413
+      Dark VFX 2 (48x64)_33: 3742181820696122714
+      Dark VFX 2 (48x64)_34: 898846540302638147
+      Dark VFX 2 (48x64)_35: -8969651886374376139
+      Dark VFX 2 (48x64)_36: -6770188677914080617
+      Dark VFX 2 (48x64)_37: 8719128692966701698
+      Dark VFX 2 (48x64)_38: 2612257684608405483
+      Dark VFX 2 (48x64)_39: -876003997513513976
+      Dark VFX 2 (48x64)_4: -1261548220001104836
+      Dark VFX 2 (48x64)_40: 6369243799729387251
+      Dark VFX 2 (48x64)_41: -5962834494917395086
+      Dark VFX 2 (48x64)_42: 7585890571460798259
+      Dark VFX 2 (48x64)_43: 143371186231379331
+      Dark VFX 2 (48x64)_5: 5218580261869590449
+      Dark VFX 2 (48x64)_6: -9120630089538121617
+      Dark VFX 2 (48x64)_7: 1789631906081506693
+      Dark VFX 2 (48x64)_8: 2388517164766063630
+      Dark VFX 2 (48x64)_9: -7845901090613453239
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

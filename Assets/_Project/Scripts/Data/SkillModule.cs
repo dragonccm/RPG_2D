@@ -1,5 +1,4 @@
 using UnityEngine;
-using RPG.Effects;
 
 /// <summary>
 /// File: SkillModule.cs 
@@ -7,9 +6,20 @@ using RPG.Effects;
 /// Description: Core skill data container and behavior definition for the Enhanced RPG Skill System.
 /// Supports Melee, Projectile, Area and Support skills with visualization and execution logic.
 /// </summary>
+/// <summary>Kỹ năng học từ đâu — nhân vật khởi đầu không có kỹ năng nào (xem SkillBook).</summary>
+public enum SkillSource { Scroll, Quest, Boss }
+
 [CreateAssetMenu(fileName = "SkillModule", menuName = "RPG/Skill Module")]
 public class SkillModule : ScriptableObject
 {
+    [Header("Định danh & nguồn (SkillBook)")]
+    [Tooltip("Id ổn định dùng khi lưu game — đừng đổi sau khi phát hành. Để trống = tên asset.")]
+    public string skillId;
+    public SkillSource source = SkillSource.Scroll;
+
+    /// <summary>Id ổn định (skillId, hoặc tên asset nếu chưa đặt).</summary>
+    public string Id => string.IsNullOrEmpty(skillId) ? name : skillId;
+
     [Header("Basic Information")]
     public string skillName;
     [TextArea(2, 4)]
@@ -43,7 +53,7 @@ public class SkillModule : ScriptableObject
     public float customEffectLifetime = 0f;
     [Tooltip("Offset position for effect relative to impact point")]
     public Vector3 effectPositionOffset = Vector3.zero;
-    [Tooltip("Enable enhanced effect features (scaling, hit effects, etc.)")]
+    [Tooltip("Enable enhanced effect features (scaling, screen shake, etc.)")]
     public bool enableEnhancedEffects = true;
 
     [Header("Animation")]
@@ -57,38 +67,6 @@ public class SkillModule : ScriptableObject
     [Header("Damage Zone")]
     [Tooltip("Optional: Custom damage zone prefab to override auto-generated zones")]
     public GameObject damageZonePrefab;
-    
-    [Header("4-Directional Attack Settings")]
-    [Tooltip("Kích hoạt tấn công 4 hướng (lên, xuống, trái, phải) với animation riêng biệt")]
-    public bool use4DirectionalAttack = false;
-    
-    [Tooltip("Hình dạng vùng sát thương cho tấn công cận chiến")]
-    public DamageAreaShape damageAreaShape = DamageAreaShape.Circle;
-    
-    [Tooltip("Kích thước vùng sát thương theo hướng (cho bán nguyệt và hình chữ nhật)")]
-    public Vector2 directionalAttackSize = new Vector2(2f, 1f);
-    
-    [Header("⚔️ Advanced Melee Settings")]
-    [Tooltip("Chiều rộng vùng tấn công (cho Rectangle và Line attacks)")]
-    public float attackWidth = 1.0f;
-    
-    [Tooltip("Góc mở vùng tấn công (cho Arc và Cone, tính bằng độ)")]
-    [Range(30f, 360f)]
-    public float attackAngle = 90f;
-    
-    [Tooltip("Lực đẩy về phía trước khi tấn công (combat lunge)")]
-    public float attackLungeForce = 1.5f;
-    
-    [Header("🎬 Smooth Combat Animation")]
-    [Tooltip("Thời gian delay trước khi gây damage (cho animation windup)")]
-    public float damageDelay = 0.2f;
-    
-    [Tooltip("Cho phép di chuyển nhẹ trong khi tấn công")]
-    public bool allowCombatMovement = false;
-    
-    [Tooltip("Tốc độ di chuyển khi combat (% của tốc độ bình thường)")]
-    [Range(0f, 0.5f)]
-    public float combatMovementSpeed = 0.3f;
     
     [Header("Balance")]
     [Range(0f, 1f)]
@@ -272,13 +250,4 @@ public enum SkillType
     Area,       // Area effect - shows target zone
     Support,    // Support skill - no damage zone
     Instant     // Instant skill - no targeting required, instant execution
-}
-
-public enum DamageAreaShape
-{
-    Circle,      // Hình tròn đồng đều mọi hướng
-    Semicircle,  // Hình bán nguyệt theo hướng tấn công
-    Rectangle,   // Hình chữ nhật theo hướng
-    Cone,        // Hình nón theo hướng tấn công
-    Line         // Hình thẳng theo hướng
 }

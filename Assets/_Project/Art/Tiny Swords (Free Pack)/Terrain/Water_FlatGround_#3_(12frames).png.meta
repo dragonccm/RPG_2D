@@ -70,7 +70,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -89,7 +89,9 @@ TextureImporter:
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
   alphaIsTransparency: 1
+  spriteTessellationMethod: 0
   spriteTessellationDetail: -1
+  spriteGeometrySubdivision: -1
   textureType: 8
   textureShape: 1
   singleChannelComponent: 0
@@ -108,7 +110,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -422,7 +424,19 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Water_FlatGround_#3_(12frames)_0: -1503835193344364547
+      Water_FlatGround_#3_(12frames)_1: -2319526246980910489
+      Water_FlatGround_#3_(12frames)_10: 6312660756391294966
+      Water_FlatGround_#3_(12frames)_11: -7168400264538971370
+      Water_FlatGround_#3_(12frames)_2: 3504253878105679904
+      Water_FlatGround_#3_(12frames)_3: -624853357211682179
+      Water_FlatGround_#3_(12frames)_4: -6486231677512285615
+      Water_FlatGround_#3_(12frames)_5: -6563459294867875651
+      Water_FlatGround_#3_(12frames)_6: -6647478745937807217
+      Water_FlatGround_#3_(12frames)_7: 2346001187955964268
+      Water_FlatGround_#3_(12frames)_8: -1237724616265508946
+      Water_FlatGround_#3_(12frames)_9: -5949439975870876643
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

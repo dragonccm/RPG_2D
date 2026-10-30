@@ -58,7 +58,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -77,7 +77,9 @@ TextureImporter:
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
   alphaIsTransparency: 1
+  spriteTessellationMethod: 0
   spriteTessellationDetail: -1
+  spriteGeometrySubdivision: -1
   textureType: 8
   textureShape: 1
   singleChannelComponent: 0
@@ -96,7 +98,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -322,7 +324,15 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      goblinsmasher_attack_0: 8155964277154860700
+      goblinsmasher_attack_1: 7187373871869020899
+      goblinsmasher_attack_2: -7909076671487450002
+      goblinsmasher_attack_3: 3954691506794536052
+      goblinsmasher_attack_4: -2301804570112163855
+      goblinsmasher_attack_5: -852836202945163501
+      goblinsmasher_attack_6: -1903478778377439586
+      goblinsmasher_attack_7: -3371919090731137722
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -39,8 +39,23 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: Ground
+    uniqueID: 371857150
+    locked: 0
+  - name: Shadows
+    uniqueID: 371857151
+    locked: 0
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Props
+    uniqueID: 371857152
+    locked: 0
+  - name: Characters
+    uniqueID: 371857153
+    locked: 0
+  - name: Effects
+    uniqueID: 371857154
     locked: 0
   - name: Layer 1
     uniqueID: 2425651459

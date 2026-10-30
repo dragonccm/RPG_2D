@@ -51,6 +51,9 @@ public class AttackState : State
             return;
         }
 
+        // Đang giữa đòn (windup/active/recovery) → đứng yên, chờ đòn kết thúc
+        if (attackController != null && attackController.IsAttacking) return;
+
         // Nếu player ra khỏi vùng attack nhưng vẫn trong vùng chaseRange → Chase
         if (distanceToPlayer > attackRange)
         {
@@ -61,8 +64,12 @@ public class AttackState : State
         // Nếu vẫn trong vùng attack → tấn công
         if (distanceToPlayer <= attackRange)
         {
-            // Ưu tiên dùng kỹ năng nếu có EnemySkillManager
-            if (skillManager != null && skillManager.CanUseSkill())
+            // Đòn dạng dữ liệu (AttackDef) đi trước; kỹ năng cũ (EnemySkillManager) chỉ còn cho prefab chưa chuyển
+            if (attackController != null && attackController.HasAttackDef)
+            {
+                attackController.Attack(aiController.playerTarget);
+            }
+            else if (skillManager != null && skillManager.CanUseSkill())
             {
                 skillManager.UseSkill();
             }

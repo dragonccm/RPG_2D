@@ -1,3 +1,4 @@
 repository "RPG_Game_Current/RPG_Game_Current@18968301879311@cloud"
   path "/"
-    smartbranch "/main" changeset "18"      
+    br "/main"
+    co "/main"

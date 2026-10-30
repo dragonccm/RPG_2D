@@ -1,12 +1,9 @@
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
 using TMPro;
-using UI;
-using Core;
 
 /// <summary>
-/// UI Manager - Qu?n lï¿½ toï¿½n b? h? th?ng UI v?i Legacy Skill UI
+/// UI Manager - Qu?n lý toàn b? h? th?ng UI v?i Legacy Skill UI
 /// </summary>
 public class UIManager : MonoBehaviour
 {
@@ -24,7 +21,6 @@ public class UIManager : MonoBehaviour
     [SerializeField] private PlayerUI playerUI;
     [SerializeField] private NearbyHealthDisplay nearbyHealthDisplay;
     [SerializeField] private TargetingSystem targetingSystem;
-    [SerializeField] private UI.PauseMenu pauseMenu;
 
     [Header("UI Settings")]
     [SerializeField] private bool showPlayerUI = true;
@@ -74,17 +70,17 @@ public class UIManager : MonoBehaviour
 
     void Update()
     {
-        // Tab toggle ?ï¿½ ???c x? lï¿½ trong PlayerController
+        // Tab toggle ?ã ???c x? lý trong PlayerController
     }
 
     /// <summary>
-    /// T? ??ng tï¿½m cï¿½c UI components theo hierarchy structure
+    /// T? ??ng tìm các UI components theo hierarchy structure
     /// </summary>
     private void AutoFindUIComponents()
     {
         Debug.Log("?? Auto-finding UI components for UIManager...");
 
-        // Tï¿½m Canvas
+        // Tìm Canvas
         Canvas canvas = FindFirstObjectByType<Canvas>();
         if (canvas == null)
         {
@@ -124,9 +120,6 @@ public class UIManager : MonoBehaviour
         if (targetingSystem == null)
             targetingSystem = FindFirstObjectByType<TargetingSystem>();
 
-        if (pauseMenu == null)
-            pauseMenu = FindFirstObjectByType<UI.PauseMenu>();
-
         Debug.Log("? Auto-find complete for UIManager");
     }
 
@@ -135,7 +128,7 @@ public class UIManager : MonoBehaviour
     /// </summary>
     private void InitializeUI()
     {
-        // T? ??ng tï¿½m cï¿½c component khï¿½c n?u ch?a ???c assign
+        // T? ??ng tìm các component khác n?u ch?a ???c assign
         if (playerUI == null)
             playerUI = FindFirstObjectByType<PlayerUI>();
 
@@ -174,21 +167,17 @@ public class UIManager : MonoBehaviour
         }
         else
         {
-            Debug.LogError("? Skill UI system incomplete! Need both SkillPanelUI and SkillDetailUI.");
+            // Báº£ng ká»¹ nÄƒng cÅ© (SkillPanelUI/DetailUI) khÃ´ng cÃ²n báº¯t buá»™c: ká»¹ nÄƒng quáº£n lÃ½ báº±ng SkillBook + SkillTreeUI (Tab) + InventoryUI (I)
         }
 
         // Other systems
         Debug.Log($"PlayerUI: {(playerUI != null ? "?" : "?")}");
         Debug.Log($"NearbyHealthDisplay: {(nearbyHealthDisplay != null ? "?" : "?")}");
         Debug.Log($"TargetingSystem: {(targetingSystem != null ? "?" : "?")}");
-        Debug.Log($"PauseMenu: {(pauseMenu != null ? "?" : "?")}");
 
         // Warnings for missing components
         if (!healthUIValid)
             Debug.LogWarning("?? Health UI components missing! Player health/mana may not display correctly.");
-
-        if (!skillUIValid)
-            Debug.LogWarning("?? Skill UI system incomplete! Skill management will not work.");
     }
 
     /// <summary>
@@ -231,22 +220,6 @@ public class UIManager : MonoBehaviour
         else
         {
             Debug.LogWarning("? SkillPanelUI not found! Cannot toggle skill panel.");
-        }
-    }
-
-    /// <summary>
-    /// Toggle pause menu v?i Escape key
-    /// </summary>
-    public void TogglePauseMenu()
-    {
-        if (pauseMenu != null)
-        {
-            pauseMenu.TogglePause();
-            Debug.Log($"?? PauseMenu toggled - Now: {(pauseMenu.IsPaused ? "PAUSED" : "RESUMED")}");
-        }
-        else
-        {
-            Debug.LogWarning("? PauseMenu not found! Cannot toggle pause menu.");
         }
     }
 
@@ -336,6 +309,24 @@ public class UIManager : MonoBehaviour
     public bool IsSkillPanelVisible()
     {
         return skillPanelUI != null && skillPanelUI.IsVisible();
+    }
+
+    /// <summary>
+    /// Context menu ?? test component
+    /// </summary>
+    [ContextMenu("?? Test All UI Components")]
+    public void TestAllUIComponents()
+    {
+        Debug.Log("?? === TESTING ALL UI COMPONENTS ===");
+        ValidateUIComponents();
+        
+        if (skillPanelUI != null)
+            skillPanelUI.TestComponent();
+            
+        if (skillDetailUI != null)
+            skillDetailUI.TestComponent();
+            
+        Debug.Log("?? === UI TEST COMPLETE ===");
     }
 
     [ContextMenu("?? Refresh Auto-Find")]

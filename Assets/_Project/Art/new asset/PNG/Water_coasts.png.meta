@@ -73,7 +73,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -92,7 +92,9 @@ TextureImporter:
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
   alphaIsTransparency: 1
+  spriteTessellationMethod: 0
   spriteTessellationDetail: -1
+  spriteGeometrySubdivision: -1
   textureType: 8
   textureShape: 1
   singleChannelComponent: 0
@@ -111,7 +113,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -447,7 +449,20 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Water_coasts_0: -4889110880608369945
+      Water_coasts_1: 7286072917376454345
+      Water_coasts_10: -8610922282053433029
+      Water_coasts_11: -7399440914069808101
+      Water_coasts_12: 2683434243874634494
+      Water_coasts_2: -6153555347235284400
+      Water_coasts_3: 2879467965831645296
+      Water_coasts_4: -1704662883310401001
+      Water_coasts_5: 8140185298851903490
+      Water_coasts_6: -6331613174696854627
+      Water_coasts_7: -4170002664527670992
+      Water_coasts_8: -3245837272849212251
+      Water_coasts_9: -8525965175599998412
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

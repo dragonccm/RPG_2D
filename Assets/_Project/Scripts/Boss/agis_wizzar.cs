@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using RPG.Animation;
 
 public class agis_wizzar : MonoBehaviour
 {
@@ -29,8 +28,7 @@ public class agis_wizzar : MonoBehaviour
     [Header("Fireball Skill")]
     public GameObject fireballPrefab;
     public float fireballCooldown = 1f;
-    public float fireballSpeed = 10f;
-    public float fireballDamage = 25f;
+    [Tooltip("Tầm bắt đầu bắn cầu lửa (AI). Tốc độ/sát thương/telegraph nằm trong AttackDef Agis_Fireball.")]
     public float fireballRange = 8f;
     public AudioClip fireballCastSound;
     public AudioClip fireballImpactSound;
@@ -47,35 +45,23 @@ public class agis_wizzar : MonoBehaviour
     public float berserkFireballCooldown = 0.3f;
     public int berserkFireballCount = 5; // Tăng từ 3 lên 5
     
+    [Header("Đòn đánh (AttackDef — Resources/Attacks)")]
+    public AttackDef fireballDef;
+    public AttackDef barrageDef;
+    public AttackDef slamDef;
+
     [Header("AOE Skill")]
     public GameObject aoePrefab;
     public float aoeCooldown = 8f;
-    public float aoeRadius = 3f;
-    public float aoeDamage = 50f;
-    public float aoeChargeTime = 2f; // Tăng thời gian warning
+    [Tooltip("Thời gian scale hiệu ứng aoePrefab (nếu có). Windup/sát thương/bán kính nằm trong AttackDef Agis_Slam.")]
+    public float aoeChargeTime = 1f;
     public AudioClip aoeCastSound;
-    
-    [Header("📢 Enhanced Warning System")]
-    [Tooltip("Màu warning cho AOE attack")]
-    public Color aoeWarningColor = new Color(1f, 0.2f, 0.2f, 0.5f);
-    [Tooltip("Màu warning cho Fireball")]
-    public Color fireballWarningColor = new Color(1f, 0.6f, 0f, 0.4f);
-    [Tooltip("Thời gian warning trước khi Fireball hit")]
-    public float fireballWarningTime = 0.8f;
     
     [Header("AI Settings")]
     public Transform playerTarget;
     public float detectionRange = 15f;
     public float attackRange = 6f;
     public float minDistance = 3f;
-    
-    [Header("🎯 Boss Mechanics (AAA Game Style)")]
-    [Tooltip("Số lần telegraph tấn công trước khi thực sự tấn công")]
-    public int telegraphCount = 2;
-    [Tooltip("Thời gian nghỉ giữa các đợt tấn công để player có thể phản ứng")]
-    public float attackCooldownBetweenPhases = 1.5f;
-    [Tooltip("Giảm tốc độ tấn công để cho player thời gian phản ứng")]
-    public float baseAttackSpeedMultiplier = 0.7f;
     
     // Character system integration - sử dụng hệ thống cũ để xây dựng hệ thống mới
     private Character character;
@@ -93,14 +79,26 @@ public class agis_wizzar : MonoBehaviour
     private float fireballCooldownTimer = 0f;
     private float aoeCooldownTimer = 0f;
 
+    private bool isDowned = false;
+    private bool endingChosen = false;
+    private GameObject endingPromptGo;
+
     // Properties utilizing Character system
     public float CurrentHealth => character != null ? character.CurrentHealth : 0f;
     public float MaxHealth => character != null ? character.MaxHealth : maxHealth;
     public bool IsDead => character != null ? character.IsDead : false;
     public float GetHealthPercentage() => character != null ? character.CurrentHealth / character.MaxHealth : 0f;
 
+    private AttackRunner attackRunner;
+
     void Start()
     {
+        attackRunner = GetComponent<AttackRunner>();
+        if (attackRunner == null) attackRunner = gameObject.AddComponent<AttackRunner>();
+        if (fireballDef == null) fireballDef = Resources.Load<AttackDef>("Attacks/Agis_Fireball");
+        if (barrageDef == null) barrageDef = Resources.Load<AttackDef>("Attacks/Agis_FireballBarrage");
+        if (slamDef == null) slamDef = Resources.Load<AttackDef>("Attacks/Agis_Slam");
+
         // Tích hợp với Character system - tận dụng hệ thống cũ
         character = GetComponent<Character>();
         if (character == null)
@@ -130,49 +128,9 @@ public class agis_wizzar : MonoBehaviour
         if (animator == null)
             animator = gameObject.AddComponent<Animator>();
             
-        // CRITICAL FIX: Ensure Boss has proper Animator Controller
-        if (animator.runtimeAnimatorController == null)
-        {
-            Debug.LogWarning($"[{gameObject.name}] No Animator Controller assigned! Attempting to load BossAnimator.controller...");
-            
-            // Try to load BossAnimator.controller
-            var bossController = Resources.Load<RuntimeAnimatorController>("BossAnimator");
-            if (bossController == null)
-            {
-                // Fallback: try to find any suitable controller
-                var controllers = Resources.FindObjectsOfTypeAll<RuntimeAnimatorController>();
-                foreach (var controller in controllers)
-                {
-                    if (controller.name.ToLower().Contains("boss") || controller.name.ToLower().Contains("agis"))
-                    {
-                        bossController = controller;
-                        break;
-                    }
-                }
-            }
-            
-            if (bossController != null)
-            {
-                animator.runtimeAnimatorController = bossController;
-                Debug.Log($"[{gameObject.name}] Successfully assigned {bossController.name} controller!");
-            }
-            else
-            {
-                Debug.LogError($"[{gameObject.name}] Could not find suitable Animator Controller! Animation will not work!");
-            }
-        }
-            
         rb2d.gravityScale = 0f;
         rb2d.linearDamping = 5f;
         rb2d.freezeRotation = true;
-        
-        // ENHANCED: Setup EnemyAnimatorController for boss
-        var animatorController = GetComponent<EnemyAnimatorController>();
-        if (animatorController == null)
-        {
-            animatorController = gameObject.AddComponent<EnemyAnimatorController>();
-            Debug.Log("Agis Wizzar: Added EnemyAnimatorController automatically");
-        }
         
         // Lưu trữ scale và speed gốc
         originalScale = transform.localScale;
@@ -191,6 +149,12 @@ public class agis_wizzar : MonoBehaviour
 
     void Update()
     {
+        if (isDowned)
+        {
+            HandleEndingChoice();
+            return;
+        }
+
         UpdateCooldowns();
         
         if (Input.GetKeyDown(KeyCode.B))
@@ -237,6 +201,7 @@ public class agis_wizzar : MonoBehaviour
     /// </summary>
     private void OnCharacterDeath()
     {
+        AudioService.Play(SfxId.BossDeath, transform.position);
         Debug.Log("Agis Wizzar defeated through Character system!");
         OnBossDeath();
     }
@@ -321,12 +286,12 @@ public class agis_wizzar : MonoBehaviour
         {
             rb2d.MovePosition(targetPosition);
             if (animator != null)
-                animator.SetBool(AnimationParameters.IsMoving, true);
+                animator.SetBool("IsMoving", true);
         }
         else
         {
             if (animator != null)
-                animator.SetBool(AnimationParameters.IsMoving, false);
+                animator.SetBool("IsMoving", false);
         }
     }
 
@@ -341,61 +306,28 @@ public class agis_wizzar : MonoBehaviour
             
             if (healthPercent <= lowHealthThreshold)
             {
-                // Máu rất thấp - teleport rất thường xuyên (60% chance - giảm từ 80%)
-                shouldTeleport = Random.Range(0f, 1f) < 0.6f;
+                // Máu rất thấp - teleport rất thường xuyên (80% chance)
+                shouldTeleport = Random.Range(0f, 1f) < 0.8f;
             }
             else if (healthPercent <= teleportHealthThreshold)
             {
-                // Máu thấp - teleport thường xuyên (35% chance - giảm từ 50%)
-                shouldTeleport = Random.Range(0f, 1f) < 0.35f;
+                // Máu thấp - teleport thường xuyên (50% chance)
+                shouldTeleport = Random.Range(0f, 1f) < 0.5f;
             }
             
             if (shouldTeleport)
             {
-                StartCoroutine(TelegraphedTeleport());
+                StartCoroutine(TeleportSkill());
                 return;
             }
         }
         
-        // Fireball skill với logic berserk và telegraph
+        // Fireball skill với logic berserk
         if (fireballCooldownTimer <= 0 && distanceToPlayer <= fireballRange)
         {
-            StartCoroutine(TelegraphedFireballAttack());
+            StartCoroutine(FireballSkill());
             return;
         }
-    }
-
-    /// <summary>
-    /// Telegraphed Teleport - shows warning before teleporting
-    /// </summary>
-    IEnumerator TelegraphedTeleport()
-    {
-        isSkillActive = true;
-        
-        // Create warning effect at current position
-        Effect2DManager.CreateWarningIndicator2D(transform.position, 1.5f, 0.8f, Color.magenta);
-        
-        yield return new WaitForSeconds(0.8f);
-        
-        // Now perform the actual teleport
-        yield return StartCoroutine(TeleportSkill());
-    }
-
-    /// <summary>
-    /// Telegraphed Fireball Attack - shows intent before attacking
-    /// </summary>
-    IEnumerator TelegraphedFireballAttack()
-    {
-        isSkillActive = true;
-        
-        // Show casting effect
-        Effect2DManager.CreateFallbackEffect2D(transform.position, Color.red, 1.2f, 1f);
-        
-        // Brief pause to show intent
-        yield return new WaitForSeconds(0.3f * baseAttackSpeedMultiplier);
-        
-        // Now perform the actual fireball attack
-        yield return StartCoroutine(FireballSkill());
     }
 
     /// <summary>
@@ -437,16 +369,8 @@ public class agis_wizzar : MonoBehaviour
         
         Debug.Log($"Agis Wizzar is teleporting! Health: {healthPercent:P1}, Cooldown: {teleportCooldownTimer}s");
         
-        // ENHANCED: Use EnemyAnimatorController for teleport animation
-        var animatorController = GetComponent<EnemyAnimatorController>();
-        if (animatorController != null)
-        {
-            animatorController.PlayTeleportAnimation();
-        }
-        else if (animator != null)
-        {
-            animator.SetTrigger(AnimationParameters.Teleport);
-        }
+        if (animator != null)
+            animator.SetTrigger("Teleport");
             
         CreateTeleportEffect(transform.position);
             
@@ -470,13 +394,12 @@ public class agis_wizzar : MonoBehaviour
     {
         if (teleportEffect != null)
         {
-            // SỬ DỤNG 2D EFFECT MANAGER - PHƯƠNG PHÁP ĐÚNG
-            Effect2DManager.CreateEffect2D(teleportEffect, position, Quaternion.identity, 1f, true);
+            VfxService.PlayPrefab(teleportEffect, position, Quaternion.identity, 1f);
         }
         else
         {
             // Fallback: Teleport effect đơn giản
-            Effect2DManager.CreateFallbackEffect2D(position, new Color(0.5f, 0f, 1f, 0.8f), 1.5f, 1f);
+            VfxService.Impact(position, new Color(0.5f, 0f, 1f), 1.5f);
         }
     }
 
@@ -500,268 +423,62 @@ public class agis_wizzar : MonoBehaviour
     IEnumerator FireballSkill()
     {
         isSkillActive = true;
-        
-        Debug.Log($"Agis Wizzar casting fireball! Berserk: {isBerserk}");
-        
+        PlaySound(fireballCastSound);
+        if (animator != null) animator.SetTrigger("CastFireball");
+
+        // Boss chớp vàng suốt windup (AttackRunner vẽ đường báo hiệu hướng bắn)
+        if (spriteRenderer != null) spriteRenderer.color = Color.yellow;
+
         if (isBerserk)
         {
-            // Berserk mode - bắn nhiều fireball
+            // Berserk: loạt đạn — mỗi viên có windup 0.4s riêng (đọc được, né được)
             fireballCooldownTimer = berserkFireballCooldown;
-            
             for (int i = 0; i < berserkFireballCount; i++)
             {
-                Vector2 targetPos = (Vector2)playerTarget.position + Random.insideUnitCircle * 1f;
-                LaunchFireball2D(targetPos);
-                
-                yield return new WaitForSeconds(0.15f); // Giảm delay giữa các fireball
+                if (playerTarget == null) break;
+                Vector2 aim = (Vector2)(playerTarget.position - transform.position) + Random.insideUnitCircle * 1f;
+                yield return attackRunner.Perform(barrageDef, aim, null, fireballPrefab);
             }
         }
         else
         {
-            // Normal mode
             fireballCooldownTimer = fireballCooldown;
-            LaunchFireball2D(playerTarget.position);
+            if (playerTarget != null)
+                yield return attackRunner.Perform(fireballDef, (Vector2)(playerTarget.position - transform.position), null, fireballPrefab);
         }
-        
+
+        if (spriteRenderer != null) spriteRenderer.color = isBerserk ? Color.red : Color.white;
         yield return new WaitForSeconds(0.2f);
         isSkillActive = false;
-    }
-
-    void LaunchFireball2D(Vector2 targetPosition)
-    {
-        Vector2 spawnPosition = (Vector2)transform.position + Vector2.up * 0.5f;
-        
-        // Create warning indicator at target position
-        float distanceToTarget = Vector2.Distance(spawnPosition, targetPosition);
-        float travelTime = distanceToTarget / fireballSpeed;
-        float warningTime = Mathf.Min(fireballWarningTime, travelTime * 0.8f);
-        
-        if (warningTime > 0.2f) // Only show warning if there's enough time
-        {
-            Effect2DManager.CreateWarningIndicator2D(targetPosition, 1f, warningTime, fireballWarningColor);
-        }
-        
-        GameObject fireball;
-        
-        if (fireballPrefab != null)
-        {
-            fireball = Instantiate(fireballPrefab, spawnPosition, Quaternion.identity);
-        }
-        else
-        {
-            fireball = CreateDefaultFireball(spawnPosition);
-        }
-        
-        FireballProjectile2D projectile = fireball.GetComponent<FireballProjectile2D>();
-        if (projectile == null)
-        {
-            projectile = fireball.AddComponent<FireballProjectile2D>();
-        }
-        
-        projectile.Initialize(targetPosition, fireballSpeed, fireballDamage, fireballImpactSound);
-        
-        PlaySound(fireballCastSound);
-        
-        if (animator != null)
-            animator.SetTrigger(AnimationParameters.CastFireball);
-            
-        Debug.Log($"🔥 Fireball launched towards {targetPosition} with {warningTime:F1}s warning!");
-    }
-
-    GameObject CreateDefaultFireball(Vector2 position)
-    {
-        GameObject fireball = new GameObject("DefaultFireball");
-        fireball.transform.position = position;
-        
-        // Sử dụng SpriteRenderer thay vì tạo texture phức tạp
-        var spriteRenderer = fireball.AddComponent<SpriteRenderer>();
-        
-        // Tạo sprite đơn giản cho fireball
-        Texture2D texture = CreateSimpleFireballTexture();
-        Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.one * 0.5f);
-        spriteRenderer.sprite = sprite;
-        spriteRenderer.sortingOrder = 10;
-        
-        var collider = fireball.AddComponent<CircleCollider2D>();
-        collider.isTrigger = true;
-        collider.radius = 0.3f;
-        
-        var rb = fireball.AddComponent<Rigidbody2D>();
-        rb.gravityScale = 0f;
-        
-        return fireball;
-    }
-
-    /// <summary>
-    /// Tạo texture đơn giản cho fireball fallback
-    /// </summary>
-    Texture2D CreateSimpleFireballTexture()
-    {
-        int size = 32;
-        Texture2D texture = new Texture2D(size, size, TextureFormat.RGBA32, false);
-        Color[] colors = new Color[size * size];
-        Vector2 center = Vector2.one * (size * 0.5f);
-        float radius = size * 0.4f;
-
-        for (int y = 0; y < size; y++)
-        {
-            for (int x = 0; x < size; x++)
-            {
-                float distance = Vector2.Distance(new Vector2(x, y), center);
-                if (distance <= radius)
-                {
-                    float intensity = 1f - (distance / radius);
-                    colors[y * size + x] = new Color(1f, intensity * 0.3f, 0f, intensity);
-                }
-                else
-                {
-                    colors[y * size + x] = Color.clear;
-                }
-            }
-        }
-
-        texture.SetPixels(colors);
-        texture.Apply();
-        return texture;
     }
 
     IEnumerator AOESkill()
     {
         isSkillActive = true;
         aoeCooldownTimer = aoeCooldown;
-        
-        Debug.Log("🔥 Agis Wizzar casting AOE! Players have time to dodge!");
-        
+
         PlaySound(aoeCastSound);
-        
-        if (animator != null)
-            animator.SetTrigger(AnimationParameters.AOECast);
-        
-        // Predict player position but give them time to react
-        Vector2 aoePosition = PredictPlayerPosition();
-        
-        // Create warning indicator first
-        GameObject warningIndicator = Effect2DManager.CreateWarningIndicator2D(
-            aoePosition, aoeRadius, aoeChargeTime, aoeWarningColor);
-        
-        // Create charge effect
-        GameObject chargeEffect = CreateAOEChargeEffect(aoePosition);
-        
-        // Wait for charge time - this gives players time to dodge
-        yield return new WaitForSeconds(aoeChargeTime);
-        
-        // Deal damage only if player is still in area
-        DealAOEDamage2D(aoePosition);
-        
-        // Create explosion effect
-        CreateAOEExplosionEffect(aoePosition);
-        
-        yield return new WaitForSeconds(0.5f);
+        if (animator != null) animator.SetTrigger("AOECast");
+
+        // Đặt vùng đập xuống chân người chơi lúc bắt đầu; windup 1s = thời gian né (AttackDef Agis_Slam)
+        Vector2 aoePosition = playerTarget.position;
+        bool customVisual = aoePrefab != null;
+        if (customVisual) CreateAOEChargeEffect(aoePosition);
+
+        yield return attackRunner.Perform(slamDef, (Vector2)(playerTarget.position - transform.position), aoePosition, null, !customVisual);
+
+        yield return new WaitForSeconds(0.3f);
         isSkillActive = false;
-        
-        Debug.Log("✨ AOE attack completed!");
     }
 
-    /// <summary>
-    /// Predict player position with some randomness to make it challenging but fair
-    /// </summary>
-    private Vector2 PredictPlayerPosition()
+    /// <summary>Hiệu ứng art tuỳ chọn (aoePrefab) lớn dần trong lúc windup; không có thì AttackRunner vẽ telegraph pixel.</summary>
+    void CreateAOEChargeEffect(Vector2 position)
     {
-        if (playerTarget == null) return transform.position;
-        
-        Vector2 playerPos = playerTarget.position;
-        
-        // Add slight prediction based on player movement but keep it fair
-        Rigidbody2D playerRb = playerTarget.GetComponent<Rigidbody2D>();
-        if (playerRb != null && playerRb.linearVelocity.magnitude > 0.1f)
-        {
-            // Predict 0.5 seconds ahead but add some randomness
-            Vector2 prediction = playerRb.linearVelocity * 0.5f;
-            playerPos += prediction + Random.insideUnitCircle * 0.5f;
-        }
-        
-        return playerPos;
-    }
-
-    /// <summary>
-    /// Create explosion effect at AOE location
-    /// </summary>
-    private void CreateAOEExplosionEffect(Vector2 position)
-    {
-        // Create main explosion effect
-        Effect2DManager.CreateFallbackEffect2D(position, Color.red, aoeRadius * 1.5f, 1f);
-        
-        // Create secondary ring effect
-        Effect2DManager.CreateFallbackEffect2D(position, Color.orange, aoeRadius * 2f, 0.8f);
-    }
-
-    GameObject CreateAOEChargeEffect(Vector2 position)
-    {
-        if (aoePrefab != null)
-        {
-            // SỬ DỤNG 2D EFFECT MANAGER cho AOE prefab
-            GameObject effect = Effect2DManager.CreateEffect2D(aoePrefab, position, Quaternion.identity, 0.1f, false);
-            
-            // Scale effect từ từ
-            if (effect != null)
-            {
-                StartCoroutine(ScaleOverTime(effect, Vector3.one * aoeRadius * 2, aoeChargeTime));
-                // Destroy sau khi charge time + thêm 1s
-                Destroy(effect, aoeChargeTime + 1f);
-            }
-            
-            return effect;
-        }
-        else
-        {
-            // Fallback: AOE charge effect đơn giản
-            return Effect2DManager.CreateFallbackEffect2D(position, Color.red, aoeRadius, aoeChargeTime + 1f);
-        }
-    }
-
-    void DealAOEDamage2D(Vector2 center)
-    {
-        Collider2D[] hits = Physics2D.OverlapCircleAll(center, aoeRadius);
-        
-        foreach (var hit in hits)
-        {
-            if (hit.CompareTag("Player"))
-            {
-                float distance = Vector2.Distance(center, hit.transform.position);
-                float damageMultiplier = 1f - (distance / aoeRadius * 0.5f);
-                float finalDamage = aoeDamage * damageMultiplier;
-                
-                bool damageDealt = false;
-                
-                // Method 1: IDamageable interface
-                IDamageable damageable = hit.GetComponent<IDamageable>();
-                if (damageable != null)
-                {
-                    damageable.TakeDamage(finalDamage);
-                    damageDealt = true;
-                    Debug.Log($"💥 AOE hit {hit.name} for {finalDamage:F1} damage via IDamageable!");
-                }
-                
-                // Method 2: Character component
-                Character character = hit.GetComponent<Character>();
-                if (character != null && !damageDealt)
-                {
-                    character.TakeDamage(finalDamage);
-                    damageDealt = true;
-                    Debug.Log($"💥 AOE hit {hit.name} for {finalDamage:F1} damage via Character!");
-                }
-                
-                // Method 3: Removed - Health component doesn't exist in codebase
-                
-                if (!damageDealt)
-                {
-                    Debug.LogWarning($"⚠️ AOE hit {hit.name} but could not deal damage! Missing damage interface.");
-                }
-                
-                // Create impact effect on player
-                Effect2DManager.CreateFallbackEffect2D(hit.transform.position, Color.yellow, 0.8f, 0.5f);
-            }
-        }
+        GameObject effect = VfxService.PlayPrefab(aoePrefab, position, Quaternion.identity, 0.1f, 0f);
+        if (effect == null) return;
+        float radius = slamDef != null ? slamDef.radius : 3f;
+        StartCoroutine(ScaleOverTime(effect, Vector3.one * radius * 2, slamDef != null ? slamDef.windup : aoeChargeTime));
+        Destroy(effect, (slamDef != null ? slamDef.windup : aoeChargeTime) + 1f);
     }
 
     IEnumerator ScaleOverTime(GameObject obj, Vector3 targetScale, float duration)
@@ -839,6 +556,7 @@ public class agis_wizzar : MonoBehaviour
     /// </summary>
     IEnumerator EnterBerserkMode()
     {
+        AudioService.Play(SfxId.BossRoar, transform.position);
         hasBerserkTriggered = true;
         isBerserk = true;
         isSkillActive = true; // Tạm dừng các skill khác
@@ -848,8 +566,8 @@ public class agis_wizzar : MonoBehaviour
         // Animation trigger
         if (animator != null)
         {
-            animator.SetBool(AnimationParameters.IsBerserk, true);
-            animator.SetTrigger(AnimationParameters.EnterBerserk);
+            animator.SetBool("IsBerserk", true);
+            animator.SetTrigger("EnterBerserk");
         }
         
         // Hiệu ứng âm thanh và visual
@@ -888,7 +606,8 @@ public class agis_wizzar : MonoBehaviour
             yield return new WaitForSeconds(0.2f);
         }
         
-
+        // Screen shake effect (nếu có camera shake system)
+        // CameraShaker.Instance?.ShakeOnce(0.5f, 4f, 0.1f, 1f);
     }
     
     /// <summary>
@@ -899,12 +618,12 @@ public class agis_wizzar : MonoBehaviour
         // Nếu có prefab cho berserk effect, sử dụng nó
         if (teleportEffect != null) // Tạm dùng teleportEffect làm berserk effect
         {
-            Effect2DManager.CreateEffect2D(teleportEffect, position, Quaternion.identity, 1.5f, true);
+            VfxService.PlayPrefab(teleportEffect, position, Quaternion.identity, 1.5f);
         }
         else
         {
             // Fallback: Berserk transform effect
-            Effect2DManager.CreateFallbackEffect2D(position, Color.red, 2f, 1.5f);
+            VfxService.Impact(position, Color.red, 2f);
         }
     }
     
@@ -943,19 +662,90 @@ public class agis_wizzar : MonoBehaviour
         Debug.Log("Agis Wizzar defeated through Character system!");
         
         if (animator != null)
-            animator.SetTrigger(AnimationParameters.Death);
+            animator.SetTrigger("Death");
             
         if (rb2d != null)
             rb2d.linearVelocity = Vector2.zero;
             
-        // Dừng tất cả coroutines
+        // Dừng tất cả coroutines chiến đấu
         StopAllCoroutines();
+
+        // Báo cáo tiến trình quest Q4
+        if (QuestManager.Instance != null)
+        {
+            QuestManager.Instance.ReportProgress("q4", "q4_agis");
+        }
+
+        // Tác động rung chấn màn hình hoành tráng khi boss gục
+        VfxService.Shake(ShakeLevel.Boss);
+        VfxService.Impact(transform.position, Color.yellow, 2.5f);
+
+        // Cuộn Hư Không đã chuyển sang mini-boss Thợ Săn Bóng (LEVEL_DESIGN 2.2) — Agis chỉ đánh dấu kết thúc
+        WorldFlags.Set("boss:agis");
         
-        // Disable movement và skills
-        this.enabled = false;
-        
-        // Destroy sau một khoảng thời gian
-        Destroy(gameObject, 3f);
+        isDowned = true;
+        ShowEndingChoicePrompt();
+    }
+
+    private void ShowEndingChoicePrompt()
+    {
+        if (endingPromptGo != null) return;
+        endingPromptGo = new GameObject("EndingChoicePrompt");
+        endingPromptGo.transform.SetParent(transform, false);
+        endingPromptGo.transform.localPosition = new Vector3(0, 1.8f, 0);
+
+        var tm = endingPromptGo.AddComponent<TextMesh>();
+        tm.text = "[F] Tha thứ   |   [J] Kết liễu";
+        tm.characterSize = 0.22f;
+        tm.anchor = TextAnchor.MiddleCenter;
+        tm.alignment = TextAlignment.Center;
+        tm.color = new Color(1f, 0.9f, 0.3f, 1f);
+    }
+
+    private void HandleEndingChoice()
+    {
+        if (endingChosen) return;
+
+        Transform pc = playerTarget;
+        if (pc == null)
+        {
+            var playerCtrl = FindFirstObjectByType<PlayerController>();
+            if (playerCtrl != null) pc = playerCtrl.transform;
+        }
+
+        if (pc != null && Vector2.Distance(transform.position, pc.position) <= 4.0f)
+        {
+            if (endingPromptGo != null) endingPromptGo.SetActive(true);
+
+            if (Input.GetKeyDown(KeyCode.F))
+            {
+                endingChosen = true;
+                if (endingPromptGo != null) Destroy(endingPromptGo);
+                if (DialogueUI.Instance != null)
+                {
+                    DialogueUI.Instance.StartDialogue(DialogueDatabase.AgisEndingForgive);
+                }
+                Debug.Log("🕊️ Người chơi chọn [THA THỨ] Agis - Đêm Trăng Đỏ khép lại trong ánh bình minh.");
+                Destroy(gameObject, 5f);
+            }
+            else if (Input.GetKeyDown(KeyCode.J) || Input.GetMouseButtonDown(0))
+            {
+                endingChosen = true;
+                if (endingPromptGo != null) Destroy(endingPromptGo);
+                if (DialogueUI.Instance != null)
+                {
+                    DialogueUI.Instance.StartDialogue(DialogueDatabase.AgisEndingDestroy);
+                }
+                VfxService.Shake(ShakeLevel.Boss);
+                VfxService.Impact(transform.position, Color.red, 3.0f);
+                Debug.Log("⚔️ Người chơi chọn [KẾT LIỄU] Agis - Ác mộng Trăng Đỏ bị chém vỡ thành tro bụi.");
+                Destroy(gameObject, 3f);
+            }
+        }
+        else
+        {
+            if (endingPromptGo != null) endingPromptGo.SetActive(false);
+        }
     }
 
     void OnDrawGizmosSelected()
@@ -976,7 +766,7 @@ public class agis_wizzar : MonoBehaviour
         }
         
         Gizmos.color = Color.magenta;
-        Gizmos.DrawWireSphere(transform.position, aoeRadius);
+        Gizmos.DrawWireSphere(transform.position, slamDef != null ? slamDef.radius : 3f);
     }
 
     public bool IsBerserk()
@@ -1005,111 +795,5 @@ public class agis_wizzar : MonoBehaviour
             character.OnDamageTaken -= OnDamageTaken;
             character.OnDeath -= OnCharacterDeath;
         }
-    }
-}
-
-public class FireballProjectile2D : MonoBehaviour
-{
-    private Vector2 targetPosition;
-    private float speed;
-    private float damage;
-    private AudioClip impactSound;
-    private bool hasTarget = false;
-    private Rigidbody2D rb2d;
-
-    public void Initialize(Vector2 target, float projectileSpeed, float projectileDamage, AudioClip impact)
-    {
-        targetPosition = target;
-        speed = projectileSpeed;
-        damage = projectileDamage;
-        impactSound = impact;
-        hasTarget = true;
-        
-        rb2d = GetComponent<Rigidbody2D>();
-        if (rb2d == null)
-            rb2d = gameObject.AddComponent<Rigidbody2D>();
-            
-        rb2d.gravityScale = 0f;
-        rb2d.freezeRotation = true;
-        
-        Vector2 direction = (targetPosition - (Vector2)transform.position).normalized;
-        rb2d.linearVelocity = direction * speed;
-        
-        if (direction != Vector2.zero)
-        {
-            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-            transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
-        }
-        
-        Destroy(gameObject, 5f);
-    }
-
-    void Update()
-    {
-        if (hasTarget)
-        {
-            if (Vector2.Distance(transform.position, targetPosition) < 0.5f)
-            {
-                Explode();
-            }
-        }
-    }
-
-    void OnTriggerEnter2D(Collider2D other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            // Try multiple ways to deal damage to ensure it works
-            bool damageDealt = false;
-            
-            // Method 1: IDamageable interface
-            IDamageable damageable = other.GetComponent<IDamageable>();
-            if (damageable != null)
-            {
-                damageable.TakeDamage(damage);
-                damageDealt = true;
-                Debug.Log($"🔥 Fireball hit {other.name} for {damage} damage via IDamageable!");
-            }
-            
-            // Method 2: Character component
-            Character character = other.GetComponent<Character>();
-            if (character != null && !damageDealt)
-            {
-                character.TakeDamage(damage);
-                damageDealt = true;
-                Debug.Log($"🔥 Fireball hit {other.name} for {damage} damage via Character!");
-            }
-            
-            // Method 3: Removed - Health component doesn't exist in codebase
-            
-            if (!damageDealt)
-            {
-                Debug.LogWarning($"⚠️ Fireball hit {other.name} but could not deal damage! Missing damage interface.");
-            }
-            
-            Explode();
-        }
-        else if (other.gameObject.layer == LayerMask.NameToLayer("Obstacle"))
-        {
-            Explode();
-        }
-    }
-
-    void Explode()
-    {
-        if (impactSound != null)
-        {
-            AudioSource.PlayClipAtPoint(impactSound, transform.position);
-        }
-        
-        CreateExplosionEffect();
-        
-        Destroy(gameObject);
-    }
-    
-    void CreateExplosionEffect()
-    {
-        // SỬ DỤNG 2D EFFECT MANAGER thay vì tạo ParticleSystem
-        Effect2DManager.CreateFallbackEffect2D(transform.position, Color.red, 1.2f, 1f);
     }
 }

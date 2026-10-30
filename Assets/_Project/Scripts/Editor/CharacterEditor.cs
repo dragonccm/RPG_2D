@@ -275,7 +275,13 @@ public class CharacterEditor : Editor
             EditorGUILayout.EndHorizontal();
             
             EditorGUILayout.BeginHorizontal();
-
+            EditorGUILayout.LabelField("Screen Shake:", GUILayout.Width(140));
+            bool newEnableScreenShake = EditorGUILayout.Toggle(character.EnableScreenShake);
+            if (newEnableScreenShake != character.EnableScreenShake)
+            {
+                character.EnableScreenShake = newEnableScreenShake;
+                EditorUtility.SetDirty(character);
+            }
             EditorGUILayout.EndHorizontal();
             
             EditorGUILayout.BeginHorizontal();

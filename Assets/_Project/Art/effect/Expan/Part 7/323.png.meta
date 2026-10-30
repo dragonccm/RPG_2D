@@ -142,7 +142,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -161,7 +161,9 @@ TextureImporter:
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
   alphaIsTransparency: 1
+  spriteTessellationMethod: 0
   spriteTessellationDetail: -1
+  spriteGeometrySubdivision: -1
   textureType: 8
   textureShape: 1
   singleChannelComponent: 0
@@ -180,7 +182,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -1022,7 +1024,43 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      323_0: -1911189370502641363
+      323_1: 2504521885246361963
+      323_10: 7714155373303944319
+      323_11: 810520227652053490
+      323_12: -4578301589137841866
+      323_13: 4919871799116938627
+      323_14: 6894447818800027341
+      323_15: -8311387828672975314
+      323_16: 2152974643860665113
+      323_17: -3531078881033511895
+      323_18: -1550881053547220096
+      323_19: -3949796434226185613
+      323_2: 6907044015624152427
+      323_20: -3399968996934701353
+      323_21: -3031373277375233981
+      323_22: 5230848790346540532
+      323_23: 3523517031553127290
+      323_24: -6272139829311264229
+      323_25: 4112014871723416173
+      323_26: -7599943343383244192
+      323_27: -5581221705131153270
+      323_28: -8042809564312914475
+      323_29: -6057050969880371489
+      323_3: -8873686781903442851
+      323_30: -4453661420447256611
+      323_31: -4493451377216077196
+      323_32: -1230107996070330414
+      323_33: 780714189377919915
+      323_34: 877316134270632736
+      323_35: -5633157520577532924
+      323_4: 2729760631256892267
+      323_5: -7644772013690146770
+      323_6: -794253538906201394
+      323_7: 3024436174759783843
+      323_8: -8920536354152135564
+      323_9: 250325499742951050
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

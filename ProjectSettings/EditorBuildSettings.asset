@@ -4,8 +4,24 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/_Project/Scenes/MainMenu.unity
+    guid: 8fe5d20780e3e764dba7493240aa53dc
+  - enabled: 1
+    path: Assets/_Project/Scenes/Maps/M1_Village.unity
+    guid: 7d215a995483013fc8a66f1679e84845
+  - enabled: 1
+    path: Assets/_Project/Scenes/Maps/M2_Forest.unity
+    guid: 10ed0ac43bbe626fa835ede38b93938b
+  - enabled: 1
+    path: Assets/_Project/Scenes/Maps/M3_Marsh.unity
+    guid: a69a605acea1dd4e38d496066dd7ac5f
+  - enabled: 1
+    path: Assets/_Project/Scenes/Maps/M4_Tower.unity
+    guid: f8f88278fe04472a5b97d54e274ac47c
+  - enabled: 1
+    path: Assets/_Project/Scenes/Maps/M5_Cave.unity
+    guid: b11fe57b6d26bd6cba901940ef2c590e
   m_configObjects:
-    com.unity.addressableassets: {fileID: 11400000, guid: 98d3202eeede8df449a7fa847da068d3,
-      type: 2}
-  m_UseUCBPForAssetBundles: 0
+    com.unity.addressableassets: {fileID: 11400000, guid: 98d3202eeede8df449a7fa847da068d3, type: 2}

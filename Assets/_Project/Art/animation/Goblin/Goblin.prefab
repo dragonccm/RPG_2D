@@ -133,6 +133,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 1
+  m_UseReflectionProbes: 0
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
@@ -473,6 +474,7 @@ GameObject:
   - component: {fileID: 3149652930160656903}
   - component: {fileID: 5967497218502263471}
   - component: {fileID: 2060940688001907084}
+  - component: {fileID: 7779337184788337122}
   m_Layer: 3
   m_Name: Goblin
   m_TagString: Enemy
@@ -498,6 +500,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &5176199457646555800
 SpriteRenderer:
+  serializedVersion: 3
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -516,10 +519,12 @@ SpriteRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -537,11 +542,12 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 6
-  m_Sprite: {fileID: 5849275302159542619, guid: e3b0d28c25f4efb4090a645cfea6c9ad,
-    type: 3}
+  m_MaskInteraction: 0
+  m_Sprite: {fileID: 5849275302159542619, guid: e3b0d28c25f4efb4090a645cfea6c9ad, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -550,8 +556,8 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+  m_BlendShapeWeights: []
 --- !u!95 &261748583510415462
 Animator:
   serializedVersion: 7
@@ -562,7 +568,7 @@ Animator:
   m_GameObject: {fileID: 8047856542747731292}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 4ad679646bd957f49b8f7b7a14908519, type: 2}
+  m_Controller: {fileID: 9100000, guid: d9611ac895133ef4495fb6d28ccb67b6, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -729,7 +735,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e80e63492ec1d1945bede9d4f647652e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 1.5
+  moveSpeed: 2.0
   rotationSpeed: 10
 --- !u!114 &7455110506165056626
 MonoBehaviour:
@@ -744,16 +750,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   animator: {fileID: 0}
-  speedParam: Speed
-  isMovingParam: IsMoving
-  isDeadParam: IsDead
-  attackTrigger: Attack
-  hurtTrigger: Hurt
-  dieTrigger: Die
-  skillTrigger: Skill
-  berserkParam: IsBerserk
-  transitionSpeed: 0.1
-  enableDebugLogs: 0
 --- !u!114 &3149652930160656903
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -766,7 +762,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e544bbe398ffc8d4399e076279f7ee19, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackRange: 1.5
+  attack: {fileID: 11400000, guid: 018b7436cd56237aebc89e2720d06bad, type: 2}
+  attackRange: 1.2
   attackCooldown: 1
 --- !u!114 &5967497218502263471
 MonoBehaviour:
@@ -797,6 +794,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e34b7e077b5548148ac2bd04d2a3c9ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  skillModules:
-  - {fileID: 11400000, guid: 357eab4f901310b479c7047afbb9aec8, type: 2}
+  skillModules: []
   useRandomSkill: 1
+--- !u!114 &7779337184788337122
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8047856542747731292}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6305de1344665ea580c3a057a5bb8ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RPG.Game::AttackRunner

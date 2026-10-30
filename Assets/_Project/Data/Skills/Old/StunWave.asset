@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3801336f91abb87468f0d8079c0aef75, type: 3}
   m_Name: StunWave
   m_EditorClassIdentifier: 
+  skillId: stun_wave
+  source: 0
   skillName: Stun Wave
   description: Area stun attack
   skillIcon: {fileID: 21300000, guid: 9d691f08998bb0348b6422e81dc82c92, type: 3}
@@ -31,15 +33,18 @@ MonoBehaviour:
   impactSound: {fileID: 0}
   effectPrefab: {fileID: 0}
   projectilePrefab: {fileID: 0}
+  customEffectLifetime: 0
+  effectPositionOffset: {x: 0, y: 0, z: 0}
+  enableEnhancedEffects: 1
   animationTrigger: Attack
   animationLength: 1
-  usesExistingAttackAnimation: 1
   skillType: 3
+  damageZonePrefab: {fileID: 0}
   criticalChance: 0.1
   criticalMultiplier: 2
   upgrades: []
   maxLevel: 5
   currentLevel: 1
   showDamageArea: 1
-  damageAreaColor: {r: 1, g: 0, b: 0, a: 0.3}
+  damageAreaColor: {r: 0, g: 1, b: 0, a: 0.3}
   damageAreaDisplayTime: 1

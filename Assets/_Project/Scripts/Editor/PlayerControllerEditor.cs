@@ -34,7 +34,7 @@ public class PlayerControllerEditor : Editor
                 
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("Current Movement:", GUILayout.Width(120));
-                EditorGUILayout.LabelField($"({playerController.Movement.x:F2}, {playerController.Movement.y:F2})");
+                EditorGUILayout.LabelField($"({playerController.movement.x:F2}, {playerController.movement.y:F2})");
                 EditorGUILayout.EndHorizontal();
                 
                 EditorGUILayout.BeginHorizontal();
@@ -73,10 +73,15 @@ public class PlayerControllerEditor : Editor
                 }
                 EditorGUILayout.EndHorizontal();
                 
-                // Movement settings info
+                // Smooth time adjustments
                 EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.LabelField("Movement Type:", GUILayout.Width(120));
-                EditorGUILayout.LabelField("Responsive (No Smoothing)", EditorStyles.boldLabel);
+                EditorGUILayout.LabelField("Smooth Move Time:", GUILayout.Width(120));
+                float newSmoothMoveTime = EditorGUILayout.Slider(playerController.smoothMoveTime, 0.01f, 1f);
+                if (newSmoothMoveTime != playerController.smoothMoveTime)
+                {
+                    playerController.smoothMoveTime = newSmoothMoveTime;
+                    EditorUtility.SetDirty(playerController);
+                }
                 EditorGUILayout.EndHorizontal();
                 
                 EditorGUILayout.BeginHorizontal();

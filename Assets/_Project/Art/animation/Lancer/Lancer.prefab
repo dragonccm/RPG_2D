@@ -220,6 +220,7 @@ GameObject:
   - component: {fileID: 3986741045161960724}
   - component: {fileID: 3772084157937045997}
   - component: {fileID: 8964467103381393915}
+  - component: {fileID: 4217390794457451677}
   m_Layer: 3
   m_Name: Lancer
   m_TagString: Enemy
@@ -245,6 +246,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &5339265101150382936
 SpriteRenderer:
+  serializedVersion: 3
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -263,10 +265,12 @@ SpriteRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -284,11 +288,12 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -594197781322936934, guid: 053998bf9b7fab244acdad6c430cefeb,
-    type: 3}
+  m_MaskInteraction: 0
+  m_Sprite: {fileID: -594197781322936934, guid: 053998bf9b7fab244acdad6c430cefeb, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -297,8 +302,8 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+  m_BlendShapeWeights: []
 --- !u!95 &2037092294052192285
 Animator:
   serializedVersion: 7
@@ -421,6 +426,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   health: {fileID: 0}
   mana: {fileID: 0}
+  maxHealth: 100
+  maxMana: 50
+  healthRegenRate: 0
+  manaRegenRate: 5
+  defense: 0
+  attackPower: 10
+  criticalChance: 0.05
+  criticalMultiplier: 2
+  moveSpeed: 3.5
+  attackSpeed: 1
+  godModeEnabled: 0
+  godModeHealth: 99999
+  godModeMana: 99999
   knockbackResistance: 1
   damageFlashDuration: 0.2
   damageFlashColor: {r: 1, g: 0, b: 0, a: 1}
@@ -463,7 +481,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e544bbe398ffc8d4399e076279f7ee19, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackRange: 2
+  attack: {fileID: 11400000, guid: aba17e4a589365893802c6ce87dd1883, type: 2}
+  attackRange: 2.7350001
   attackCooldown: 1
 --- !u!114 &3137885024273327423
 MonoBehaviour:
@@ -477,7 +496,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e80e63492ec1d1945bede9d4f647652e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 3
+  moveSpeed: 2.4
   rotationSpeed: 10
 --- !u!114 &3986741045161960724
 MonoBehaviour:
@@ -521,9 +540,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e34b7e077b5548148ac2bd04d2a3c9ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  skillModules:
-  - {fileID: 11400000, guid: 707e9487b31b78b4a98bea65ee1b6a43, type: 2}
+  skillModules: []
   useRandomSkill: 0
+--- !u!114 &4217390794457451677
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3729075743242336014}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6305de1344665ea580c3a057a5bb8ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RPG.Game::AttackRunner
 --- !u!1 &7390354048877065881
 GameObject:
   m_ObjectHideFlags: 0
@@ -657,6 +687,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 1
+  m_UseReflectionProbes: 0
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0

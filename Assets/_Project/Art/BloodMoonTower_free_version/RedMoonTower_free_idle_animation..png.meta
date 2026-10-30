@@ -67,7 +67,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -86,7 +86,9 @@ TextureImporter:
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
   alphaIsTransparency: 1
+  spriteTessellationMethod: 0
   spriteTessellationDetail: -1
+  spriteGeometrySubdivision: -1
   textureType: 8
   textureShape: 1
   singleChannelComponent: 0
@@ -105,7 +107,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -397,7 +399,18 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      RedMoonTower_free_idle_animation._0: -4227435001158437254
+      RedMoonTower_free_idle_animation._1: -4233646917209677197
+      RedMoonTower_free_idle_animation._10: 4213756085002500049
+      RedMoonTower_free_idle_animation._2: -7343736504891969453
+      RedMoonTower_free_idle_animation._3: -6083554418270614127
+      RedMoonTower_free_idle_animation._4: -7114993313860212086
+      RedMoonTower_free_idle_animation._5: -5564170900477571125
+      RedMoonTower_free_idle_animation._6: 4447534075942178317
+      RedMoonTower_free_idle_animation._7: 7834845600494809709
+      RedMoonTower_free_idle_animation._8: -698412963896224032
+      RedMoonTower_free_idle_animation._9: -2173200318115679039
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

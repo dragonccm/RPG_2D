@@ -229,7 +229,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -248,7 +248,9 @@ TextureImporter:
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
   alphaIsTransparency: 1
+  spriteTessellationMethod: 0
   spriteTessellationDetail: -1
+  spriteGeometrySubdivision: -1
   textureType: 8
   textureShape: 1
   singleChannelComponent: 0
@@ -267,7 +269,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -1747,7 +1749,72 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Tilemap_color1_0: 4684625920699962428
+      Tilemap_color1_1: -2801873246907429078
+      Tilemap_color1_10: 1418375321201274708
+      Tilemap_color1_11: -8992189254483969355
+      Tilemap_color1_12: -3293826169491285364
+      Tilemap_color1_13: 2468736761819628169
+      Tilemap_color1_14: 249127335269095975
+      Tilemap_color1_15: 120966392478926727
+      Tilemap_color1_16: 1311339825560053648
+      Tilemap_color1_17: 7518868150231657459
+      Tilemap_color1_18: 2944866425670003460
+      Tilemap_color1_19: -2804451518926523279
+      Tilemap_color1_2: 7801342956118196415
+      Tilemap_color1_20: -4336045200530116284
+      Tilemap_color1_21: -5663187401509772035
+      Tilemap_color1_22: -7962071013999737797
+      Tilemap_color1_23: 7272332894472844370
+      Tilemap_color1_24: -7473837398066495716
+      Tilemap_color1_25: 2205626041221952261
+      Tilemap_color1_26: 8761957845823429309
+      Tilemap_color1_27: -7602718512742726791
+      Tilemap_color1_28: 4299903223893273855
+      Tilemap_color1_29: -156968979077948116
+      Tilemap_color1_3: 2381845703017299674
+      Tilemap_color1_30: -6005370149783978446
+      Tilemap_color1_31: -3887639646538638151
+      Tilemap_color1_32: -7676271994124391679
+      Tilemap_color1_33: -567363726576857262
+      Tilemap_color1_34: -5170102666605548192
+      Tilemap_color1_35: -6914060815751580637
+      Tilemap_color1_36: -2818783850665287378
+      Tilemap_color1_37: 4877094068914342608
+      Tilemap_color1_38: -5460246916487401979
+      Tilemap_color1_39: 8040887467247185324
+      Tilemap_color1_4: 5980407047448068244
+      Tilemap_color1_40: 6659697122546123297
+      Tilemap_color1_41: -5328810533467712069
+      Tilemap_color1_42: 3858118010278745957
+      Tilemap_color1_43: -3793614902417640485
+      Tilemap_color1_44: -918892767159726313
+      Tilemap_color1_45: 3368758497067531475
+      Tilemap_color1_46: 5809642575974107265
+      Tilemap_color1_47: -2717959069546875479
+      Tilemap_color1_48: -2730756614561629265
+      Tilemap_color1_49: -1600266700000864503
+      Tilemap_color1_5: 7614361197189378962
+      Tilemap_color1_50: -6162260638384905595
+      Tilemap_color1_51: -7989441365163098092
+      Tilemap_color1_52: -4156132361999277927
+      Tilemap_color1_53: 6678773690062355152
+      Tilemap_color1_54: -5833622645773596244
+      Tilemap_color1_55: 46385456578341019
+      Tilemap_color1_56: -5490583000368920266
+      Tilemap_color1_57: 6025417231891396771
+      Tilemap_color1_58: -389833285977466161
+      Tilemap_color1_59: -6876386774670606448
+      Tilemap_color1_6: -4455189763106589383
+      Tilemap_color1_60: 2213162740780828126
+      Tilemap_color1_61: -2121317567515395388
+      Tilemap_color1_62: 7278956865320723726
+      Tilemap_color1_63: 2442936209934616833
+      Tilemap_color1_64: 8525603795300512417
+      Tilemap_color1_7: 2514084195207275289
+      Tilemap_color1_8: 6012010895760242090
+      Tilemap_color1_9: 3062889884838147064
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

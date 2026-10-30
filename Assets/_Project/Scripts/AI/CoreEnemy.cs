@@ -2,11 +2,10 @@ using UnityEngine;
 using UnityEngine.AI;
 using System.Collections;
 using System;
-using RPG.Animation;
 
 /// <summary>
-/// Script c? s? cho t?t c? k? ??ch - ch?a thu?c t�nh v� ch?c n?ng chung
-/// M?i k? ??ch ??u c?n script n�y ?? ho?t ??ng
+/// Script c? s? cho t?t c? k? ??ch - ch?a thu?c tính và ch?c n?ng chung
+/// M?i k? ??ch ??u c?n script này ?? ho?t ??ng
 /// </summary>
 [RequireComponent(typeof(NavMeshAgent))]
 [RequireComponent(typeof(Animator))]
@@ -37,7 +36,7 @@ public class CoreEnemy : MonoBehaviour, IDamageable
     [SerializeField] private float detectionRange = 8f;
     [SerializeField] private float chaseRange = 15f;
     [SerializeField] private float loseTargetRange = 20f;
-    [SerializeField] private LayerMask playerLayerMask = 1 << 7;
+    [SerializeField] private LayerMask playerLayerMask = 1 << 6; // Layer 6 là Player theo TagManager
     [SerializeField] private LayerMask obstacleLayerMask = 1;
     [SerializeField] private bool useLineOfSight = true;
     [SerializeField] private float targetUpdateInterval = 0.2f;
@@ -82,13 +81,7 @@ public class CoreEnemy : MonoBehaviour, IDamageable
     // Movement tracking
     private Vector3 lastPosition;
     private Vector2 moveDirection;
-    private float currentMoveSpeed;
-    
-    // Cache variables cho animation optimization
-    private float lastMoveSpeed = 0f;
-    private bool wasMoving = false;
-    private float lastMoveX = 0f;
-    private float lastMoveY = 0f;
+    private float currentMoveSpeed = 0f;
     
     #endregion
     
@@ -105,11 +98,6 @@ public class CoreEnemy : MonoBehaviour, IDamageable
     public float ChaseRange => chaseRange;
     public bool IsDead => isDead;
     public bool IsStunned => isStunned;
-
-    /// <summary>
-    /// Transform of this damageable object
-    /// </summary>
-    public UnityEngine.Transform Transform => transform;
     public Transform CurrentTarget => currentTarget;
     public NavMeshAgent NavAgent => navAgent;
     public Animator EnemyAnimator => animator;
@@ -257,35 +245,13 @@ public class CoreEnemy : MonoBehaviour, IDamageable
         moveDirection = new Vector2(movementDelta.x, movementDelta.z);
         currentMoveSpeed = movementDelta.magnitude / Time.deltaTime;
         
-        // ENHANCED: Update animation through EnemyAnimatorController
-        var animatorController = GetComponent<EnemyAnimatorController>();
-        if (animatorController != null)
-        {
-            animatorController.PlayMoveAnimation(currentMoveSpeed);
-        }
-        
-        // Tối ưu: Chỉ cập nhật animator parameters khi có thay đổi
+        // Update animator parameters
         if (animator != null)
         {
-            // Cache current values để tránh cập nhật liên tục
-            if (Mathf.Abs(currentMoveSpeed - lastMoveSpeed) > 0.01f || 
-                wasMoving != (currentMoveSpeed > 0.1f))
-            {
-                animator.SetFloat(AnimationParameters.MoveSpeed, currentMoveSpeed);
-                animator.SetBool(AnimationParameters.IsMoving, currentMoveSpeed > 0.1f);
-                lastMoveSpeed = currentMoveSpeed;
-                wasMoving = currentMoveSpeed > 0.1f;
-            }
-            
-            // Chỉ cập nhật MoveX/MoveY khi thay đổi đáng kể
-            if (Mathf.Abs(moveDirection.x - lastMoveX) > 0.01f || 
-                Mathf.Abs(moveDirection.y - lastMoveY) > 0.01f)
-            {
-                animator.SetFloat(AnimationParameters.MoveX, moveDirection.x);
-                animator.SetFloat(AnimationParameters.MoveY, moveDirection.y);
-                lastMoveX = moveDirection.x;
-                lastMoveY = moveDirection.y;
-            }
+            animator.SetFloat("MoveSpeed", currentMoveSpeed);
+            animator.SetBool("IsMoving", currentMoveSpeed > 0.1f);
+            animator.SetFloat("MoveX", moveDirection.x);
+            animator.SetFloat("MoveY", moveDirection.y);
         }
         
         lastPosition = currentPosition;
@@ -319,8 +285,8 @@ public class CoreEnemy : MonoBehaviour, IDamageable
     
     private Transform FindBestTarget()
     {
-        // Find all potential targets in detection range
-        Collider[] hitColliders = Physics.OverlapSphere(transform.position, detectionRange, playerLayerMask);
+        // Find all potential targets in detection range (dùng Physics2D cho game 2D top-down)
+        Collider2D[] hitColliders = Physics2D.OverlapCircleAll(transform.position, detectionRange, playerLayerMask);
         
         Transform bestTarget = null;
         float bestScore = float.MinValue;
@@ -507,17 +473,10 @@ public class CoreEnemy : MonoBehaviour, IDamageable
         
         OnHealthChanged?.Invoke(this, oldHealth, currentHealth);
         
-        // ENHANCED: Trigger hurt animation through EnemyAnimatorController
-        var animatorController = GetComponent<EnemyAnimatorController>();
-        if (animatorController != null)
-        {
-            animatorController.PlayHurtAnimation();
-        }
-        
         // Play hurt sound
         PlayHurtSound();
         
-        // Trigger hurt animation (fallback for legacy system)
+        // Trigger hurt animation
         TriggerAnimation("Hurt");
         
         // Check for death
@@ -550,13 +509,6 @@ public class CoreEnemy : MonoBehaviour, IDamageable
         
         isDead = true;
         
-        // ENHANCED: Trigger death animation through EnemyAnimatorController
-        var animatorController = GetComponent<EnemyAnimatorController>();
-        if (animatorController != null)
-        {
-            animatorController.PlayDeathAnimation();
-        }
-        
         // Stop movement
         StopMovement();
         
@@ -567,7 +519,7 @@ public class CoreEnemy : MonoBehaviour, IDamageable
         // Play death sound
         PlayDeathSound();
         
-        // Trigger death animation (fallback for legacy system)
+        // Trigger death animation
         TriggerAnimation("Death");
         
         // Notify listeners

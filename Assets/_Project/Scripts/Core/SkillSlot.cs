@@ -41,6 +41,7 @@ public class SkillSlot
     {
         if (!isUnlocked || skill == null) 
         {
+            Debug.LogWarning($"Cannot equip skill to slot {slotIndex}: Slot not unlocked or skill is null");
             return false;
         }
         
@@ -55,10 +56,12 @@ public class SkillSlot
         
         if (executor == null)
         {
+            Debug.LogError($"Failed to create executor for skill {skill.skillName} in slot {slotIndex}");
             equippedSkill = null;
             return false;
         }
         
+        Debug.Log($"? Successfully equipped skill '{skill.skillName}' to slot {slotIndex} with hotkey {GetHotkeyDisplayName()}");
         return true;
     }
     
@@ -67,6 +70,11 @@ public class SkillSlot
     /// </summary>
     public void UnequipSkill()
     {
+        if (equippedSkill != null)
+        {
+            Debug.Log($"?? Unequipped skill '{equippedSkill.skillName}' from slot {slotIndex}");
+        }
+        
         equippedSkill = null;
         executor = null;
         ResetCooldown();
@@ -86,6 +94,7 @@ public class SkillSlot
     public void UnlockSlot()
     {
         isUnlocked = true;
+        Debug.Log($"?? Unlocked skill slot {slotIndex} with hotkey {GetHotkeyDisplayName()}");
     }
     
     /// <summary>
@@ -97,6 +106,8 @@ public class SkillSlot
         
         KeyCode oldKey = hotkey;
         hotkey = newKey;
+        
+        Debug.Log($"?? Updated slot {slotIndex} hotkey from {GetHotkeyDisplayName(oldKey)} to {GetHotkeyDisplayName()}");
     }
     
     /// <summary>
@@ -129,6 +140,7 @@ public class SkillSlot
         SetCooldown();
         lastUsedTime = Time.time;
         
+        Debug.Log($"? Executed skill '{equippedSkill.skillName}' from slot {slotIndex}");
         return true;
     }
     
@@ -270,6 +282,7 @@ public class SkillSlot
         {
             if (executor == null)
             {
+                Debug.LogError($"Slot {slotIndex} has skill but no executor - fixing...");
                 executor = equippedSkill.CreateExecutor();
                 return executor != null;
             }

@@ -1,0 +1,23 @@
+{
+    "name": "RPG.Tests.EditMode",
+    "rootNamespace": "",
+    "references": [
+        "RPG.Game",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner",
+        "RPG.Game.Editor"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

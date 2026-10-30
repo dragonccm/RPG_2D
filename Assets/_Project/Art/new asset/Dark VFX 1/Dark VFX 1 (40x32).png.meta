@@ -82,7 +82,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -101,7 +101,9 @@ TextureImporter:
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
   alphaIsTransparency: 1
+  spriteTessellationMethod: 0
   spriteTessellationDetail: -1
+  spriteGeometrySubdivision: -1
   textureType: 8
   textureShape: 1
   singleChannelComponent: 0
@@ -120,7 +122,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -522,7 +524,23 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Dark VFX 1 (40x32)_0: 5322389570696283013
+      Dark VFX 1 (40x32)_1: -2643919085024643229
+      Dark VFX 1 (40x32)_10: 3739189737878219129
+      Dark VFX 1 (40x32)_11: 6594634170952355415
+      Dark VFX 1 (40x32)_12: 219710311259875709
+      Dark VFX 1 (40x32)_13: 3882201928097561049
+      Dark VFX 1 (40x32)_14: -3151882524567011024
+      Dark VFX 1 (40x32)_15: 3942030414955739294
+      Dark VFX 1 (40x32)_2: 4016469099483565362
+      Dark VFX 1 (40x32)_3: -3035007237998209773
+      Dark VFX 1 (40x32)_4: 953614384257721753
+      Dark VFX 1 (40x32)_5: 9206420409242847204
+      Dark VFX 1 (40x32)_6: -3306352342384808525
+      Dark VFX 1 (40x32)_7: 2944292589821218816
+      Dark VFX 1 (40x32)_8: -7466231177720500285
+      Dark VFX 1 (40x32)_9: -547511368734702096
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

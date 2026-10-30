@@ -208,7 +208,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -227,7 +227,9 @@ TextureImporter:
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
   alphaIsTransparency: 1
+  spriteTessellationMethod: 0
   spriteTessellationDetail: -1
+  spriteGeometrySubdivision: -1
   textureType: 8
   textureShape: 1
   singleChannelComponent: 0
@@ -246,7 +248,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -1572,7 +1574,65 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      NightBorne_0: -8804577451312863447
+      NightBorne_1: 4541750074466545783
+      NightBorne_10: -8630077547763592464
+      NightBorne_11: 8828395637555187138
+      NightBorne_12: 9163635500261087072
+      NightBorne_13: -6923885970043332651
+      NightBorne_14: 363774542823790193
+      NightBorne_15: 2294633204174513064
+      NightBorne_16: 7018995681840017482
+      NightBorne_17: 8414011603434205889
+      NightBorne_18: -3164419483077263248
+      NightBorne_19: 5083154300484032116
+      NightBorne_2: -8239006915776606373
+      NightBorne_20: -4829220664459573023
+      NightBorne_21: -1184382605107113275
+      NightBorne_22: -5919938194821099110
+      NightBorne_23: -8770818236958866315
+      NightBorne_24: -1927809215821552941
+      NightBorne_25: -3074926159877256613
+      NightBorne_26: -8189142574560365079
+      NightBorne_27: -6492071446626870798
+      NightBorne_28: 5990439139389260119
+      NightBorne_29: -2842755984532108854
+      NightBorne_3: -4665311039209658066
+      NightBorne_30: -120187220933850463
+      NightBorne_31: -604301505416848564
+      NightBorne_32: -3105514515409464378
+      NightBorne_33: -5063285392418353067
+      NightBorne_34: -7257403696482743351
+      NightBorne_35: 7437584850889283984
+      NightBorne_36: 8548559911559072422
+      NightBorne_37: -8965171658419641037
+      NightBorne_38: -8514666527570245238
+      NightBorne_39: 5389232431511811324
+      NightBorne_4: 5201573932019284902
+      NightBorne_40: 5829958208077408561
+      NightBorne_41: 810612845163130981
+      NightBorne_42: 3060354622298161473
+      NightBorne_43: -4363609517831859592
+      NightBorne_44: -1159967265761478601
+      NightBorne_45: 7256534150947680899
+      NightBorne_46: 3912207925484056106
+      NightBorne_47: 2029386098945700016
+      NightBorne_48: -7705136319623115422
+      NightBorne_49: -4622668482687186571
+      NightBorne_5: 3079978775435183711
+      NightBorne_50: 8456261001067786734
+      NightBorne_51: 7122196807548437983
+      NightBorne_52: -543444408847256576
+      NightBorne_53: 7465451782741479867
+      NightBorne_54: -2601604636754659197
+      NightBorne_55: -3884138607530488051
+      NightBorne_56: -8785807031976187778
+      NightBorne_57: -5020255782854710537
+      NightBorne_6: -1148362564002726747
+      NightBorne_7: 5888622227354725610
+      NightBorne_8: -1202396436292935338
+      NightBorne_9: -6309155646296237868
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

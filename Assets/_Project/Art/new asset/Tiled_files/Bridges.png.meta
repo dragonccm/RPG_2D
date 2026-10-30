@@ -118,7 +118,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -137,7 +137,9 @@ TextureImporter:
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
   alphaIsTransparency: 1
+  spriteTessellationMethod: 0
   spriteTessellationDetail: -1
+  spriteGeometrySubdivision: -1
   textureType: 8
   textureShape: 1
   singleChannelComponent: 0
@@ -156,7 +158,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -822,7 +824,35 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Bridges_0: 4419207245272849179
+      Bridges_1: -978938595932761890
+      Bridges_10: -3602347933649339817
+      Bridges_11: 3761576167961936120
+      Bridges_12: 8102311876266904689
+      Bridges_13: 7419103761710208350
+      Bridges_14: 1167405310055883050
+      Bridges_15: -2325498525974044729
+      Bridges_16: -4748258791055438362
+      Bridges_17: -1000398799335944427
+      Bridges_18: 7551350793846364490
+      Bridges_19: -1675032134624486066
+      Bridges_2: 4619552979010320299
+      Bridges_20: 6823825797905457947
+      Bridges_21: -6998540239343022904
+      Bridges_22: -4852479476045768825
+      Bridges_23: 6278053515679689107
+      Bridges_24: 5717534272316589883
+      Bridges_25: -8221928709733938011
+      Bridges_26: -9175580244413574692
+      Bridges_27: -2494720345927995531
+      Bridges_3: -7964094763856153742
+      Bridges_4: -5928713052716369325
+      Bridges_5: -2458347662786323051
+      Bridges_6: 502732440738137211
+      Bridges_7: -4276752969576645033
+      Bridges_8: 5169223617025914343
+      Bridges_9: -4847967973376863162
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

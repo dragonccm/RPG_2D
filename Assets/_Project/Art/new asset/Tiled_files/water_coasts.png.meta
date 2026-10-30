@@ -454,7 +454,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -473,7 +473,9 @@ TextureImporter:
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
   alphaIsTransparency: 1
+  spriteTessellationMethod: 0
   spriteTessellationDetail: -1
+  spriteGeometrySubdivision: -1
   textureType: 8
   textureShape: 1
   singleChannelComponent: 0
@@ -492,7 +494,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -3622,7 +3624,147 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      water_coasts_0: -8122105404376671430
+      water_coasts_1: 6571393205858908708
+      water_coasts_10: -4233815564071597124
+      water_coasts_100: 4721120160742370334
+      water_coasts_101: -4505295785892244602
+      water_coasts_102: -2240535285585740225
+      water_coasts_103: -8155190231675546362
+      water_coasts_104: 6528513704185683812
+      water_coasts_105: -7798735561977501217
+      water_coasts_106: -168486021075584908
+      water_coasts_107: 6659882485355623579
+      water_coasts_108: -2324861818713267276
+      water_coasts_109: 4963677509365399523
+      water_coasts_11: 8962028058733364104
+      water_coasts_110: 3304204442698319227
+      water_coasts_111: -830800952337039144
+      water_coasts_112: -8803226201346085368
+      water_coasts_113: -8981345902814504149
+      water_coasts_114: -3258356096056001287
+      water_coasts_115: 8071652569682516972
+      water_coasts_116: 1489614649325412918
+      water_coasts_117: 4840712446079000775
+      water_coasts_118: -7575138240202357363
+      water_coasts_119: 7313110273908568364
+      water_coasts_12: 6362199366747046466
+      water_coasts_120: -6718064596324333638
+      water_coasts_121: -6705138139540514749
+      water_coasts_122: -8223292422287557795
+      water_coasts_123: 5684614524231897620
+      water_coasts_124: -3872292162973275139
+      water_coasts_125: -1324981635227318607
+      water_coasts_126: 2993422961290683365
+      water_coasts_127: 8076917573014112436
+      water_coasts_128: -7840406179271803681
+      water_coasts_129: -533912191429386114
+      water_coasts_13: -5687863580382760644
+      water_coasts_130: -442848924078095571
+      water_coasts_131: -4699747292046811103
+      water_coasts_132: -7341719838478584267
+      water_coasts_133: 5037413159114630655
+      water_coasts_134: -5666355524841025585
+      water_coasts_135: 8964550500370903348
+      water_coasts_136: -2746821146645363147
+      water_coasts_137: -64262499282648254
+      water_coasts_138: -8139389195025902834
+      water_coasts_139: 989113157636590125
+      water_coasts_14: 1715235478768496078
+      water_coasts_15: -1871159825033410338
+      water_coasts_16: 1902052498823024331
+      water_coasts_17: -133822894939272624
+      water_coasts_18: -8871284302676457303
+      water_coasts_19: 319513282508525606
+      water_coasts_2: -43145478551321415
+      water_coasts_20: -1966137855627435219
+      water_coasts_21: -8166805718540264305
+      water_coasts_22: 3901558459337874995
+      water_coasts_23: -7004599188790558295
+      water_coasts_24: 5462017533077224165
+      water_coasts_25: 5948168879557659964
+      water_coasts_26: 1376208356627042032
+      water_coasts_27: -5699095251272532756
+      water_coasts_28: -2601530432529838250
+      water_coasts_29: -2260755073181007174
+      water_coasts_3: -2834912715854804450
+      water_coasts_30: -7572361212537086479
+      water_coasts_31: -8962781203965095221
+      water_coasts_32: 7303050654753831786
+      water_coasts_33: -5773776404545795844
+      water_coasts_34: 8651367212374736046
+      water_coasts_35: -5743436230863262705
+      water_coasts_36: -4342767967449808232
+      water_coasts_37: -271076908150013827
+      water_coasts_38: -7498886515443199385
+      water_coasts_39: 4298707827330931208
+      water_coasts_4: 5049629847057994996
+      water_coasts_40: -2228925704132297812
+      water_coasts_41: -7475923448676713740
+      water_coasts_42: -6231067346695068921
+      water_coasts_43: 252614112184154139
+      water_coasts_44: -6296677158213206367
+      water_coasts_45: 2847639561785324040
+      water_coasts_46: 1375638889789808687
+      water_coasts_47: -1628266341970438531
+      water_coasts_48: 1808106103230395922
+      water_coasts_49: -2445669505265107296
+      water_coasts_5: 4076392732248336861
+      water_coasts_50: -3342507957934785366
+      water_coasts_51: 6954821017727933412
+      water_coasts_52: -3724565242584794815
+      water_coasts_53: 3901592685251259291
+      water_coasts_54: -4420301438546392513
+      water_coasts_55: -9130903157762402975
+      water_coasts_56: -1053432240609225222
+      water_coasts_57: 82400058553051983
+      water_coasts_58: 1452878369368807337
+      water_coasts_59: -8616382680340388736
+      water_coasts_6: -3315712543169009800
+      water_coasts_60: 3490137673355769810
+      water_coasts_61: -3728650802743726711
+      water_coasts_62: 8877477517390308603
+      water_coasts_63: -4364918947994458707
+      water_coasts_64: -2418139772272979082
+      water_coasts_65: -3865640321157641597
+      water_coasts_66: -6934970835750534287
+      water_coasts_67: 3717903046775352474
+      water_coasts_68: -2977398455236000050
+      water_coasts_69: 4745186588850843275
+      water_coasts_7: -1065963617093701018
+      water_coasts_70: -1254615564646441799
+      water_coasts_71: -7388670254553254856
+      water_coasts_72: -9072176664659723069
+      water_coasts_73: 8979314655133961037
+      water_coasts_74: 4147703538878334568
+      water_coasts_75: 6623901228428482402
+      water_coasts_76: 312161217317345327
+      water_coasts_77: 3154619102216025951
+      water_coasts_78: 2336082280004137474
+      water_coasts_79: -2366433192527093638
+      water_coasts_8: 961522211323490527
+      water_coasts_80: -4054822281656817773
+      water_coasts_81: 444706970806048204
+      water_coasts_82: -6335118036766814002
+      water_coasts_83: 7153908738990612166
+      water_coasts_84: 1314803481126494356
+      water_coasts_85: -4991426482350302806
+      water_coasts_86: -4047682566842005336
+      water_coasts_87: 337166361406910153
+      water_coasts_88: -5144507393842826257
+      water_coasts_89: -4509330840751126371
+      water_coasts_9: 3247278013249254160
+      water_coasts_90: -2102053991053032366
+      water_coasts_91: -1415902208526823067
+      water_coasts_92: 3584447013306880871
+      water_coasts_93: 1225123711035208337
+      water_coasts_94: 7284097172458714755
+      water_coasts_95: 4435389842643000247
+      water_coasts_96: -5308016691199715200
+      water_coasts_97: -5312672093011648517
+      water_coasts_98: 8172592854402544
+      water_coasts_99: -7619792671538906392
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

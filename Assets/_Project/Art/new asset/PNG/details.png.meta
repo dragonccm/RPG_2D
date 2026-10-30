@@ -142,7 +142,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -161,7 +161,9 @@ TextureImporter:
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
   alphaIsTransparency: 1
+  spriteTessellationMethod: 0
   spriteTessellationDetail: -1
+  spriteGeometrySubdivision: -1
   textureType: 8
   textureShape: 1
   singleChannelComponent: 0
@@ -180,7 +182,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -1022,7 +1024,43 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      details_0: -5038951506153503170
+      details_1: -3956403424265050589
+      details_10: 6921221083621538853
+      details_11: 5838514410241047823
+      details_12: -2062060434115420297
+      details_13: -6715765666167863947
+      details_14: -3187710752700213817
+      details_15: -3881738945346563361
+      details_16: -478479799325603553
+      details_17: -1128643930972988218
+      details_18: -3191204816758253830
+      details_19: -6150518983002668466
+      details_2: -1853376364916220049
+      details_20: -7785576502127414536
+      details_21: 5035202814881073899
+      details_22: -469226104294898508
+      details_23: -2879753979990575422
+      details_24: -7956252828816127959
+      details_25: -4401064498735333733
+      details_26: -2927697740335768356
+      details_27: 2543764042586794446
+      details_28: 1610129427235545275
+      details_29: -4810061785995382448
+      details_3: -979469967312736027
+      details_30: -473010483000414731
+      details_31: -594456605343019016
+      details_32: -5576049915706428415
+      details_33: 1045450427111208444
+      details_34: -8754467693707745935
+      details_35: -6375945800806186300
+      details_4: 5004845202217804123
+      details_5: -8421137230177170762
+      details_6: -8181388065476472649
+      details_7: -40285812246312896
+      details_8: 4264040532120010889
+      details_9: -8581570325288175063
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

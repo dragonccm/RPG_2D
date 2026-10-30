@@ -1,0 +1,100 @@
+{
+ "entries": [
+  {
+   "key": "menu.title",
+   "text": "RED MOON"
+  },
+  {
+   "key": "menu.subtitle",
+   "text": "Phong Nguyet Village — the third moon night"
+  },
+  {
+   "key": "menu.new",
+   "text": "New game"
+  },
+  {
+   "key": "menu.continue",
+   "text": "Continue"
+  },
+  {
+   "key": "menu.quit",
+   "text": "Quit"
+  },
+  {
+   "key": "inv.title",
+   "text": "INVENTORY (16 SLOTS)"
+  },
+  {
+   "key": "inv.pick",
+   "text": "Select an item"
+  },
+  {
+   "key": "inv.pick.hint",
+   "text": "Click a slot to see details."
+  },
+  {
+   "key": "inv.use",
+   "text": "Use"
+  },
+  {
+   "key": "inv.learn",
+   "text": "Learn"
+  },
+  {
+   "key": "inv.empty",
+   "text": "(Empty)"
+  },
+  {
+   "key": "inv.empty.hint",
+   "text": "This slot is empty."
+  },
+  {
+   "key": "inv.detail",
+   "text": "{0}\n\n[Type]: {1}\n[Amount]: {2}"
+  },
+  {
+   "key": "item.type.consumable",
+   "text": "Consumable"
+  },
+  {
+   "key": "item.type.scroll",
+   "text": "Skill scroll"
+  },
+  {
+   "key": "item.type.key",
+   "text": "Quest item"
+  },
+  {
+   "key": "item.type.material",
+   "text": "Material"
+  },
+  {
+   "key": "item.type.other",
+   "text": "Other"
+  },
+  {
+   "key": "inv.learned.already",
+   "text": "You already learned {0}!"
+  },
+  {
+   "key": "inv.learned.ok",
+   "text": "Learned: {0}!"
+  },
+  {
+   "key": "inv.received",
+   "text": "Received: {0}"
+  },
+  {
+   "key": "skilltree.points",
+   "text": "SKILL TREE — points left: {0}  (Tab to close)"
+  },
+  {
+   "key": "menu.sfx",
+   "text": "Sound effects"
+  },
+  {
+   "key": "menu.music",
+   "text": "Music"
+  }
+ ]
+}

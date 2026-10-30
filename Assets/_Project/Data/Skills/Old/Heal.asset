@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3801336f91abb87468f0d8079c0aef75, type: 3}
   m_Name: Heal
   m_EditorClassIdentifier: 
+  skillId: heal
+  source: 0
   skillName: Heal
   description: Instantly restore health to the caster.
   skillIcon: {fileID: 21300000, guid: c4e0a89e20c2f2643b3295fe1f6e16af, type: 3}
@@ -31,6 +33,9 @@ MonoBehaviour:
   impactSound: {fileID: 0}
   effectPrefab: {fileID: 0}
   projectilePrefab: {fileID: 0}
+  customEffectLifetime: 0
+  effectPositionOffset: {x: 0, y: 0, z: 0}
+  enableEnhancedEffects: 1
   animationTrigger: Guard
   animationLength: 1
   skillType: 3

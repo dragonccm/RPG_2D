@@ -154,7 +154,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -168,12 +168,14 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 64
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
   alphaIsTransparency: 1
+  spriteTessellationMethod: 0
   spriteTessellationDetail: -1
+  spriteGeometrySubdivision: -1
   textureType: 8
   textureShape: 1
   singleChannelComponent: 0
@@ -192,7 +194,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -233,19 +235,19 @@ TextureImporter:
       name: Pawn_Yellow_0
       rect:
         serializedVersion: 2
-        x: 66
-        y: 1023
-        width: 60
-        height: 61
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 0
+        y: 960
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: e96a73f7b33fef2c0800000000000000
+      spriteID: 92e3a944827f200ac9564b028f19ad56
       internalID: -4395808749404051810
       vertices: []
       indices: 
@@ -255,19 +257,19 @@ TextureImporter:
       name: Pawn_Yellow_1
       rect:
         serializedVersion: 2
-        x: 257
-        y: 1023
-        width: 60
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 192
+        y: 960
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: c3403070f98a2e180800000000000000
+      spriteID: c108420f78298274bb18534c49d91d57
       internalID: -9087515697109334980
       vertices: []
       indices: 
@@ -277,19 +279,19 @@ TextureImporter:
       name: Pawn_Yellow_2
       rect:
         serializedVersion: 2
-        x: 449
-        y: 1023
-        width: 60
-        height: 58
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 384
+        y: 960
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: e77edab76d25f3770800000000000000
+      spriteID: 257d121ab55de92aaa0aecaca19ba033
       internalID: 8592677695197669246
       vertices: []
       indices: 
@@ -299,19 +301,19 @@ TextureImporter:
       name: Pawn_Yellow_3
       rect:
         serializedVersion: 2
-        x: 642
-        y: 1023
-        width: 60
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 576
+        y: 960
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 127d4cae249c09ab0800000000000000
+      spriteID: e636e3c9fb94e58cea96827783ccc811
       internalID: -5003277896764827871
       vertices: []
       indices: 
@@ -321,19 +323,19 @@ TextureImporter:
       name: Pawn_Yellow_4
       rect:
         serializedVersion: 2
-        x: 835
-        y: 1023
-        width: 60
-        height: 60
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 768
+        y: 960
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 0039d17d18e58d6c0800000000000000
+      spriteID: 478f6ce72a55fe448812eb07baec4270
       internalID: -4118437947477486848
       vertices: []
       indices: 
@@ -343,19 +345,19 @@ TextureImporter:
       name: Pawn_Yellow_5
       rect:
         serializedVersion: 2
-        x: 1027
-        y: 1023
-        width: 60
-        height: 61
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 960
+        y: 960
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 8d1662f8d1b991b90800000000000000
+      spriteID: 363986e494d941072a04721fbb99750d
       internalID: -7270609572154940968
       vertices: []
       indices: 
@@ -365,19 +367,19 @@ TextureImporter:
       name: Pawn_Yellow_6
       rect:
         serializedVersion: 2
-        x: 64
-        y: 831
-        width: 60
-        height: 62
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 0
+        y: 768
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: c7f395f251e3c2720800000000000000
+      spriteID: 95bfeaad09bc48e02b8bd65c5eb7b99a
       internalID: 2822699327164071804
       vertices: []
       indices: 
@@ -387,19 +389,19 @@ TextureImporter:
       name: Pawn_Yellow_7
       rect:
         serializedVersion: 2
-        x: 257
-        y: 831
-        width: 60
-        height: 61
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 192
+        y: 768
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 12a0c4630ecfe5de0800000000000000
+      spriteID: cb922440feab2bc23af32b483c83486f
       internalID: -1342357598996002271
       vertices: []
       indices: 
@@ -409,19 +411,19 @@ TextureImporter:
       name: Pawn_Yellow_8
       rect:
         serializedVersion: 2
-        x: 450
-        y: 831
-        width: 60
-        height: 57
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 384
+        y: 768
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: e7dcfb6810ba44770800000000000000
+      spriteID: 660ee93e83b524a54ba3a1f44b15f889
       internalID: 8594182011973782910
       vertices: []
       indices: 
@@ -431,19 +433,19 @@ TextureImporter:
       name: Pawn_Yellow_9
       rect:
         serializedVersion: 2
-        x: 641
-        y: 831
-        width: 64
-        height: 62
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 576
+        y: 768
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: a8f526cb40984f0e0800000000000000
+      spriteID: 31f060c803e15d4c483548a519ba468b
       internalID: -2237012461462855798
       vertices: []
       indices: 
@@ -453,19 +455,19 @@ TextureImporter:
       name: Pawn_Yellow_10
       rect:
         serializedVersion: 2
-        x: 834
-        y: 831
-        width: 61
-        height: 61
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 768
+        y: 768
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: ad0a1a6b8e22489f0800000000000000
+      spriteID: 91556a4032feee869898e801a609b2d8
       internalID: -467210078447886118
       vertices: []
       indices: 
@@ -475,19 +477,19 @@ TextureImporter:
       name: Pawn_Yellow_11
       rect:
         serializedVersion: 2
-        x: 1026
-        y: 831
-        width: 60
-        height: 57
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 960
+        y: 768
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 92d42675550cde1b0800000000000000
+      spriteID: b42131bbdf56b94a6a07f30cbc006411
       internalID: -5625628886745068247
       vertices: []
       indices: 
@@ -497,19 +499,19 @@ TextureImporter:
       name: Pawn_Yellow_12
       rect:
         serializedVersion: 2
-        x: 63
-        y: 639
-        width: 67
-        height: 77
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 0
+        y: 576
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 0a467b15f89934350800000000000000
+      spriteID: 2e9c4e23ec6ff2d4d8308a67b0519c75
       internalID: 5999807969417979040
       vertices: []
       indices: 
@@ -519,19 +521,19 @@ TextureImporter:
       name: Pawn_Yellow_13
       rect:
         serializedVersion: 2
-        x: 254
-        y: 639
-        width: 67
-        height: 79
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 192
+        y: 576
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 00d05dc3d74c8bb90800000000000000
+      spriteID: 9cd66734fea7dd172bda9574f5987285
       internalID: -7225809559945409280
       vertices: []
       indices: 
@@ -541,19 +543,19 @@ TextureImporter:
       name: Pawn_Yellow_14
       rect:
         serializedVersion: 2
-        x: 446
-        y: 639
-        width: 67
-        height: 79
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 384
+        y: 576
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 33614f163e78a3ab0800000000000000
+      spriteID: 7bfbfc8a342af52378fa3e8b5f4aaecd
       internalID: -5027556623335025101
       vertices: []
       indices: 
@@ -563,19 +565,19 @@ TextureImporter:
       name: Pawn_Yellow_15
       rect:
         serializedVersion: 2
-        x: 639
-        y: 639
-        width: 94
-        height: 64
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 576
+        y: 576
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 5c400f977c60ef160800000000000000
+      spriteID: 8da8d09000c7f86c18e67b36e03a3fae
       internalID: 7061088719577547973
       vertices: []
       indices: 
@@ -585,19 +587,19 @@ TextureImporter:
       name: Pawn_Yellow_16
       rect:
         serializedVersion: 2
-        x: 679
-        y: 696
-        width: 24
-        height: 11
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 768
+        y: 576
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: d3b889cfc5c90ae60800000000000000
+      spriteID: 2cfadcf874daf1233ae040aee7b289d9
       internalID: 7971543263634557757
       vertices: []
       indices: 
@@ -607,19 +609,19 @@ TextureImporter:
       name: Pawn_Yellow_17
       rect:
         serializedVersion: 2
-        x: 832
-        y: 639
-        width: 69
-        height: 58
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 960
+        y: 576
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: b145dec6bb66a3fd0800000000000000
+      spriteID: 0b439cf7b9bd370b0a8aaca7c9fb5562
       internalID: -2361462099429993445
       vertices: []
       indices: 
@@ -629,19 +631,19 @@ TextureImporter:
       name: Pawn_Yellow_18
       rect:
         serializedVersion: 2
-        x: 884
-        y: 642
-        width: 39
-        height: 54
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 0
+        y: 384
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 39f0df95164332a30800000000000000
+      spriteID: 2536f001bcdce8e329be821143f1a0a9
       internalID: 4189249671110922131
       vertices: []
       indices: 
@@ -651,19 +653,19 @@ TextureImporter:
       name: Pawn_Yellow_19
       rect:
         serializedVersion: 2
-        x: 1029
-        y: 639
-        width: 78
-        height: 60
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 192
+        y: 384
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: c599072b7e50898d0800000000000000
+      spriteID: 4dae471f4a18cd9b6bb9cffe24ac5c52
       internalID: -2839513072367789732
       vertices: []
       indices: 
@@ -673,19 +675,19 @@ TextureImporter:
       name: Pawn_Yellow_20
       rect:
         serializedVersion: 2
-        x: 42
-        y: 447
-        width: 83
-        height: 62
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 384
+        y: 384
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 188b4bb63fadd10d0800000000000000
+      spriteID: 466a1b37718dd3e2d83d31527fa9f8e2
       internalID: -3450361000477017983
       vertices: []
       indices: 
@@ -695,19 +697,19 @@ TextureImporter:
       name: Pawn_Yellow_21
       rect:
         serializedVersion: 2
-        x: 228
-        y: 447
-        width: 90
-        height: 66
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 576
+        y: 384
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 9186db33bef28c340800000000000000
+      spriteID: 4cb93f0ddac1ec0128828fba86742f9f
       internalID: 4884206483115173913
       vertices: []
       indices: 
@@ -717,19 +719,19 @@ TextureImporter:
       name: Pawn_Yellow_22
       rect:
         serializedVersion: 2
-        x: 420
-        y: 447
-        width: 90
-        height: 66
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 768
+        y: 384
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 63f6980428fb60710800000000000000
+      spriteID: 92ec395b24788d5d38b1c0fbd82cea4d
       internalID: 1659224078882008886
       vertices: []
       indices: 
@@ -739,19 +741,19 @@ TextureImporter:
       name: Pawn_Yellow_23
       rect:
         serializedVersion: 2
-        x: 628
-        y: 473
-        width: 7
-        height: 14
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 960
+        y: 384
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: ae44ca682bf105b10800000000000000
+      spriteID: 7bcb76ffe86d49eec9c1f91384a07839
       internalID: 1968107888784983274
       vertices: []
       indices: 
@@ -761,19 +763,19 @@ TextureImporter:
       name: Pawn_Yellow_24
       rect:
         serializedVersion: 2
-        x: 632
-        y: 447
-        width: 108
-        height: 56
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 0
+        y: 192
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: a16e16b31ae36b5b0800000000000000
+      spriteID: b8e97c15b921fa91e809b10df05156b7
       internalID: -5353022244876327398
       vertices: []
       indices: 
@@ -783,19 +785,19 @@ TextureImporter:
       name: Pawn_Yellow_25
       rect:
         serializedVersion: 2
-        x: 830
-        y: 461
-        width: 11
-        height: 13
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 192
+        y: 192
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 0b5304a82dec98c40800000000000000
+      spriteID: e2feb3618bc11677ab966fb76a6c8682
       internalID: 5515166622349800880
       vertices: []
       indices: 
@@ -805,19 +807,19 @@ TextureImporter:
       name: Pawn_Yellow_26
       rect:
         serializedVersion: 2
-        x: 841
-        y: 447
-        width: 90
-        height: 58
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 384
+        y: 192
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: e8a71ed6739f86180800000000000000
+      spriteID: a1e13e1e24a581e928b4b665f1ae8583
       internalID: -9121767028776928626
       vertices: []
       indices: 
@@ -827,19 +829,19 @@ TextureImporter:
       name: Pawn_Yellow_27
       rect:
         serializedVersion: 2
-        x: 1018
-        y: 439
-        width: 71
-        height: 68
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 576
+        y: 192
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 09c536323a7e276b0800000000000000
+      spriteID: 0c032b1cef8a42d9387df119dafd8ee6
       internalID: -5299919123602252656
       vertices: []
       indices: 
@@ -849,19 +851,19 @@ TextureImporter:
       name: Pawn_Yellow_28
       rect:
         serializedVersion: 2
-        x: 66
-        y: 255
-        width: 60
-        height: 62
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 768
+        y: 192
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 599db3a5f84e5f720800000000000000
+      spriteID: 086dc8e37fae75681b69b99e85926a1c
       internalID: 2879458841118628245
       vertices: []
       indices: 
@@ -871,19 +873,19 @@ TextureImporter:
       name: Pawn_Yellow_29
       rect:
         serializedVersion: 2
-        x: 257
-        y: 255
-        width: 60
-        height: 61
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 960
+        y: 192
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: a6b362dd2c3b4a390800000000000000
+      spriteID: a3fd6c997ae9ff0a79cb2e59adbaef56
       internalID: -7807918204438299798
       vertices: []
       indices: 
@@ -893,19 +895,19 @@ TextureImporter:
       name: Pawn_Yellow_30
       rect:
         serializedVersion: 2
-        x: 449
-        y: 255
-        width: 60
-        height: 60
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 0
+        y: 0
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: cf123e63b2276d2c0800000000000000
+      spriteID: 0579e6acc12283698803cb61e79ec868
       internalID: -4407209655405436420
       vertices: []
       indices: 
@@ -915,19 +917,19 @@ TextureImporter:
       name: Pawn_Yellow_31
       rect:
         serializedVersion: 2
-        x: 642
-        y: 255
-        width: 60
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 192
+        y: 0
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 68689ee24f452f520800000000000000
+      spriteID: 8ea36e83a27d99f61a692589ccb54797
       internalID: 2734341331503122054
       vertices: []
       indices: 
@@ -937,19 +939,19 @@ TextureImporter:
       name: Pawn_Yellow_32
       rect:
         serializedVersion: 2
-        x: 835
-        y: 255
-        width: 60
-        height: 60
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 384
+        y: 0
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 022b180ee396d1290800000000000000
+      spriteID: 07f1c4074d6bdc1d295d62dd18f57560
       internalID: -7918056851071978976
       vertices: []
       indices: 
@@ -959,19 +961,19 @@ TextureImporter:
       name: Pawn_Yellow_33
       rect:
         serializedVersion: 2
-        x: 1027
-        y: 255
-        width: 60
-        height: 61
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 576
+        y: 0
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 2f1f96f67bb4d77a0800000000000000
+      spriteID: 4a770f618b8173aa9a0c4514594334df
       internalID: -6377858246066441742
       vertices: []
       indices: 
@@ -981,19 +983,19 @@ TextureImporter:
       name: Pawn_Yellow_34
       rect:
         serializedVersion: 2
-        x: 64
-        y: 63
-        width: 60
-        height: 62
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 768
+        y: 0
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: ad7947c82ca005020800000000000000
+      spriteID: ec13b986db61b7a7396cbcd93aea8c97
       internalID: 2328372838046930906
       vertices: []
       indices: 
@@ -1003,108 +1005,20 @@ TextureImporter:
       name: Pawn_Yellow_35
       rect:
         serializedVersion: 2
-        x: 257
-        y: 63
-        width: 60
-        height: 62
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 960
+        y: 0
+        width: 192
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5, y: 0.34895834}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: ab3f60dc82e2c39f0800000000000000
+      spriteID: 515fc68cb5cd00a66947839a46a69b59
       internalID: -487463906889501766
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Pawn_Yellow_36
-      rect:
-        serializedVersion: 2
-        x: 450
-        y: 63
-        width: 60
-        height: 58
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 503c6f9d3e7e28ce0800000000000000
-      internalID: -1404305167985753339
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Pawn_Yellow_37
-      rect:
-        serializedVersion: 2
-        x: 644
-        y: 63
-        width: 60
-        height: 62
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 7784f35beadcaed50800000000000000
-      internalID: 6767447540326418551
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Pawn_Yellow_38
-      rect:
-        serializedVersion: 2
-        x: 835
-        y: 63
-        width: 60
-        height: 62
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 40234803c46f5b420800000000000000
-      internalID: 2645291163241951748
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Pawn_Yellow_39
-      rect:
-        serializedVersion: 2
-        x: 1026
-        y: 63
-        width: 60
-        height: 58
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 47578d7b32f03eaf0800000000000000
-      internalID: -368434098431560332
       vertices: []
       indices: 
       edges: []
@@ -1113,7 +1027,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 534e88f7ebc737ab6988a981311e2fc8
     internalID: 0
     vertices: []
     indices: 
@@ -1153,10 +1067,6 @@ TextureImporter:
       Pawn_Yellow_33: -6377858246066441742
       Pawn_Yellow_34: 2328372838046930906
       Pawn_Yellow_35: -487463906889501766
-      Pawn_Yellow_36: -1404305167985753339
-      Pawn_Yellow_37: 6767447540326418551
-      Pawn_Yellow_38: 2645291163241951748
-      Pawn_Yellow_39: -368434098431560332
       Pawn_Yellow_4: -4118437947477486848
       Pawn_Yellow_5: -7270609572154940968
       Pawn_Yellow_6: 2822699327164071804
