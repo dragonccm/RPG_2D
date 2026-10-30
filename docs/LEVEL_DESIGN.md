@@ -5,7 +5,7 @@
 > GUIDELINES thắng về **quy chuẩn kỹ thuật**.
 
 **Phiên bản:** 0.2 — 29/10/2026
-**Trạng thái:** M1–M4 đã dựng (`Scenes/Maps/`), sinh bằng `MapBuilder` từ `Editor/Maps/MapSpecs.cs`. `World.unity` cũ giữ để đối chiếu, không build. Xem mục 8 cho phần đã làm / còn thiếu.
+**Trạng thái:** M1–M4 đã dựng (`Scenes/Maps/`), sinh bằng `MapBuilder` từ `Editor/Maps/MapSpecs.cs`. Scene cũ (World, Battle, SampleScene, demo asset) đã xoá; map dựng từ scene rỗng + `Prefabs/Core`. Xem mục 8 cho phần đã làm / còn thiếu.
 
 ---
 
@@ -340,3 +340,5 @@ Tên tilemap hiện tại (`Collisin-low`, `Non-Collision-high`, `Boundiary`, `s
 
 **Kiểm tra tự động:** PlayMode `MapSmokeTests` 12/12 — nạp cả 5 map, chuyển map, cổng làng, encounter, khe vực, bầy chuột, bến đò theo flag, làng đổi ánh sáng khi q3 bắt đầu.
 **Chưa kiểm bằng tay:** cảm giác nhịp chơi từng map (thời lượng 45–60s/lộ trình, độ khó) — cần playtest.
+
+**Kiểm tra chuẩn design tự động:** `MapDesignCheck` — kích thước 36–80×28–66, đúng 1 điểm bắt đầu, có đống lửa, mọi mục tiêu tới được (giả định đủ kỹ năng), nhóm địch cách chỗ xuất hiện > bán kính kích hoạt + 2, mật độ chi tiết ≥ 12/màn hình, mọi cổng trỏ đúng map và điểm xuất hiện. Khi kiểm lần đầu đã bắt 7 lỗi thật (nhóm địch kích hoạt ngay chỗ xuất hiện ở rừng/đầm/tháp, tháp quá trống) và đã sửa.

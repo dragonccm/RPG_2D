@@ -17,7 +17,7 @@ Game 2D top-down action RPG. Một lính canh làng rời Làng Phong Nguyệt t
 
 1. Mở bằng Unity **6000.6.7f1** (URP 2D — pipeline gán tại `Assets/_Project/Settings/UniversalRP.asset`).
 2. Mở `Assets/_Project/Scenes/MainMenu.unity` → Play → **Chơi mới** (hoặc mở thẳng một map trong `Scenes/Maps/`).
-3. Build Settings: MainMenu → M1_Village → M2_Forest → M3_Marsh → M4_Tower → M5_Cave (`World.unity` là scene cũ, không build).
+3. Build Settings: MainMenu → M1_Village → M2_Forest → M3_Marsh → M4_Tower → M5_Cave (không còn scene cũ: World/Battle/SampleScene và các scene demo đã xoá).
 
 **Điều khiển:** WASD di chuyển · chuột trái hoặc J đánh (combo 3 nhịp, hướng theo chuột) · Shift Lướt Gió · Q Hư Không · giữ/thả E Hỏa Kích · F tương tác · Tab cây kỹ năng · I túi đồ.
 Mọi kỹ năng **chỉ học từ cuộn bí kíp** (hoặc quest/boss); nhân vật khởi đầu chỉ có combo chém. Cây kỹ năng chỉ cường hoá.
@@ -25,7 +25,7 @@ Mọi kỹ năng **chỉ học từ cuộn bí kíp** (hoặc quest/boss); nhân
 ## Dựng lại map
 
 Map sinh từ lưới ASCII trong `Assets/_Project/Scripts/Editor/Maps/MapSpecs.cs` (ký hiệu ở `MapSpec.cs`).
-Sửa lưới → menu **Tools/RPG/Maps/Build All Maps**, hoặc batch:
+Scene dựng từ scene rỗng + prefab lõi `Prefabs/Core` (Warrior, camera, ánh sáng, UI); `MapDesignCheck` (test `MapDesignTests`) kiểm kích thước, kết nối, khoảng cách nhóm địch, mật độ chi tiết, cổng. Sửa lưới → menu **Tools/RPG/Maps/Build All Maps**, hoặc batch:
 
 ```bash
 Unity -batchmode -quit -projectPath . -executeMethod MapBuilder.BuildAll -snapDir /tmp/maps

@@ -13,7 +13,7 @@ public static class SceneSnapshot
 {
     public static void Run()
     {
-        string scene = Arg("-snapScene", "Assets/_Project/Scenes/World.unity");
+        string scene = Arg("-snapScene", "Assets/_Project/Scenes/Maps/M1_Village.unity");
         string output = Arg("-snapOut", "snapshot.png");
         string res = Arg("-snapRes", "1600x900");
         var parts = res.Split('x');

@@ -167,7 +167,7 @@ public class UIManager : MonoBehaviour
         }
         else
         {
-            Debug.LogError("? Skill UI system incomplete! Need both SkillPanelUI and SkillDetailUI.");
+            // Bảng kỹ năng cũ (SkillPanelUI/DetailUI) không còn bắt buộc: kỹ năng quản lý bằng SkillBook + SkillTreeUI (Tab) + InventoryUI (I)
         }
 
         // Other systems
@@ -178,9 +178,6 @@ public class UIManager : MonoBehaviour
         // Warnings for missing components
         if (!healthUIValid)
             Debug.LogWarning("?? Health UI components missing! Player health/mana may not display correctly.");
-
-        if (!skillUIValid)
-            Debug.LogWarning("?? Skill UI system incomplete! Skill management will not work.");
     }
 
     /// <summary>

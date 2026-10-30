@@ -10,21 +10,18 @@ EditorBuildSettings:
     guid: 8fe5d20780e3e764dba7493240aa53dc
   - enabled: 1
     path: Assets/_Project/Scenes/Maps/M1_Village.unity
-    guid: 14e6e8bc490dcfe03a1a74e4b7d36519
+    guid: 7d215a995483013fc8a66f1679e84845
   - enabled: 1
     path: Assets/_Project/Scenes/Maps/M2_Forest.unity
-    guid: f8072cf7cc05c536e9ab17b992150ca2
+    guid: 10ed0ac43bbe626fa835ede38b93938b
   - enabled: 1
     path: Assets/_Project/Scenes/Maps/M3_Marsh.unity
-    guid: 75615652067f0254a9c8b055eb25dbeb
+    guid: a69a605acea1dd4e38d496066dd7ac5f
   - enabled: 1
     path: Assets/_Project/Scenes/Maps/M4_Tower.unity
-    guid: 8702e5b044ca3f874bbcb644b007c2f4
+    guid: f8f88278fe04472a5b97d54e274ac47c
   - enabled: 1
     path: Assets/_Project/Scenes/Maps/M5_Cave.unity
-    guid: dac2cb4238cf14b628def7ababe121f7
-  - enabled: 0
-    path: Assets/_Project/Scenes/World.unity
-    guid: 8df5b224f44dd354d868569dac9abdf1
+    guid: b11fe57b6d26bd6cba901940ef2c590e
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: 98d3202eeede8df449a7fa847da068d3, type: 2}

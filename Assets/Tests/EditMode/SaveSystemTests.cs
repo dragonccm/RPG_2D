@@ -31,7 +31,7 @@ public class SaveSystemTests
     {
         var d = new SaveSystem.SaveData
         {
-            scene = "World",
+            scene = "M1_Village",
             posX = 3.5f,
             posY = -19.95f,
             hp = 77f,
@@ -48,7 +48,7 @@ public class SaveSystemTests
         var loaded = SaveSystem.Load();
 
         Assert.IsNotNull(loaded);
-        Assert.AreEqual("World", loaded.scene);
+        Assert.AreEqual("M1_Village", loaded.scene);
         Assert.AreEqual(3.5f, loaded.posX, 0.001f);
         Assert.AreEqual(-19.95f, loaded.posY, 0.001f);
         Assert.AreEqual(77f, loaded.hp, 0.001f);

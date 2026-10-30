@@ -13,14 +13,19 @@ using UnityEngine.Tilemaps;
 /// <summary>
 /// Dựng scene map từ MapSpec (LEVEL_DESIGN 6): địa hình Tiny Swords tự ghép mép (cỏ trên cát trên nước,
 /// khối đá nhô có vách + bóng đổ), vật thể y-sort, clutter rải theo seed, cơ chế/NPC/địch theo ký hiệu,
-/// ánh sáng 2D theo vùng, hạt môi trường, NavMesh 2D. Scene gốc nhân bản từ World.unity để giữ nguyên
-/// player/camera/UI đã cấu hình.
+/// ánh sáng 2D theo vùng, hạt môi trường, NavMesh 2D. Scene dựng từ scene rỗng + prefab lõi (Prefabs/Core:
+/// player, camera, ánh sáng, UI) — không còn scene mẫu.
 /// Batch: Unity -batchmode -quit -executeMethod MapBuilder.BuildAll [-snapDir dir]
 /// </summary>
 public static class MapBuilder
 {
     public const string MapFolder = "Assets/_Project/Scenes/Maps";
-    private const string TemplateScene = "Assets/_Project/Scenes/World.unity";
+    private const string CoreFolder = "Assets/_Project/Prefabs/Core/";
+    private static readonly string[] CorePrefabs =
+    {
+        "Main Camera", "Global Light 2D", "EventSystem", "GameManager", "UIManager",
+        "UI Canvas", "UI CANVAS 1", "UI Cursor", "Warrior",
+    };
     private const string MenuScene = "Assets/_Project/Scenes/MainMenu.unity";
 
     private static readonly Dictionary<string, string> EnemyPrefabs = new Dictionary<string, string>
@@ -61,14 +66,32 @@ public static class MapBuilder
         Debug.Log("[MapBuilder] Xong: " + string.Join(", ", built));
     }
 
+    /// <summary>Nối tham chiếu giữa các prefab lõi (trước đây nằm trong scene World): GameManager → kỹ năng của Warrior.</summary>
+    private static void WireCore()
+    {
+        var skills = Object.FindAnyObjectByType<ModularSkillManager>();
+        foreach (var gm in Object.FindObjectsByType<Core.GameManager>())
+        {
+            var so = new SerializedObject(gm);
+            var p = so.FindProperty("skillManager");
+            if (p != null && skills != null) { p.objectReferenceValue = skills; so.ApplyModifiedPropertiesWithoutUndo(); }
+        }
+    }
+
     // ═════════════════════════════════════════ BUILD ═════════════════════════════════════════
     public static string Build(MapSpec spec)
     {
         string path = $"{MapFolder}/{spec.sceneName}.unity";
         AssetDatabase.DeleteAsset(path);
-        AssetDatabase.CopyAsset(TemplateScene, path);
-        var scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Single);
-        StripTemplate(scene);
+        var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+        foreach (var name in CorePrefabs)
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(CoreFolder + name + ".prefab");
+            if (prefab == null) throw new System.Exception("[MapBuilder] Thiếu prefab lõi " + name);
+            PrefabUtility.InstantiatePrefab(prefab, scene);
+        }
+        WireCore();
+        EditorSceneManager.SaveScene(scene, path);
 
         var ctx = new Ctx(spec);
         ctx.Parse();
@@ -88,21 +111,6 @@ public static class MapBuilder
         EditorSceneManager.SaveScene(scene);
         Debug.Log($"[MapBuilder] {spec.sceneName}: {spec.Width}×{spec.Height} tile, {ctx.propCount} vật thể, {ctx.clutterCount} clutter");
         return path;
-    }
-
-    private static void StripTemplate(Scene scene)
-    {
-        foreach (var root in scene.GetRootGameObjects())
-        {
-            bool isCharacter = root.GetComponentInChildren<Character>(true) != null;
-            bool keep = root.GetComponentInChildren<PlayerController>(true) != null
-                        || root.GetComponent<Camera>() != null
-                        || (root.GetComponent<Canvas>() != null && !isCharacter) // canvas UI (không phải thanh máu của quái)
-                        || root.GetComponent<UnityEngine.EventSystems.EventSystem>() != null
-                        || root.name.Contains("GameManager") || root.name.Contains("UIManager")
-                        || (root.GetComponent<Light2D>() != null && root.GetComponent<Light2D>().lightType == Light2D.LightType.Global);
-            if (!keep) Object.DestroyImmediate(root);
-        }
     }
 
     // ───────── Phân tích lưới ─────────
@@ -1131,7 +1139,6 @@ public static class MapBuilder
     {
         var scenes = new List<EditorBuildSettingsScene> { new EditorBuildSettingsScene(MenuScene, true) };
         scenes.AddRange(maps.Select(m => new EditorBuildSettingsScene(m, true)));
-        scenes.Add(new EditorBuildSettingsScene(TemplateScene, false)); // scene cũ — giữ để đối chiếu, không build
         EditorBuildSettings.scenes = scenes.ToArray();
     }
 
